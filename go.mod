@@ -23,7 +23,7 @@ require (
 	github.com/spf13/pflag v1.0.10
 	github.com/spf13/viper v1.21.0
 	github.com/stretchr/testify v1.11.1
-	github.com/testcontainers/testcontainers-go v0.41.0
+	github.com/testcontainers/testcontainers-go v0.42.0
 	github.com/tinylib/msgp v1.6.3
 	go.etcd.io/bbolt v1.4.3
 	go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp v0.67.0
@@ -77,7 +77,7 @@ require (
 	github.com/grafana/regexp v0.0.0-20250905093917-f7b3be9d1853 // indirect
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.28.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
-	github.com/klauspost/compress v1.18.4 // indirect
+	github.com/klauspost/compress v1.18.5 // indirect
 	github.com/klauspost/cpuid/v2 v2.3.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.3.0 // indirect
 	github.com/lufia/plan9stats v0.0.0-20260216142805-b3301c5f2a88 // indirect
@@ -91,12 +91,13 @@ require (
 	github.com/minio/minio-go/v7 v7.0.99 // indirect
 	github.com/moby/docker-image-spec v1.3.1 // indirect
 	github.com/moby/go-archive v0.2.0 // indirect
-	github.com/moby/patternmatcher v0.6.0 // indirect
+	github.com/moby/moby/api v1.54.1 // indirect
+	github.com/moby/moby/client v0.4.0 // indirect
+	github.com/moby/patternmatcher v0.6.1 // indirect
 	github.com/moby/sys/sequential v0.6.0 // indirect
 	github.com/moby/sys/user v0.4.0 // indirect
 	github.com/moby/sys/userns v0.1.0 // indirect
 	github.com/moby/term v0.5.2 // indirect
-	github.com/morikuni/aec v1.1.0 // indirect
 	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/munnerz/goautoneg v0.0.0-20191010083416-a7dc8b61c822 // indirect
 	github.com/natefinch/atomic v1.0.1 // indirect
@@ -104,7 +105,6 @@ require (
 	github.com/opencontainers/image-spec v1.1.1 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
 	github.com/philhofer/fwd v1.2.0 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.1-0.20181226105442-5d4384ee4fb2 // indirect
 	github.com/power-devops/perfstat v0.0.0-20240221224432-82ca36839d55 // indirect
 	github.com/prometheus/client_model v0.6.2 // indirect
@@ -119,7 +119,7 @@ require (
 	github.com/sagikazarmark/locafero v0.12.0 // indirect
 	github.com/secure-io/sio-go v0.3.1 // indirect
 	github.com/shirou/gopsutil/v3 v3.24.5 // indirect
-	github.com/shirou/gopsutil/v4 v4.26.2 // indirect
+	github.com/shirou/gopsutil/v4 v4.26.3 // indirect
 	github.com/shoenig/go-m1cpu v0.2.1 // indirect
 	github.com/sirupsen/logrus v1.9.4 // indirect
 	github.com/spf13/afero v1.15.0 // indirect
