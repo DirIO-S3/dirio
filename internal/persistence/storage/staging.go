@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 
 	"github.com/mallardduck/dirio/internal/consts"
-	dispath "github.com/mallardduck/dirio/internal/persistence/path"
+	"github.com/mallardduck/dirio/internal/persistence/path"
 )
 
 type stagingManager struct {
@@ -21,7 +21,7 @@ type stagingManager struct {
 // stageObject creates a temp file under .dirio-uploads/<bucket>/<uuid>.
 // Returns the open file and its rootFS-relative path (used for commit/abort).
 func (m *stagingManager) stageObject(bucket string) (billy.File, string, error) {
-	stagingFS, err := dispath.NewUploadStagingFS(m.rootFS, bucket)
+	stagingFS, err := path.NewUploadStagingFS(m.rootFS, bucket)
 	if err != nil {
 		return nil, "", fmt.Errorf("failed to get staging filesystem: %w", err)
 	}
@@ -55,18 +55,38 @@ func (m *stagingManager) abortObject(stagedPath string) {
 // getUploadStagingFS returns a billy.Filesystem scoped to .dirio-uploads/<bucket>.
 // Multipart operations within this FS use the uploadID as the top-level subdirectory.
 func (m *stagingManager) getUploadStagingFS(bucket string) (billy.Filesystem, error) {
-	return dispath.NewUploadStagingFS(m.rootFS, bucket)
+	return path.NewUploadStagingFS(m.rootFS, bucket)
 }
 
-// abortMultipartUpload removes all staging state for a multipart uploadID.
-func (m *stagingManager) abortMultipartUpload(bucket, uploadID string) error {
-	stagingFS, err := dispath.NewUploadStagingFS(m.rootFS, bucket)
+// cleanupMultipartUpload removes all staging state for a multipart uploadID.
+func (m *stagingManager) cleanupMultipartUpload(bucket, uploadID string) error {
+	stagingFS, err := path.NewUploadStagingFS(m.rootFS, bucket)
 	if err != nil {
 		return fmt.Errorf("failed to get staging filesystem: %w", err)
 	}
 	return util.RemoveAll(stagingFS, uploadID)
 }
 
-// cleanup is a startup stub for orphan removal.
-// TODO: sweep .dirio-uploads/ on startup to remove crash leftovers. See TODO.md.
-func (m *stagingManager) cleanup() {}
+// cleanup sweeps .dirio-uploads/ on startup and removes all orphaned staging state
+// left over from a previous crash. Called once during Storage initialization.
+func (m *stagingManager) cleanup() {
+	buckets, err := m.rootFS.ReadDir(consts.DirIOUploadsDir)
+	if err != nil {
+		return // staging root doesn't exist yet — nothing to sweep
+	}
+	for _, b := range buckets {
+		stagingPath := filepath.Join(consts.DirIOUploadsDir, b.Name())
+		entries, err := m.rootFS.ReadDir(stagingPath)
+		if err != nil {
+			continue
+		}
+		for _, e := range entries {
+			entryPath := filepath.Join(stagingPath, e.Name())
+			if err := util.RemoveAll(m.rootFS, entryPath); err != nil {
+				m.log.Warn("failed to remove orphaned staging entry", "path", entryPath, "error", err)
+			} else {
+				m.log.Info("removed orphaned staging entry", "path", entryPath)
+			}
+		}
+	}
+}
