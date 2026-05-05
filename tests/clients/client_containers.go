@@ -4,7 +4,7 @@ import (
 	"runtime"
 	"time"
 
-	"github.com/docker/docker/api/types/container"
+	"github.com/moby/moby/api/types/container"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 )
@@ -25,6 +25,12 @@ func hostGatewayHosts() []string {
 	return nil
 }
 
+func setGateways(config *container.HostConfig) {
+	if extraGateways := hostGatewayHosts(); extraGateways != nil {
+		config.ExtraHosts = append(config.ExtraHosts, extraGateways...)
+	}
+}
+
 // AwsClientContainer returns a container request for the AWS CLI client
 // with the pre-built image. The Docker image is built once and cached for reuse.
 func AwsClientContainer(envMap map[string]string) testcontainers.ContainerRequest {
@@ -36,14 +42,10 @@ func AwsClientContainer(envMap map[string]string) testcontainers.ContainerReques
 			Tag:        "aws",
 			KeepImage:  true, // Keep the image for reuse across tests
 		},
-		Env: envMap,
-		HostConfigModifier: func(config *container.HostConfig) {
-			if extraGateways := hostGatewayHosts(); extraGateways != nil {
-				config.ExtraHosts = append(config.ExtraHosts, extraGateways...)
-			}
-		},
-		Entrypoint: []string{"./awscli.sh"},
-		WaitingFor: wait.ForExit().WithExitTimeout(3 * time.Minute),
+		Env:                envMap,
+		HostConfigModifier: setGateways,
+		Entrypoint:         []string{"./awscli.sh"},
+		WaitingFor:         wait.ForExit().WithExitTimeout(3 * time.Minute),
 	}
 }
 
@@ -58,14 +60,10 @@ func MinioClientContainer(envMap map[string]string) testcontainers.ContainerRequ
 			Tag:        "mc-latest",
 			KeepImage:  true, // Keep the image for reuse across tests
 		},
-		Env: envMap,
-		HostConfigModifier: func(config *container.HostConfig) {
-			if extraGateways := hostGatewayHosts(); extraGateways != nil {
-				config.ExtraHosts = append(config.ExtraHosts, extraGateways...)
-			}
-		},
-		Cmd:        []string{"./mc.sh"},
-		WaitingFor: wait.ForExit().WithExitTimeout(3 * time.Minute),
+		Env:                envMap,
+		HostConfigModifier: setGateways,
+		Cmd:                []string{"./mc.sh"},
+		WaitingFor:         wait.ForExit().WithExitTimeout(3 * time.Minute),
 	}
 }
 
@@ -83,14 +81,10 @@ func MinioVersionedClientContainer(release string, envMap map[string]string) tes
 			BuildArgs:  map[string]*string{"MC_RELEASE": &release},
 			KeepImage:  true, // Cache per version so CI doesn't rebuild on every run
 		},
-		Env: envMap,
-		HostConfigModifier: func(config *container.HostConfig) {
-			if extraGateways := hostGatewayHosts(); extraGateways != nil {
-				config.ExtraHosts = append(config.ExtraHosts, extraGateways...)
-			}
-		},
-		Cmd:        []string{"./mc.sh"},
-		WaitingFor: wait.ForExit().WithExitTimeout(3 * time.Minute),
+		Env:                envMap,
+		HostConfigModifier: setGateways,
+		Cmd:                []string{"./mc.sh"},
+		WaitingFor:         wait.ForExit().WithExitTimeout(3 * time.Minute),
 	}
 }
 
@@ -105,13 +99,9 @@ func Boto3ClientContainer(envMap map[string]string) testcontainers.ContainerRequ
 			Tag:        "boto3",
 			KeepImage:  true, // Keep the image for reuse across tests
 		},
-		Env: envMap,
-		HostConfigModifier: func(config *container.HostConfig) {
-			if extraGateways := hostGatewayHosts(); extraGateways != nil {
-				config.ExtraHosts = append(config.ExtraHosts, extraGateways...)
-			}
-		},
-		Cmd:        []string{"-c", "python3 ./boto3cli.py"},
-		WaitingFor: wait.ForExit().WithExitTimeout(2 * time.Minute),
+		Env:                envMap,
+		HostConfigModifier: setGateways,
+		Cmd:                []string{"-c", "python3 ./boto3cli.py"},
+		WaitingFor:         wait.ForExit().WithExitTimeout(2 * time.Minute),
 	}
 }
