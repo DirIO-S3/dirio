@@ -432,12 +432,12 @@ Both single-port and dual-port modes are supported and maintained. **Dual-port i
 - ✅ **mDNS Dual-port mode** — ensure mDNS services register for both ports and services
 
 ### Docs and Enablement
-- [x] **Document deployment modes** — write `docs/DEPLOYMENT.md` covering single-port vs dual-port, when to use each, example configs for both, and mDNS/DNS routing for dual-port
-- [x] **nginx reference configs** — document `proxy_pass` examples for both modes: S3 path-routed on single port, and split-port with separate `server {}` blocks; include TLS termination, Host header preservation, and pre-signed URL considerations (in DEPLOYMENT for now)
-- [x] **Docker Compose example** — single service, dual-port exposed, bind-mounted data directory; suitable as a quickstart template (in DEPLOYMENT for now)
+- ✅ **Document deployment modes** — write `docs/DEPLOYMENT.md` covering single-port vs dual-port, when to use each, example configs for both, and mDNS/DNS routing for dual-port
+- ✅ **nginx reference configs** — document `proxy_pass` examples for both modes: S3 path-routed on single port, and split-port with separate `server {}` blocks; include TLS termination, Host header preservation, and pre-signed URL considerations (in DEPLOYMENT for now)
+- ✅ **Docker Compose example** — single service, dual-port exposed, bind-mounted data directory; suitable as a quickstart template (in DEPLOYMENT for now)
 
 ### Configuration Tooling
-- [x] **`dirio config {get|set} <config key> <value: when set>` subcommand** — update data config values without manually editing `.dirio/config.json` (e.g. `dirio config set region us-west-2`, `dirio config set compression.enabled true`); print current config via `dirio config show`
+- ✅ **`dirio config {get|set} <config key> <value: when set>` subcommand** — update data config values without manually editing `.dirio/config.json` (e.g. `dirio config set region us-west-2`, `dirio config set compression.enabled true`); print current config via `dirio config show`
 
 ## Phase 7: DirIO Client - DIO
 
@@ -453,14 +453,14 @@ Both single-port and dual-port modes are supported and maintained. **Dual-port i
 
 The `dio` ownership and simulation commands require HTTP endpoints that do not yet exist. This phase adds them to the server, independent of the console.
 
-- [x] `internal/http/api/dirio/` package — `RegisterRoutes`, `RouteHandlers`, handlers
-- [x] Wire into `server.SetupRoutes` unconditionally (not gated by `--console` or `noconsole`)
-- [x] `GET /.dirio/api/v1/buckets/{bucket}/owner` — get bucket owner
-- [x] `PUT /.dirio/api/v1/buckets/{bucket}/owner` — transfer ownership (admin only)
-- [x] `GET /.dirio/api/v1/buckets/{bucket}/objects/{key}` — get object owner
-- [x] `POST /.dirio/api/v1/simulate` — policy simulation
-- [x] `GET /.dirio/api/v1/buckets/{bucket}/permissions/{accessKey}` — effective permissions matrix
-- [x] Integration tests in `tests/dirioapi/`
+- ✅ `internal/http/api/dirio/` package — `RegisterRoutes`, `RouteHandlers`, handlers
+- ✅ Wire into `server.SetupRoutes` unconditionally (not gated by `--console` or `noconsole`)
+- ✅ `GET /.dirio/api/v1/buckets/{bucket}/owner` — get bucket owner
+- ✅ `PUT /.dirio/api/v1/buckets/{bucket}/owner` — transfer ownership (admin only)
+- ✅ `GET /.dirio/api/v1/buckets/{bucket}/objects/{key}` — get object owner
+- ✅ `POST /.dirio/api/v1/simulate` — policy simulation
+- ✅ `GET /.dirio/api/v1/buckets/{bucket}/permissions/{accessKey}` — effective permissions matrix
+- ✅ Integration tests in `tests/dirioapi/`
 
 ### Phase 7.1 — Client Foundation
 
@@ -597,6 +597,12 @@ The actual HTTP serving layer. Behavior is fundamentally different from the S3 A
 - [ ] Document the two-tier log model: Phase 5 access log (always on, lightweight) vs Phase 6 audit log (configurable, heavy)
 
 ## Phase 11: Stability and Performance Enhancements
+
+### Known Bugs / Robustness
+
+- [ ] **Crash-resistant staging cleanup** — orphaned files in `.dirio-uploads/<bucket>/` from mid-upload crashes are not currently removed. `stagingManager` has a `cleanup()` stub; wire it into `Storage.New()` (best-effort sweep on startup) or add a background goroutine with configurable interval. No age threshold needed — everything in staging is transient.
+
+- [ ] **`scopedFS.ReadDir` lazy-stat race** — billy v5.6.2's `readDir` helper uses `os.ReadDir` (lazy `DirEntry.Info()` calls). If a file is deleted between the directory scan and the `Info()` call (e.g. concurrent `DeleteObject` + `ListObjectsV2`), billy returns `ErrNotExist` which propagates as a 500. Fix: override `scopedFS.ReadDir` in `internal/persistence/path/fs.go` to use `fs.base.Open(fs.join(path))` then `f.Readdir(-1)` — same billy path scoping, but `os.File.Readdir(-1)` Lstats all entries eagerly so there is no lazy-eval window. (The temp-file variant of this race is eliminated by the upload staging service; this covers the concurrent-delete edge case.)
 
 ### Operational Validation
 - [ ] **End-to-end MinIO migration test** — export data from a real MinIO instance, import into DirIO, verify all objects, metadata, and IAM (users/policies/mappings) are intact
