@@ -14,7 +14,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/go-git/go-billy/v5/util"
 	"github.com/google/uuid"
 )
 
@@ -337,9 +336,5 @@ func (s *Service) ListParts(ctx context.Context, req *ListPartsRequest) (*ListPa
 
 // cleanupMultipartUpload removes all parts and metadataManager for a multipart upload
 func (s *Service) cleanupMultipartUpload(ctx context.Context, bucket, uploadID string) error {
-	stagingFS, err := s.diskStorage.GetUploadStagingFS(ctx, bucket)
-	if err != nil {
-		return fmt.Errorf("failed to get staging filesystem: %w", err)
-	}
-	return util.RemoveAll(stagingFS, uploadID)
+	return s.diskStorage.CleanupMultipartUpload(ctx, bucket, uploadID)
 }

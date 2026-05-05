@@ -51,14 +51,17 @@ func New(rootFS billy.Filesystem, metadataManager *metadata.Manager) (*Storage, 
 		return nil, fmt.Errorf("rootFS cannot be nil")
 	}
 
+	staging := &stagingManager{
+		rootFS: rootFS,
+		log:    logging.Component("staging"),
+	}
+	staging.cleanup()
+
 	return &Storage{
 		rootFS:          rootFS,
 		metadataManager: metadataManager,
 		log:             logging.Component("storage"),
-		staging: &stagingManager{
-			rootFS: rootFS,
-			log:    logging.Component("staging"),
-		},
+		staging:         staging,
 	}, nil
 }
 
@@ -71,6 +74,11 @@ func (s *Storage) GetBucketFS(ctx context.Context, bucket string) (billy.Filesys
 // All in-progress write state lives here, outside bucket directories.
 func (s *Storage) GetUploadStagingFS(ctx context.Context, bucket string) (billy.Filesystem, error) {
 	return s.staging.getUploadStagingFS(bucket)
+}
+
+// CleanupMultipartUpload removes all staging state for a multipart uploadID.
+func (s *Storage) CleanupMultipartUpload(ctx context.Context, bucket, uploadID string) error {
+	return s.staging.cleanupMultipartUpload(bucket, uploadID)
 }
 
 // ListBuckets returns all buckets
