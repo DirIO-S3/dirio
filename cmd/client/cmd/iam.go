@@ -11,6 +11,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/mallardduck/dirio/internal/dioclient/render"
+	"github.com/mallardduck/dirio/pkg/dioclient"
 )
 
 // --- flags ---
@@ -19,6 +20,7 @@ var (
 	flagIAMPolicyUser  string
 	flagIAMPolicyGroup string
 	flagIAMPolicyFile  string
+	flagIAMPolicyV1    bool
 )
 
 // --- command tree ---
@@ -157,6 +159,8 @@ func init() {
 
 	iamPolicyCreateCmd.Flags().StringVar(&flagIAMPolicyFile, "file", "", "path to policy JSON file (required)")
 	_ = iamPolicyCreateCmd.MarkFlagRequired("file")
+
+	iamPolicyInfoCmd.Flags().BoolVar(&flagIAMPolicyV1, "v1", false, "use the legacy V1 admin API (for older MinIO or pre-fix DirIO builds)")
 
 	iamPolicyAttachCmd.Flags().StringVar(&flagIAMPolicyUser, "user", "", "attach to this user (access key)")
 	iamPolicyAttachCmd.Flags().StringVar(&flagIAMPolicyGroup, "group", "", "attach to this group")
@@ -392,7 +396,12 @@ func runIAMPolicyInfo(cmd *cobra.Command, args []string) error {
 
 	warnIfGenericS3(cmd.Context())
 
-	info, err := ac.InfoCannedPolicy(cmd.Context(), args[0])
+	ctx := cmd.Context()
+	if flagIAMPolicyV1 {
+		ctx = dioclient.WithV1API(ctx)
+	}
+
+	info, err := ac.InfoCannedPolicy(ctx, args[0])
 	if err != nil {
 		return fmt.Errorf("iam policy info: %w", err)
 	}
