@@ -1,10 +1,7 @@
 package main
 
-import (
-	"fmt"
-)
+import "github.com/mallardduck/dirio/cmd/client/cmd"
 
 func main() {
-	fmt.Println("DirIO CLI client - Coming soon!")
-	fmt.Println("For now, use AWS CLI or other S3 clients to interact with the server")
+	cmd.Execute()
 }
