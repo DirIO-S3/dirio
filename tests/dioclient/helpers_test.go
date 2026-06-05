@@ -26,21 +26,6 @@ func newClient(t *testing.T, endpoint, accessKey, secretKey string) *dioclient.C
 	return c
 }
 
-// newClientPathStyle creates a dioclient.Client with path-style bucket addressing.
-// Required for S3 servers that don't support virtual-hosted-style DNS routing.
-func newClientPathStyle(t *testing.T, endpoint, accessKey, secretKey string) *dioclient.Client {
-	t.Helper()
-	c, err := dioclient.New(dioclient.Config{
-		Endpoint:  endpoint,
-		AccessKey: accessKey,
-		SecretKey: secretKey,
-		Region:    "us-east-1",
-		PathStyle: true,
-	})
-	require.NoError(t, err)
-	return c
-}
-
 // minioSeedClient returns a raw minio-go client for seeding test data.
 // pkg/dioclient has no write methods yet (Phase 7.2), so tests use this to create
 // buckets and objects before exercising the read-only dioclient methods.

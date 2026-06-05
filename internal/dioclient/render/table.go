@@ -45,7 +45,7 @@ func Table(w io.Writer, headers []string, rows [][]string, mode OutputMode) {
 	switch mode {
 	case ModeTUI:
 		writeTUITable(w, headers, rows, widths)
-	default:
+	case ModePlain, ModeJSON:
 		writePlainTable(w, headers, rows, widths)
 	}
 }

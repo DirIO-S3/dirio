@@ -2,6 +2,7 @@ package dioclient
 
 import (
 	"context"
+	"io"
 
 	"github.com/minio/minio-go/v7"
 )
@@ -60,4 +61,68 @@ func (c *Client) ListObjects(ctx context.Context, bucket, prefix string, recursi
 	}()
 
 	return out
+}
+
+// PutObject uploads r to bucket/key. size is the content length (-1 for unknown).
+// minio-go automatically uses multipart when size exceeds the part size (8 MiB).
+func (c *Client) PutObject(ctx context.Context, bucket, key string, r io.Reader, size int64, contentType string) error {
+	if contentType == "" {
+		contentType = "application/octet-stream"
+	}
+	_, err := c.mc.PutObject(ctx, bucket, key, r, size, minio.PutObjectOptions{
+		ContentType: contentType,
+		PartSize:    8 * 1024 * 1024,
+	})
+	return err
+}
+
+// GetObject returns a reader for the object content and its metadata.
+// The caller must close the returned ReadCloser.
+func (c *Client) GetObject(ctx context.Context, bucket, key string) (io.ReadCloser, ObjectInfo, error) {
+	obj, err := c.mc.GetObject(ctx, bucket, key, minio.GetObjectOptions{})
+	if err != nil {
+		return nil, ObjectInfo{}, err
+	}
+	stat, err := obj.Stat()
+	if err != nil {
+		obj.Close()
+		return nil, ObjectInfo{}, err
+	}
+	return obj, ObjectInfo{
+		Key:          stat.Key,
+		Size:         stat.Size,
+		LastModified: stat.LastModified,
+		ETag:         stat.ETag,
+		ContentType:  stat.ContentType,
+		StorageClass: stat.StorageClass,
+	}, nil
+}
+
+// StatObject returns metadata for bucket/key without downloading it.
+func (c *Client) StatObject(ctx context.Context, bucket, key string) (ObjectInfo, error) {
+	stat, err := c.mc.StatObject(ctx, bucket, key, minio.StatObjectOptions{})
+	if err != nil {
+		return ObjectInfo{}, err
+	}
+	return ObjectInfo{
+		Key:          stat.Key,
+		Size:         stat.Size,
+		LastModified: stat.LastModified,
+		ETag:         stat.ETag,
+		ContentType:  stat.ContentType,
+		StorageClass: stat.StorageClass,
+	}, nil
+}
+
+// RemoveObject deletes bucket/key.
+func (c *Client) RemoveObject(ctx context.Context, bucket, key string) error {
+	return c.mc.RemoveObject(ctx, bucket, key, minio.RemoveObjectOptions{})
+}
+
+// CopyObject performs a server-side copy from srcBucket/srcKey to dstBucket/dstKey.
+func (c *Client) CopyObject(ctx context.Context, srcBucket, srcKey, dstBucket, dstKey string) error {
+	src := minio.CopySrcOptions{Bucket: srcBucket, Object: srcKey}
+	dst := minio.CopyDestOptions{Bucket: dstBucket, Object: dstKey}
+	_, err := c.mc.CopyObject(ctx, dst, src)
+	return err
 }
