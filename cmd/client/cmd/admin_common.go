@@ -14,8 +14,8 @@ import (
 
 // resolveClientConfig loads the profile config and resolves clientCfg for the
 // given profileName (empty = global --profile flag or default).
-func resolveClientConfig(profileName string) (profile.Config, dioclient.Config, error) {
-	cfg, err := profile.Load()
+func resolveClientConfig(profileName string) (cfg profile.Config, clientCfg dioclient.Config, err error) {
+	cfg, err = profile.Load()
 	if err != nil {
 		return profile.Config{}, dioclient.Config{}, err
 	}
@@ -25,7 +25,7 @@ func resolveClientConfig(profileName string) (profile.Config, dioclient.Config, 
 		name = flagProfile
 	}
 
-	clientCfg := profile.Resolve(cfg, name)
+	clientCfg = profile.Resolve(cfg, name)
 	applyFlagOverrides(&clientCfg)
 	return cfg, clientCfg, nil
 }
@@ -71,7 +71,7 @@ func warnIfGenericS3(ctx context.Context) {
 func requireDirIO(ctx context.Context) error {
 	cfg, err := profile.Load()
 	if err != nil {
-		return nil // non-fatal; let the actual command fail with a meaningful error
+		return nil //nolint:nilerr // profile load failure is non-fatal here; the command will fail with a clearer error
 	}
 
 	name := flagProfile

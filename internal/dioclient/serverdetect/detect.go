@@ -48,7 +48,7 @@ func Detect(ctx context.Context, endpoint string) (ServerType, error) {
 }
 
 func probeOK(ctx context.Context, client *http.Client, rawURL string) bool {
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, rawURL, http.NoBody)
 	if err != nil {
 		return false
 	}

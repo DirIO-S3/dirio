@@ -7,10 +7,10 @@ import (
 	"sort"
 	"time"
 
+	"github.com/minio/madmin-go/v3"
 	"github.com/spf13/cobra"
 
 	"github.com/mallardduck/dirio/internal/dioclient/render"
-	"github.com/minio/madmin-go/v3"
 )
 
 // --- flags ---
@@ -348,7 +348,7 @@ func runIAMPolicyList(cmd *cobra.Command, _ []string) error {
 		for _, n := range names {
 			render.JSON(os.Stdout, os.Stderr, map[string]any{
 				"name":   n,
-				"policy": json.RawMessage(policies[n]),
+				"policy": policies[n],
 			})
 		}
 		return nil
@@ -401,7 +401,7 @@ func runIAMPolicyInfo(cmd *cobra.Command, args []string) error {
 	if mode == render.ModeJSON {
 		render.JSON(os.Stdout, os.Stderr, map[string]any{
 			"name":       info.PolicyName,
-			"policy":     json.RawMessage(info.Policy),
+			"policy":     info.Policy,
 			"created_at": info.CreateDate.Format(time.RFC3339),
 			"updated_at": info.UpdateDate.Format(time.RFC3339),
 		})
@@ -410,7 +410,7 @@ func runIAMPolicyInfo(cmd *cobra.Command, args []string) error {
 
 	// Pretty-print the policy JSON with indentation.
 	var buf []byte
-	if pretty, err := json.MarshalIndent(json.RawMessage(info.Policy), "", "  "); err == nil {
+	if pretty, err := json.MarshalIndent(info.Policy, "", "  "); err == nil {
 		buf = pretty
 	} else {
 		buf = info.Policy

@@ -121,7 +121,7 @@ func (s *ServiceAccountHTTPService) AddServiceAccount(w nethttp.ResponseWriter, 
 	}
 
 	sa, err := s.serviceAccounts.Create(r.Context(), &serviceaccount.CreateServiceAccountRequest{
-		AccessKey:   body.AccessKey, // empty = auto-generate
+		AccessKey:   body.AccessKey,
 		SecretKey:   body.SecretKey,
 		Name:        body.Name,
 		Description: body.Description,
