@@ -113,7 +113,7 @@ func (a *AdminClient) AddCannedPolicy(ctx context.Context, name string, policyJS
 func (a *AdminClient) InfoCannedPolicy(ctx context.Context, name string) (*madmin.PolicyInfo, error) {
 	// InfoCannedPolicy (V1) returns raw policy JSON bytes; DirIO does not yet
 	// implement the V2 response format that includes timestamps and PolicyName.
-	raw, err := a.mc.InfoCannedPolicy(ctx, name) //nolint:staticcheck
+	raw, err := a.mc.InfoCannedPolicy(ctx, name) //nolint:staticcheck // InfoCannedPolicyV2 not yet supported by DirIO
 	if err != nil {
 		return nil, err
 	}

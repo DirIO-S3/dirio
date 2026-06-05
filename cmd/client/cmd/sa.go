@@ -6,11 +6,11 @@ import (
 	"os"
 	"time"
 
+	"github.com/minio/madmin-go/v3"
 	"github.com/spf13/cobra"
 
 	"github.com/mallardduck/dirio/internal/dioclient/render"
 	"github.com/mallardduck/dirio/pkg/dioclient"
-	"github.com/minio/madmin-go/v3"
 )
 
 // --- flags ---
