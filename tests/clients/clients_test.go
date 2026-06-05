@@ -313,9 +313,8 @@ func registerServer(server *TestServer) {
 
 // parseTestOutput extracts JSON from log output and parses it
 func parseTestOutput(logOutput string) (*TestOutput, error) {
-	// Find JSON output (starts with { and ends with })
-	// The logs will contain human-readable output followed by JSON
-	startIdx := strings.LastIndex(logOutput, "\n{")
+	// Use Index (first occurrence) to land on the outer { not a nested result entry.
+	startIdx := strings.Index(logOutput, "\n{")
 	if startIdx == -1 {
 		startIdx = strings.Index(logOutput, "{")
 	}
@@ -323,11 +322,8 @@ func parseTestOutput(logOutput string) (*TestOutput, error) {
 		return nil, fmt.Errorf("no JSON output found in logs")
 	}
 
-	jsonStr := logOutput[startIdx:]
-	jsonStr = strings.TrimSpace(jsonStr)
-
 	var output TestOutput
-	if err := json.Unmarshal([]byte(jsonStr), &output); err != nil {
+	if err := json.NewDecoder(strings.NewReader(logOutput[startIdx:])).Decode(&output); err != nil {
 		return nil, fmt.Errorf("failed to parse JSON output: %w", err)
 	}
 
@@ -625,8 +621,6 @@ func TestMCAdmin(t *testing.T) {
 	}
 
 	if state.ExitCode != 0 {
-		t.Skipf("mc-admin: Failed - For now MinIO mc Admin commands are expected to fail")
-		// TODO eventually we can fix more of the admin code and then uncomment this
-		// t.Errorf("mc admin tests failed with exit code %d", state.ExitCode)
+		t.Errorf("mc admin tests failed with exit code %d", state.ExitCode)
 	}
 }
