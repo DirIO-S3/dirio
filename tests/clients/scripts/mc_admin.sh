@@ -133,7 +133,15 @@ EOF
 }
 
 test_admin_policy_list() {
-    mc admin policy list ${MC_ALIAS} 2>/dev/null | grep -q "${TEST_POLICY}"
+    local raw_output
+    raw_output=$(mc admin policy list ${MC_ALIAS} 2>&1) || {
+        echo "mc admin policy list failed. Output was: ${raw_output}" >&2
+        return 1
+    }
+    echo "${raw_output}" | grep -q "${TEST_POLICY}" || {
+        echo "Policy ${TEST_POLICY} not found. mc output was: ${raw_output}" >&2
+        return 1
+    }
 }
 
 test_admin_policy_info() {
