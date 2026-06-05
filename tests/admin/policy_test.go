@@ -75,8 +75,8 @@ func TestCreatePolicy_InvalidDocument(t *testing.T) {
 	assert.Equal(t, http.StatusBadRequest, resp.StatusCode)
 }
 
-// TestGetPolicyInfo_Success creates a policy and reads it back
-func TestGetPolicyInfo_Success(t *testing.T) {
+// TestGetPolicyInfo_V1_Success creates a policy and reads it back using the default V1 format (raw IAM doc)
+func TestGetPolicyInfo_V1_Success(t *testing.T) {
 	ts := NewTestServer(t)
 
 	body := samplePolicyDocument("my-bucket")
@@ -89,7 +89,25 @@ func TestGetPolicyInfo_Success(t *testing.T) {
 
 	var policy map[string]any
 	DecodeJSON(t, resp2, &policy)
-	assert.Equal(t, "info-policy", policy["name"])
+	assert.Equal(t, "2012-10-17", policy["Version"])
+}
+
+// TestGetPolicyInfo_V2_Success creates a policy and reads it back using the V2 format (name + doc + timestamps)
+func TestGetPolicyInfo_V2_Success(t *testing.T) {
+	ts := NewTestServer(t)
+
+	body := samplePolicyDocument("my-bucket")
+	resp := ts.AdminRequest(t, http.MethodPut, "/add-canned-policy?name=info-policy", body)
+	DrainAndClose(resp)
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+
+	resp2 := ts.AdminRequest(t, http.MethodGet, "/info-canned-policy?name=info-policy&v=2", nil)
+	require.Equal(t, http.StatusOK, resp2.StatusCode)
+
+	var policy map[string]any
+	DecodeJSON(t, resp2, &policy)
+	assert.Equal(t, "info-policy", policy["PolicyName"])
+	assert.NotEmpty(t, policy["Policy"])
 }
 
 // TestGetPolicyInfo_NotFound returns 404 for an unknown policy

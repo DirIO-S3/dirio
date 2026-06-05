@@ -112,17 +112,39 @@ func (s *GroupHTTPService) UpdateGroupMembers(w nethttp.ResponseWriter, r *netht
 
 	ctx := r.Context()
 
+	var ok bool
 	if body.IsRemove {
-		if !s.removeGroupMembers(w, ctx, body.Group, body.Members) {
-			return
-		}
+		ok = s.handleRemove(w, ctx, body.Group, body.Members)
 	} else {
-		if !s.ensureGroupAndAddMembers(w, ctx, body.Group, body.Members) {
-			return
-		}
+		ok = s.ensureGroupAndAddMembers(w, ctx, body.Group, body.Members)
 	}
+	if ok {
+		w.WriteHeader(nethttp.StatusOK)
+	}
+}
 
-	w.WriteHeader(nethttp.StatusOK)
+// handleRemove dispatches a remove request: deletes the group when members is
+// empty, otherwise removes the listed members from it.
+func (s *GroupHTTPService) handleRemove(w nethttp.ResponseWriter, ctx context.Context, groupName string, members []string) bool {
+	if len(members) == 0 {
+		// Empty member list means "delete the group entirely".
+		return s.deleteGroup(w, ctx, groupName)
+	}
+	return s.removeGroupMembers(w, ctx, groupName, members)
+}
+
+// deleteGroup deletes the named group. Writes an HTTP error and returns false on failure.
+func (s *GroupHTTPService) deleteGroup(w nethttp.ResponseWriter, ctx context.Context, groupName string) bool {
+	if err := s.groups.Delete(ctx, groupName); err != nil {
+		s.log.Error("Failed to delete group", "error", err, "group", groupName)
+		if svcerrors.IsNotFound(err) {
+			w.WriteHeader(nethttp.StatusNotFound)
+			return false
+		}
+		w.WriteHeader(nethttp.StatusInternalServerError)
+		return false
+	}
+	return true
 }
 
 // removeGroupMembers removes each member from the group by access key.

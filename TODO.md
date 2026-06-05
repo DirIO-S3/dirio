@@ -462,34 +462,38 @@ The `dio` ownership and simulation commands require HTTP endpoints that do not y
 - ✅ `GET /.dirio/api/v1/buckets/{bucket}/permissions/{accessKey}` — effective permissions matrix
 - ✅ Integration tests in `tests/dirioapi/`
 
-### Phase 7.1 — Client Foundation
+### Phase 7.1 — Client Foundation ✅ COMPLETE
 
-- [ ] `cmd/client/main.go` wired to cobra root
-- [ ] `internal/dioclient/profile/` — load/save `~/.dirio/client.yaml`, profile selection, env var override; path parser (`[profile/]bucket[/key]`)
-- [ ] `internal/dioclient/render/` — TTY detection, output mode (TUI/plain/JSON), table + JSON renderers
-- [ ] `dio config init` — interactive `huh` form; writes `~/.dirio/client.yaml`
-- [ ] `dio config show` / `dio config profiles`
-- [ ] `dio ls [[profile/]bucket[/prefix]]` — bucket list and object list with TUI table
-- [ ] Respect `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / `AWS_ENDPOINT_URL` env vars
+- ✅ `cmd/client/main.go` wired to cobra root
+- ✅ `pkg/dioclient/` — importable client library (`Client`, `ListBuckets`, `ListObjects`; wraps minio-go/v7; no internal/ deps)
+- ✅ `internal/dioclient/profile/` — load/save `~/.dirio/client.yaml`, profile selection, env var override; path parser (`[profile/]bucket[/key]`)
+- ✅ `internal/dioclient/render/` — TTY detection, output mode (TUI/plain/JSON), table + JSON renderers
+- ✅ `dio config init` — interactive `huh` form; writes `~/.dirio/client.yaml`
+- ✅ `dio config show` / `dio config profiles`
+- ✅ `dio ls [[profile/]bucket[/prefix]]` — bucket list and object list with TUI table
+- ✅ Respect `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / `AWS_ENDPOINT_URL` env vars
 
-### Phase 7.2 — S3 Operations
+### Phase 7.2 — S3 Operations ✅ COMPLETE
 
-- [ ] `dio cp <src> <dst>` — upload/download/server-side copy; multipart above 8 MB; progress bar
-- [ ] `dio sync <src> <dst>` — sync local directory to/from bucket; `--delete`; `--dry-run`
+- ✅ `dio cp <src> <dst>` — upload/download/server-side copy; multipart above 8 MB; progress bar
+- ✅ `dio sync <src> <dst>` — sync local directory to/from bucket; `--delete`; `--dry-run`
 
-### Phase 7.3 — DirIO-Specific (requires Phase 7.0)
+### Phase 7.3 — DirIO-Specific (requires Phase 7.0) ✅ COMPLETE
 
-- [ ] `internal/dioclient/dirioapi/` — HTTP client wrapper for `/.dirio/api/v1/`
-- [ ] `dio ownership get [profile/]bucket[/object]` — calls `GET /.dirio/api/v1/buckets/{bucket}/owner`
-- [ ] `dio ownership transfer [profile/]bucket <user>` — calls `PUT /.dirio/api/v1/buckets/{bucket}/owner`
-- [ ] `dio simulate <user> [profile/]bucket <action>` — calls `POST /.dirio/api/v1/simulate`
-- [ ] `dio simulate --all-actions` — calls `GET /.dirio/api/v1/buckets/{bucket}/permissions/{accessKey}`
+- ✅ `pkg/dioclient/dirio.go` — `DirioClient` wrapping `/.dirio/api/v1/` with SigV4 auth (ownership, simulate, permissions)
+- ✅ `dio ownership get [profile/]bucket[/object]` — calls `GET /.dirio/api/v1/buckets/{bucket}/owner` (or object variant)
+- ✅ `dio ownership transfer [profile/]bucket <user>` — calls `PUT /.dirio/api/v1/buckets/{bucket}/owner`
+- ✅ `dio simulate <action> [profile/]bucket[/key]` — calls `POST /.dirio/api/v1/simulate`
+- ✅ `dio simulate --all-actions [profile/]bucket` — calls `GET /.dirio/api/v1/buckets/{bucket}/permissions/{accessKey}`
+- ✅ Integration tests: `tests/dioclient/dirioapi_test.go` (10 tests pass against in-process DirIO server)
 
-### Phase 7.4 — IAM & Service Accounts
+### Phase 7.4 — IAM & Service Accounts ✅ COMPLETE
 
-- [ ] `dio sa create/list/info/update/rm` — calls `/minio/admin/v3/` service account endpoints
-- [ ] `dio iam user create/list/info/delete/enable/disable`
-- [ ] `dio iam policy create/list/info/delete/attach/detach`
+- ✅ `dio sa create/list/info/update/rm` — calls `/minio/admin/v3/` service account endpoints
+- ✅ `dio iam user create/list/info/delete/enable/disable`
+- ✅ `dio iam policy create/list/info/delete/attach/detach`
+- ✅ Server-side admin API compatibility verified via TestMCAdmin (25/25 mc tests pass against DirIO)
+- ✅ Client-side integration tests: `tests/dioclient/admin_test.go` (20 tests pass against in-process DirIO server)
 
 ## Phase 8: Web Console — Extended Features
 
