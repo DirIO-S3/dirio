@@ -10,6 +10,16 @@ import (
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
+type ctxKey int
+
+const ctxUseV1API ctxKey = iota
+
+// WithV1API returns a context that tells InfoCannedPolicy to use the legacy V1 API
+// instead of V2. Pass this when connecting to older MinIO or pre-fix DirIO builds.
+func WithV1API(ctx context.Context) context.Context {
+	return context.WithValue(ctx, ctxUseV1API, true)
+}
+
 // AdminClient is a connected DirIO/MinIO admin client. It is safe for concurrent use.
 type AdminClient struct {
 	mc *madmin.AdminClient
@@ -108,19 +118,17 @@ func (a *AdminClient) AddCannedPolicy(ctx context.Context, name string, policyJS
 }
 
 // InfoCannedPolicy returns metadata and raw JSON for a named policy.
-// DirIO's endpoint returns only the raw policy document, so PolicyName is
-// populated from the input argument and timestamps are left at zero.
+// By default it uses the V2 API (includes timestamps and PolicyName).
+// Wrap ctx with WithV1API to use the legacy V1 API instead (for older servers).
 func (a *AdminClient) InfoCannedPolicy(ctx context.Context, name string) (*madmin.PolicyInfo, error) {
-	// InfoCannedPolicy (V1) returns raw policy JSON bytes; DirIO does not yet
-	// implement the V2 response format that includes timestamps and PolicyName.
-	raw, err := a.mc.InfoCannedPolicy(ctx, name) //nolint:staticcheck // InfoCannedPolicyV2 not yet supported by DirIO
-	if err != nil {
-		return nil, err
+	if ctx.Value(ctxUseV1API) == true {
+		raw, err := a.mc.InfoCannedPolicy(ctx, name) //nolint:staticcheck // deprecated V1 API used intentionally for legacy server compatibility
+		if err != nil {
+			return nil, err
+		}
+		return &madmin.PolicyInfo{PolicyName: name, Policy: json.RawMessage(raw)}, nil
 	}
-	return &madmin.PolicyInfo{
-		PolicyName: name,
-		Policy:     json.RawMessage(raw),
-	}, nil
+	return a.mc.InfoCannedPolicyV2(ctx, name)
 }
 
 // DeleteCannedPolicy removes a named IAM policy.
