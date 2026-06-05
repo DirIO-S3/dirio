@@ -59,9 +59,9 @@ tasks:
   # ── Tests ──────────────────────────────────────────────────────────────────
 
   test:
-    desc: Run all tests (except client tests which require Docker)
+    desc: Run all tests (except tests that require Docker)
     cmds:
-      - go test -v -race ./... -skip "TestAWSCLI|TestBoto3|TestMinIOMC|TestMCAdmin|TestSanityCheck"
+      - go test -v -race ./... -skip "TestAWSCLI|TestBoto3|TestMinIOMC|TestMCAdmin|TestSanityCheck|S3Mock"
 
   test-unit:
     desc: Run unit tests only (excludes integration and client tests)
@@ -71,7 +71,17 @@ tasks:
   test-integration:
     desc: Run integration tests only
     cmds:
-      - go test -v -race ./tests/integration/...
+      - go test -v -race ./tests/integration/... ./tests/dioclient/... -run "DirIO"
+
+  test-dioclient:
+    desc: Run DIO client library tests against in-process DirIO (no Docker)
+    cmds:
+      - go test -v -race ./tests/dioclient/... -run "DirIO"
+
+  test-dioclient-s3mock:
+    desc: Run DIO client S3 compatibility tests against Floci (requires Docker)
+    cmds:
+      - go test -v ./tests/dioclient/... -run "S3Mock"
 
   test-admin:
     desc: Run admin API tests only
