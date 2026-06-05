@@ -309,9 +309,6 @@ printf "\n\n"
 # Output JSON results
 finalize_test_runner
 
-echo "End: MCAdmin"
-printf "\n\n"
-
 if [ $TEST_FAILED -gt 0 ]; then
     exit 1
 else
