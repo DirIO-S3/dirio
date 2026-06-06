@@ -16,11 +16,19 @@ import (
 // expiry must be between 1 second and 7 days (604800 seconds); region should match
 // the server's configured region (defaults to "us-east-1").
 func GeneratePresignedGetURL(accessKey, secretKey, region, bucket, key, baseURL string, expiry time.Duration) (string, error) {
-	return generatePresignedGetURL(accessKey, secretKey, region, bucket, key, baseURL, expiry, time.Now().UTC())
+	return GeneratePresignedURL(accessKey, secretKey, region, bucket, key, baseURL, http.MethodGet, expiry)
 }
 
-// generatePresignedGetURL is the inner implementation with an injectable timestamp for testing.
-func generatePresignedGetURL(accessKey, secretKey, region, bucket, key, baseURL string, expiry time.Duration, now time.Time) (string, error) {
+// GeneratePresignedURL builds a pre-signed S3 URL for the given object and HTTP method
+// using AWS Signature Version 4 query-string authentication.
+//
+// expiry must be between 1 second and 7 days (604800 seconds).
+func GeneratePresignedURL(accessKey, secretKey, region, bucket, key, baseURL, method string, expiry time.Duration) (string, error) {
+	return generatePresignedURL(accessKey, secretKey, region, bucket, key, baseURL, method, expiry, time.Now().UTC())
+}
+
+// generatePresignedURL is the inner implementation with an injectable timestamp for testing.
+func generatePresignedURL(accessKey, secretKey, region, bucket, key, baseURL, method string, expiry time.Duration, now time.Time) (string, error) {
 	expirySeconds := int(expiry.Seconds())
 	if expirySeconds < 1 || expirySeconds > 604800 {
 		return "", ErrInvalidExpiresValue
@@ -48,7 +56,7 @@ func generatePresignedGetURL(accessKey, secretKey, region, bucket, key, baseURL 
 	// Build a synthetic request so we can reuse the canonical-request builder.
 	// Host is set explicitly because Go's net/http does not put it in Header.
 	syntheticReq := &http.Request{
-		Method: http.MethodGet,
+		Method: method,
 		URL: &url.URL{
 			Scheme:   u.Scheme,
 			Host:     u.Host,

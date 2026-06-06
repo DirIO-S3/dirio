@@ -42,8 +42,8 @@ type API interface {
 	GetGroup(ctx context.Context, name string) (*Group, error)
 	CreateGroup(ctx context.Context, req CreateGroupRequest) (*Group, error)
 	DeleteGroup(ctx context.Context, name string) error
-	AddGroupMember(ctx context.Context, groupName, userUID string) error
-	RemoveGroupMember(ctx context.Context, groupName, userUID string) error
+	AddGroupMember(ctx context.Context, groupName, userAccessKey string) error
+	RemoveGroupMember(ctx context.Context, groupName, userUUID string) error
 	AttachGroupPolicy(ctx context.Context, groupName, policyName string) error
 	DetachGroupPolicy(ctx context.Context, groupName, policyName string) error
 	SetGroupStatus(ctx context.Context, groupName string, enabled bool) error
@@ -58,6 +58,8 @@ type API interface {
 	SetServiceAccountStatus(ctx context.Context, uuid string, enabled bool) error
 
 	// Buckets
+	CreateBucket(ctx context.Context, name, ownerAccessKey string) error
+	DeleteBucket(ctx context.Context, name string) error
 	ListBuckets(ctx context.Context) ([]*Bucket, error)
 	GetBucket(ctx context.Context, bucket string) (*Bucket, error)
 	GetBucketPolicy(ctx context.Context, bucket string) (string, error) // raw JSON
@@ -92,6 +94,7 @@ type User struct {
 	Status           string    `json:"status"` // "on" or "off"
 	AttachedPolicies []string  `json:"attachedPolicies"`
 	UpdatedAt        time.Time `json:"updatedAt"`
+	SecretKey        string    `json:"secretKey,omitempty"` // only populated when auto-generated on create
 }
 
 // Policy represents an IAM policy as seen by the console.
@@ -120,13 +123,15 @@ type Owner struct {
 
 // CreateUserRequest is the input for CreateUser.
 type CreateUserRequest struct {
-	AccessKey string `json:"accessKey"`
-	SecretKey string `json:"secretKey"`
+	AccessKey      string `json:"accessKey"`
+	SecretKey      string `json:"secretKey"`
+	GenerateSecret bool   `json:"generateSecret"` // if true, SecretKey is ignored and one is generated
 }
 
 // UpdateUserRequest is the input for updating a user.
 type UpdateUserRequest struct {
-	SecretKey *string `json:"secretKey,omitempty"`
+	SecretKey      *string `json:"secretKey,omitempty"`
+	GenerateSecret bool    `json:"generateSecret"`
 }
 
 // CreatePolicyRequest is the input for CreatePolicy.
@@ -216,6 +221,7 @@ type GeneratePresignedURLRequest struct {
 	Key       string        `json:"key"`
 	Expiry    time.Duration `json:"expiry"`
 	BaseURL   string        `json:"baseURL"`
+	Method    string        `json:"method"` // HTTP method, e.g. "GET" or "PUT"; defaults to "GET"
 }
 
 // EffectivePermissions shows the evaluated access for a user on a bucket.
