@@ -19,6 +19,10 @@ func GeneratePresignedGetURL(accessKey, secretKey, region, bucket, key, baseURL 
 	return GeneratePresignedURL(accessKey, secretKey, region, bucket, key, baseURL, http.MethodGet, expiry)
 }
 
+func generatePresignedGetURL(accessKey, secretKey, region, bucket, key, baseURL string, expiry time.Duration, now time.Time) (string, error) {
+	return generatePresignedURL(accessKey, secretKey, region, bucket, key, baseURL, http.MethodGet, expiry, now)
+}
+
 // GeneratePresignedURL builds a pre-signed S3 URL for the given object and HTTP method
 // using AWS Signature Version 4 query-string authentication.
 //
