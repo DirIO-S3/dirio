@@ -2,8 +2,6 @@ package ui
 
 import (
 	"fmt"
-
-	"github.com/mallardduck/dirio/consoleapi"
 )
 
 // CurrentOwnerAccessKey returns the access key of the current bucket owner,
@@ -13,18 +11,6 @@ func (d BucketDetailData) CurrentOwnerAccessKey() string {
 		return d.Owner.AccessKey
 	}
 	return ""
-}
-
-// nonAdminUsers returns only the non-admin entries from a user slice.
-// Used by templates that need to filter the system admin account.
-func nonAdminUsers(users []*consoleapi.User) []*consoleapi.User {
-	out := make([]*consoleapi.User, 0, len(users))
-	for _, u := range users {
-		if u.UUID != consoleapi.AdminUserUUID {
-			out = append(out, u)
-		}
-	}
-	return out
 }
 
 // formatBytes formats a byte count as a human-readable string (e.g. "1.4 MB").
