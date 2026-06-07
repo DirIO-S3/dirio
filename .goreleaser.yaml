@@ -7,6 +7,8 @@ project_name: dirio
 
 before:
   hooks:
+    # Sync workspace before anything else so all go.work.sum entries are current.
+    - go work sync
     - go mod tidy
     # Install templ CLI pinned to the version in go.mod.
     - go install github.com/a-h/templ/cmd/templ@v0.3.1020

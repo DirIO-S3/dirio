@@ -14,7 +14,7 @@ import (
 
 	"github.com/mallardduck/dirio/console/auth"
 	"github.com/mallardduck/dirio/console/ui"
-	"github.com/mallardduck/dirio/consoleapi"
+	"github.com/mallardduck/dirio/api"
 )
 
 // Handler holds the console API reference used by all handler methods.

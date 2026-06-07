@@ -24,7 +24,7 @@ import (
 	"github.com/mallardduck/dirio/console/handlers"
 	"github.com/mallardduck/dirio/console/middleware"
 	"github.com/mallardduck/dirio/console/ui"
-	"github.com/mallardduck/dirio/consoleapi"
+	"github.com/mallardduck/dirio/api"
 )
 
 //go:embed static

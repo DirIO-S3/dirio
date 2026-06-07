@@ -11,7 +11,7 @@ import (
 
 	svcerrors "github.com/mallardduck/dirio/internal/service/errors"
 	"github.com/mallardduck/dirio/internal/service/group"
-	iamPkg "github.com/mallardduck/dirio/pkg/iam"
+	iamPkg "github.com/mallardduck/dirio/sdk/iam"
 )
 
 type GroupHTTPService struct {

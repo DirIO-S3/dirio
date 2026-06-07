@@ -1,14 +1,14 @@
 package iam
 
-import (
-	"github.com/mallardduck/dirio/internal/consts"
-)
+import "github.com/google/uuid"
+
+// AdminUUIDString is the canonical string form of the admin account UUID.
+// Must match internal/consts.AdminUUIDString and api.AdminUserUUID.
+const AdminUUIDString = "badfc0de-fadd-fc0f-fee0-000dadbeef00"
 
 // AdminUserUUID is the stable UUID for all admin/root credentials.
 // This UUID is shared by both the CLI admin and data config admin accounts,
 // ensuring consistent ownership tracking even when access keys are rotated.
 //
 // "BAD CODE ADD COFFEE DADBEEF" - because admin needs coffee
-//
-// Note: This re-exports consts.AdminUUID for package-level access.
-var AdminUserUUID = consts.AdminUUID
+var AdminUserUUID = uuid.MustParse(AdminUUIDString)

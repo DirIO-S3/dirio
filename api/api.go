@@ -1,6 +1,9 @@
 // Package consoleapi defines the interface contract between the DirIO web console
 // and the DirIO server. This package is the only coupling point: the console/
 // package imports only this package, never internal/.
+//
+// Module path: github.com/mallardduck/dirio/api
+// Package name stays consoleapi so all callers keep using consoleapi.Foo unchanged.
 package consoleapi
 
 import (

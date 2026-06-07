@@ -17,7 +17,7 @@ import (
 	"github.com/mallardduck/dirio/internal/service/group"
 	"github.com/mallardduck/dirio/internal/service/policy"
 	"github.com/mallardduck/dirio/internal/service/user"
-	"github.com/mallardduck/dirio/pkg/iam"
+	"github.com/mallardduck/dirio/sdk/iam"
 )
 
 // policyInfoV2 matches the madmin PolicyInfo wire format for ?v=2 responses.
