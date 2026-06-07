@@ -1,6 +1,6 @@
 # DirIO Development Roadmap
 
-Current status: **Phase 8 complete (except 8.1)** — Phases 1–8 done (8.1 Audit Log Viewer deferred); next up is Phase 8.1 or Phase 9.
+Current status: **Phases 1–8 complete** — next up is Phase 9.
 
 > 📋 Completed work log: [docs/CHANGELOG.md](docs/CHANGELOG.md)
 
@@ -495,7 +495,7 @@ The `dio` ownership and simulation commands require HTTP endpoints that do not y
 - ✅ Server-side admin API compatibility verified via TestMCAdmin (25/25 mc tests pass against DirIO)
 - ✅ Client-side integration tests: `tests/dioclient/admin_test.go` (20 tests pass against in-process DirIO server)
 
-## Phase 8: Web Console — Extended Features ✅ (except 8.1)
+## Phase 8: Web Console — Extended Features ✅
 
 **Foundation built in Phase 4.3 (auth, IAM views, policy editor, simulator, ownership management). This phase covers the S3 data plane UI and IAM management forms — making DirIO fully operable without a terminal for day-to-day tasks.**
 
@@ -519,11 +519,6 @@ The `dio` ownership and simulation commands require HTTP endpoints that do not y
 - ✅ **Transfer bucket to admin** — ownership transfer supports clearing owner (UserSelect with empty label)
 - ✅ **User delete cleanup** — deleting a user removes them from all group memberships via `GetGroupNamesForUser` index
 - ✅ **Orphaned member removal** — remove form uses raw UUID so deleted users can still be removed from groups
-
-### Phase 8.1: Audit Log Viewer
-- [ ] Filterable log stream in console — filter by user, bucket, action, allow/deny, time range
-  - Depends on a queryable audit log source for console — may require rebuilding audit log feature and logging.
-- [ ] Export filtered log to CSV/JSON
 
 ## Phase 9: Ensure vHost and Path-style buckets are both supported correctly (Plus Website buckets)
 
@@ -607,8 +602,12 @@ The actual HTTP serving layer. Behavior is fundamentally different from the S3 A
 - [ ] `audit.output` config key (stdout / file path / HTTP endpoint)
 - [ ] `audit.max_body_bytes` — cap body capture size (default 4KB)
 
+### Console UI
+- [ ] Filterable log stream in console — filter by user, bucket, action, allow/deny, time range
+- [ ] Export filtered log to CSV/JSON
+
 ### Observability
-- [ ] Document the two-tier log model: Phase 5 access log (always on, lightweight) vs Phase 6 audit log (configurable, heavy)
+- [ ] Document the two-tier log model: Phase 5 access log (always on, lightweight) vs Phase 10 audit log (configurable, heavy)
 
 ## Phase 11: Stability and Performance Enhancements
 
