@@ -15,7 +15,7 @@ import (
 	"github.com/mallardduck/dirio/internal/http/auth"
 	svcerrors "github.com/mallardduck/dirio/internal/service/errors"
 	"github.com/mallardduck/dirio/internal/service/serviceaccount"
-	iamPkg "github.com/mallardduck/dirio/pkg/iam"
+	iamPkg "github.com/mallardduck/dirio/sdk/iam"
 )
 
 type ServiceAccountHTTPService struct {

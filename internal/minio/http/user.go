@@ -18,7 +18,7 @@ import (
 	svcerrors "github.com/mallardduck/dirio/internal/service/errors"
 	"github.com/mallardduck/dirio/internal/service/policy"
 	"github.com/mallardduck/dirio/internal/service/user"
-	iamPkg "github.com/mallardduck/dirio/pkg/iam"
+	iamPkg "github.com/mallardduck/dirio/sdk/iam"
 )
 
 type UserHTTPService struct {

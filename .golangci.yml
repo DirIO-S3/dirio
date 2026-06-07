@@ -47,7 +47,7 @@ linters:
             - "**/console/**/*.go"
           deny:
             - pkg: "github.com/mallardduck/dirio/internal"
-              desc: "console/ must not import internal/ — use consoleapi/ interface only"
+              desc: "console/ must not import internal/ — use dirio/api interface only"
         metadata-only-via-service:
           # Deny direct metadata imports in handler/adapter/CLI layers.
           # Intentionally NOT listed here (i.e. allowed to import metadata directly):
@@ -61,13 +61,53 @@ linters:
             - "**/internal/http/api/**/*.go"
             - "**/internal/minio/**/*.go"
             - "**/console/**/*.go"
-            - "**/consoleapi/**/*.go"
+            - "**/api/**/*.go"
             - "**/cmd/**/*.go"
-            - "**/pkg/**/*.go"
+            - "**/sdk/**/*.go"
             - "**/tests/**/*.go"
           deny:
             - pkg: "github.com/mallardduck/dirio/internal/persistence/metadata"
               desc: "import metadata only via the service layer (ServicesFactory); HTTP handlers and console adapters must not access metadata directly"
+        api-no-minio:
+          files:
+            - "**/api/**/*.go"
+          deny:
+            - pkg: "github.com/minio/minio-go"
+              desc: "dirio/api is a neutral contract module — no MinIO types allowed"
+            - pkg: "github.com/minio/madmin-go"
+              desc: "dirio/api is a neutral contract module — no MinIO types allowed"
+        console-no-minio:
+          files:
+            - "**/console/**/*.go"
+          deny:
+            - pkg: "github.com/minio/minio-go"
+              desc: "console/ has no MinIO deps — use dirio/api interface"
+            - pkg: "github.com/minio/madmin-go"
+              desc: "console/ has no MinIO deps — use dirio/api interface"
+        sdk-madmin-quarantine:
+          # madmin-go is allowed anywhere within sdk/dioclient/ for now.
+          # Future: tighten to sdk/dioclient/compat/minio/ only once native types are added.
+          files:
+            - "**/sdk/**/*.go"
+            - "!**/sdk/dioclient/**/*.go"
+          deny:
+            - pkg: "github.com/minio/madmin-go"
+              desc: "madmin-go must stay within sdk/dioclient/ — eventually migrate to compat/minio/"
+        server-no-stray-minio:
+          # internal/ may only use MinIO libs in the explicit compat zones:
+          #   internal/minio/    — MinIO admin API wire protocol + data import
+          #   internal/jsonutil/ — madmin encrypt/decrypt for wire compat
+          #   internal/testutil/ — test helpers that construct madmin-encrypted payloads
+          files:
+            - "**/internal/**/*.go"
+            - "!**/internal/minio/**"
+            - "!**/internal/jsonutil/**"
+            - "!**/internal/testutil/**"
+          deny:
+            - pkg: "github.com/minio/minio-go"
+              desc: "minio-go outside compat zone — use sdk/dioclient for S3 client ops"
+            - pkg: "github.com/minio/madmin-go"
+              desc: "madmin-go outside compat zone — wire protocol only in internal/minio/, internal/jsonutil/, and internal/testutil/"
     errcheck:
       check-type-assertions: false
       check-blank: false

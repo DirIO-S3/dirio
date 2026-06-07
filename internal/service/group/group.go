@@ -8,7 +8,7 @@ import (
 
 	"github.com/mallardduck/dirio/internal/persistence/metadata"
 	svcerrors "github.com/mallardduck/dirio/internal/service/errors"
-	"github.com/mallardduck/dirio/pkg/iam"
+	"github.com/mallardduck/dirio/sdk/iam"
 )
 
 // Service provides group management operations

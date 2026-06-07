@@ -3,7 +3,7 @@ package profile
 import (
 	"os"
 
-	"github.com/mallardduck/dirio/pkg/dioclient"
+	"github.com/mallardduck/dirio/sdk/dioclient"
 )
 
 // Resolve returns a dioclient.Config for the given profile name (or the

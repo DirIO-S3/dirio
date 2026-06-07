@@ -8,7 +8,7 @@ import (
 
 	"github.com/mallardduck/dirio/internal/dioclient/profile"
 	"github.com/mallardduck/dirio/internal/dioclient/render"
-	"github.com/mallardduck/dirio/pkg/dioclient"
+	"github.com/mallardduck/dirio/sdk/dioclient"
 )
 
 // --- command tree ---
