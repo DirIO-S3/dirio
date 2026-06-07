@@ -33,8 +33,8 @@ func (m *mockAdminBackend) DeleteServiceAccount(_ context.Context, _ string) err
 func (m *mockAdminBackend) ListUsers(_ context.Context) (map[string]UserInfo, error) {
 	return nil, nil
 }
-func (m *mockAdminBackend) AddUser(_ context.Context, _, _ string) error    { return nil }
-func (m *mockAdminBackend) RemoveUser(_ context.Context, _ string) error    { return nil }
+func (m *mockAdminBackend) AddUser(_ context.Context, _, _ string) error { return nil }
+func (m *mockAdminBackend) RemoveUser(_ context.Context, _ string) error { return nil }
 func (m *mockAdminBackend) GetUserInfo(_ context.Context, _ string) (UserInfo, error) {
 	return UserInfo{}, nil
 }
