@@ -8,8 +8,8 @@ import (
 	"github.com/go-git/go-billy/v5/osfs"
 	"github.com/spf13/cobra"
 
+	"github.com/mallardduck/dirio/common/output"
 	intCliConfig "github.com/mallardduck/dirio/internal/cli/config"
-	"github.com/mallardduck/dirio/internal/cli/output"
 	"github.com/mallardduck/dirio/internal/config"
 	"github.com/mallardduck/dirio/internal/config/data"
 	"github.com/mallardduck/dirio/internal/crypto"
