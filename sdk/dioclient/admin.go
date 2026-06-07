@@ -20,7 +20,7 @@ func WithV1API(ctx context.Context) context.Context {
 
 // AdminClient is a connected DirIO/MinIO admin client. It is safe for concurrent use.
 type AdminClient struct {
-	proxy *compatminio.AdminProxy
+	proxy adminBackend
 }
 
 // NewAdminClient creates an AdminClient for the given Config using the MinIO

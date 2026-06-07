@@ -48,13 +48,7 @@ func (p *AdminProxy) ListServiceAccounts(ctx context.Context, user string) (Serv
 	}
 	accounts := make([]ServiceAccountInfo, len(resp.Accounts))
 	for i, a := range resp.Accounts {
-		accounts[i] = ServiceAccountInfo{
-			AccessKey:     a.AccessKey,
-			ParentUser:    a.ParentUser,
-			AccountStatus: a.AccountStatus,
-			Name:          a.Name,
-			Expiration:    a.Expiration,
-		}
+		accounts[i] = mapServiceAccountInfo(a)
 	}
 	return ServiceAccountsListResp{Accounts: accounts}, nil
 }
@@ -70,7 +64,7 @@ func (p *AdminProxy) AddServiceAccount(ctx context.Context, req AddServiceAccoun
 	if err != nil {
 		return Credentials{}, err
 	}
-	return Credentials{AccessKey: creds.AccessKey, SecretKey: creds.SecretKey}, nil
+	return mapCredentials(creds), nil
 }
 
 func (p *AdminProxy) InfoServiceAccount(ctx context.Context, accessKey string) (ServiceAccountInfoResp, error) {
@@ -78,14 +72,7 @@ func (p *AdminProxy) InfoServiceAccount(ctx context.Context, accessKey string) (
 	if err != nil {
 		return ServiceAccountInfoResp{}, err
 	}
-	return ServiceAccountInfoResp{
-		ParentUser:    info.ParentUser,
-		AccountStatus: info.AccountStatus,
-		Name:          info.Name,
-		Description:   info.Description,
-		ImpliedPolicy: info.ImpliedPolicy,
-		Expiration:    info.Expiration,
-	}, nil
+	return mapInfoServiceAccountResp(info), nil
 }
 
 func (p *AdminProxy) UpdateServiceAccount(ctx context.Context, accessKey string, req UpdateServiceAccountReq) error {
@@ -109,12 +96,7 @@ func (p *AdminProxy) ListUsers(ctx context.Context) (map[string]UserInfo, error)
 	}
 	out := make(map[string]UserInfo, len(raw))
 	for k, u := range raw {
-		out[k] = UserInfo{
-			Status:     AccountStatus(u.Status),
-			PolicyName: u.PolicyName,
-			MemberOf:   u.MemberOf,
-			UpdatedAt:  u.UpdatedAt,
-		}
+		out[k] = mapUserInfo(u)
 	}
 	return out, nil
 }
@@ -132,12 +114,7 @@ func (p *AdminProxy) GetUserInfo(ctx context.Context, accessKey string) (UserInf
 	if err != nil {
 		return UserInfo{}, err
 	}
-	return UserInfo{
-		Status:     AccountStatus(u.Status),
-		PolicyName: u.PolicyName,
-		MemberOf:   u.MemberOf,
-		UpdatedAt:  u.UpdatedAt,
-	}, nil
+	return mapUserInfo(u), nil
 }
 
 func (p *AdminProxy) SetUserStatus(ctx context.Context, accessKey string, status AccountStatus) error {
@@ -160,7 +137,8 @@ func (p *AdminProxy) InfoCannedPolicyV1(ctx context.Context, name string) (*Poli
 	if err != nil {
 		return nil, err
 	}
-	return &PolicyInfo{PolicyName: name, Policy: json.RawMessage(raw)}, nil
+	pi := PolicyInfo{PolicyName: name, Policy: json.RawMessage(raw)}
+	return &pi, nil
 }
 
 // InfoCannedPolicyV2 uses the V2 admin API (includes timestamps and PolicyName).
@@ -169,12 +147,8 @@ func (p *AdminProxy) InfoCannedPolicyV2(ctx context.Context, name string) (*Poli
 	if err != nil {
 		return nil, err
 	}
-	return &PolicyInfo{
-		PolicyName: info.PolicyName,
-		Policy:     info.Policy,
-		CreateDate: info.CreateDate,
-		UpdateDate: info.UpdateDate,
-	}, nil
+	pi := mapPolicyInfo(*info)
+	return &pi, nil
 }
 
 func (p *AdminProxy) DeleteCannedPolicy(ctx context.Context, name string) error {
@@ -190,10 +164,7 @@ func (p *AdminProxy) AttachPolicy(ctx context.Context, req PolicyAssociationReq)
 	if err != nil {
 		return PolicyAssociationResp{}, err
 	}
-	return PolicyAssociationResp{
-		PoliciesDetached: resp.PoliciesDetached,
-		PoliciesAttached: resp.PoliciesAttached,
-	}, nil
+	return mapPolicyAssociationResp(resp), nil
 }
 
 func (p *AdminProxy) DetachPolicy(ctx context.Context, req PolicyAssociationReq) (PolicyAssociationResp, error) {
@@ -205,8 +176,5 @@ func (p *AdminProxy) DetachPolicy(ctx context.Context, req PolicyAssociationReq)
 	if err != nil {
 		return PolicyAssociationResp{}, err
 	}
-	return PolicyAssociationResp{
-		PoliciesDetached: resp.PoliciesDetached,
-		PoliciesAttached: resp.PoliciesAttached,
-	}, nil
+	return mapPolicyAssociationResp(resp), nil
 }
