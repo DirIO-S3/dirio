@@ -79,6 +79,9 @@ archives:
         formats:
           - zip
 
+release:
+  draft: true
+
 checksum:
   name_template: 'checksums.txt'
 
