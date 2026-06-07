@@ -59,7 +59,7 @@ linters:
           #   internal/context/**     — context helpers used by the above layers
           files:
             - "**/internal/http/api/**/*.go"
-            - "**/internal/minio/**/*.go"
+            - "**/internal/compat/minio/**/*.go"
             - "**/console/**/*.go"
             - "**/api/**/*.go"
             - "**/cmd/**/*.go"
@@ -122,7 +122,7 @@ linters:
               desc: "cmd/client must not import server startup"
             - pkg: "github.com/mallardduck/dirio/internal/telemetry"
               desc: "cmd/client must not import server telemetry"
-            - pkg: "github.com/mallardduck/dirio/internal/minio"
+            - pkg: "github.com/mallardduck/dirio/internal/compat/minio"
               desc: "cmd/client must not import server MinIO compat layer"
             - pkg: "github.com/mallardduck/dirio/internal/console"
               desc: "cmd/client must not import server console adapter"
@@ -176,18 +176,18 @@ linters:
               desc: "console/ must stay neutral — no dirio-specific common/ imports"
         server-no-stray-minio:
           # MinIO libs are quarantined to two zones in internal/:
-          #   internal/minio/    — madmin wire protocol (encrypt/decrypt + admin HTTP handlers)
+          #   internal/compat/minio/    — madmin wire protocol (encrypt/decrypt + admin HTTP handlers)
           #   internal/testutil/ — test helpers that construct madmin-encrypted payloads
           # All other internal/ code must stay minio-free.
           files:
             - "**/internal/**/*.go"
-            - "!**/internal/minio/**"
+            - "!**/internal/compat/minio/**"
             - "!**/internal/testutil/**"
           deny:
             - pkg: "github.com/minio/minio-go"
               desc: "minio-go outside compat zone — use sdk/dioclient for S3 client ops"
             - pkg: "github.com/minio/madmin-go"
-              desc: "madmin-go outside compat zone — wire protocol belongs in internal/minio/ only"
+              desc: "madmin-go outside compat zone — wire protocol belongs in internal/compat/minio/ only"
     errcheck:
       check-type-assertions: false
       check-blank: false
