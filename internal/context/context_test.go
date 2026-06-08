@@ -64,7 +64,7 @@ func TestWithPreSignedUser(t *testing.T) {
 
 	exp, ok := GetPreSignedExpiresAt(ctx)
 	assert.True(t, ok)
-	assert.Equal(t, expiry, exp)
+	assert.Equal(t, exp, expiry)
 }
 
 func TestIsPreSignedRequest_False(t *testing.T) {
@@ -114,7 +114,7 @@ func TestWithServiceAccountInfo(t *testing.T) {
 	require.NotNil(t, got)
 	assert.Equal(t, &id, got.ParentUserUUID)
 	assert.Equal(t, iam.PolicyModeOverride, got.PolicyMode)
-	assert.Equal(t, `{"Version":"2012-10-17"}`, got.EmbeddedPolicyJSON)
+	assert.JSONEq(t, `{"Version":"2012-10-17"}`, got.EmbeddedPolicyJSON)
 }
 
 func TestGetServiceAccountInfo_Missing(t *testing.T) {

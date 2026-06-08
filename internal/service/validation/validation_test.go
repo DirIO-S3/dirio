@@ -4,9 +4,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mallardduck/dirio/sdk/iam"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/mallardduck/dirio/sdk/iam"
 )
 
 // ── common ────────────────────────────────────────────────────────────────────
@@ -196,7 +197,7 @@ func TestValidatePolicyDocument(t *testing.T) {
 			{Effect: "Allow", Action: "s3:GetObject"},
 		},
 	}
-	assert.NoError(t, ValidatePolicyDocument(validDoc))
+	require.NoError(t, ValidatePolicyDocument(validDoc))
 
 	t.Run("nil document", func(t *testing.T) {
 		err := ValidatePolicyDocument(nil)

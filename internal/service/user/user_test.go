@@ -71,7 +71,7 @@ func TestCreate_InvalidStatus(t *testing.T) {
 		SecretKey: "supersecretpassword1",
 		Status:    iam.UserStatus("bogus"),
 	})
-	assert.Error(t, err)
+	require.Error(t, err)
 	assert.Contains(t, err.Error(), "bogus")
 }
 

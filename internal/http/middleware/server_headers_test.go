@@ -6,8 +6,9 @@ import (
 	"testing"
 
 	"github.com/google/uuid"
-	"github.com/mallardduck/dirio/internal/global"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/mallardduck/dirio/internal/global"
 )
 
 func TestSetDefaultHeadersMiddleware(t *testing.T) {

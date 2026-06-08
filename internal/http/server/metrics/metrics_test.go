@@ -21,6 +21,6 @@ func TestHandlePrometheus_NilProvider(t *testing.T) {
 
 	// With nil telemetry the handler is the teapot NoopHandler: returns 200.
 	rec := httptest.NewRecorder()
-	handler.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/.dirio/metrics", nil))
+	handler.ServeHTTP(rec, httptest.NewRequest(http.MethodGet, "/.dirio/metrics", http.NoBody))
 	assert.Equal(t, http.StatusOK, rec.Code)
 }
