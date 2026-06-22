@@ -48,6 +48,8 @@ github.com/Masterminds/semver/v3 v3.5.0 h1:kQceYJfbupGfZOKZQg0kou0DgAKhzDg2NZPAw
 github.com/Masterminds/semver/v3 v3.5.0/go.mod h1:4V+yj/TJE1HU9XfppCwVMZq3I84lprf4nC11bSS5beM=
 github.com/Microsoft/go-winio v0.6.2 h1:F2VQgta7ecxGYO8k3ZZz3RS8fVIXVxONVUPlNERoyfY=
 github.com/Microsoft/go-winio v0.6.2/go.mod h1:yd8OoFMLzJbo9gZq8j5qaps8bJ9aShtEA8Ipt1oGCvU=
+github.com/Oudwins/tailwind-merge-go v0.2.1 h1:jxRaEqGtwwwF48UuFIQ8g8XT7YSualNuGzCvQ89nPFE=
+github.com/Oudwins/tailwind-merge-go v0.2.1/go.mod h1:kkZodgOPvZQ8f7SIrlWkG/w1g9JTbtnptnePIh3V72U=
 github.com/a-h/parse v0.0.0-20250122154542-74294addb73e h1:HjVbSQHy+dnlS6C3XajZ69NYAb5jbGNfHanvm1+iYlo=
 github.com/a-h/parse v0.0.0-20250122154542-74294addb73e/go.mod h1:3mnrkvGpurZ4ZrTDbYU84xhwXW2TjTKShSwjRi2ihfQ=
 github.com/a-h/templ v0.3.1020 h1:ypAT/L5ySWEnZ6Zft/5yfoWXYYkhFNvEFOeeqecg4tw=
@@ -289,6 +291,14 @@ github.com/lufia/plan9stats v0.0.0-20260330125221-c963978e514e h1:Q6MvJtQK/iRcRt
 github.com/lufia/plan9stats v0.0.0-20260330125221-c963978e514e/go.mod h1:autxFIvghDt3jPTLoqZ9OZ7s9qTGNAWmYCjVFWPX/zg=
 github.com/magiconair/properties v1.8.10 h1:s31yESBquKXCV9a/ScB3ESkOjUYYv+X0rg8SYxI99mE=
 github.com/magiconair/properties v1.8.10/go.mod h1:Dhd985XPs7jluiymwWYZ0G4Z61jb3vdS329zhj2hYo0=
+github.com/mallardduck/dirio/api v0.0.0-20260608005525-2f53ba8ad90d h1:Pbp6Epg45tqNF1sWRXCVnPsTnp1rf6a4DnplWdKjTto=
+github.com/mallardduck/dirio/api v0.0.0-20260608005525-2f53ba8ad90d/go.mod h1:kV0GE6PFjUopMjJxdbz2pALeER+dg+L2qyvooKWHtGQ=
+github.com/mallardduck/dirio/common v0.0.0-20260608005525-2f53ba8ad90d h1:q5/rLrh/DcBdKjNUWP7o7WQ5ZQWqOLqhNMfTTLe4L1g=
+github.com/mallardduck/dirio/common v0.0.0-20260608005525-2f53ba8ad90d/go.mod h1:sF+HNVcBKXSeDJNpa2CEHN5N/gIIqeiLiH1MnmuhDTU=
+github.com/mallardduck/dirio/console v0.0.0-20260608005525-2f53ba8ad90d h1:RoPLF8Ns2VCWPvy2ho6K2iqNU12db+KbgLLHtG9ivPE=
+github.com/mallardduck/dirio/console v0.0.0-20260608005525-2f53ba8ad90d/go.mod h1:DbthQVvMvyupj7CGEa+s+V/m6Xvm7NVYd+UvNctf45g=
+github.com/mallardduck/dirio/sdk v0.0.0-20260608005525-2f53ba8ad90d h1:QF8VJaHXq9Dc850hD+Ws/x3ch7GrLt1Tx8d2Q//43tI=
+github.com/mallardduck/dirio/sdk v0.0.0-20260608005525-2f53ba8ad90d/go.mod h1:dDr+SJUc+DeWTYwD5NQl+sPeZ7ASBYFx7B0ylgS62QU=
 github.com/mallardduck/dnssd v0.0.0-20260320220649-bc4db50b7db8 h1:uE15L7jNiGBgF77kGRK8xBOOyEp5tV7YyO6xrul4RVE=
 github.com/mallardduck/dnssd v0.0.0-20260320220649-bc4db50b7db8/go.mod h1:tG4GE8orv6+irE5rdsNgb6MJSxm6cyMUKdC5jmD22gk=
 github.com/mallardduck/go-http-helpers v0.1.0 h1:jRDoVnPahYuOOsX7nS0S9YAWkC9R6RFvDSfIck828yk=
@@ -439,8 +449,8 @@ github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
 github.com/subosito/gotenv v1.6.0 h1:9NlTDc1FTs4qu0DDq7AEtTPNw6SVm7uBMsUCUjABIf8=
 github.com/subosito/gotenv v1.6.0/go.mod h1:Dk4QP5c2W3ibzajGcXpNraDfq2IrhjMIvMSWPKKo0FU=
-github.com/testcontainers/testcontainers-go v0.42.0 h1:He3IhTzTZOygSXLJPMX7n44XtK+qhjat1nI9cneBbUY=
-github.com/testcontainers/testcontainers-go v0.42.0/go.mod h1:vZjdY1YmUA1qEForxOIOazfsrdyORJAbhi0bp8plN30=
+github.com/testcontainers/testcontainers-go v0.43.0 h1:oEQx5MW2DGd9z3AeEQfB2lPM0eLs7ztyaGRu75bFo5A=
+github.com/testcontainers/testcontainers-go v0.43.0/go.mod h1:+VxkT2NQnKOZPKi6praMuMKYHYyOGXr0XSBSlSMCzFo=
 github.com/tinylib/msgp v1.6.4 h1:mOwYbyYDLPj35mkA2BjjYejgJk9BuHxDdvRnb6v2ZcQ=
 github.com/tinylib/msgp v1.6.4/go.mod h1:RSp0LW9oSxFut3KzESt5Voq4GVWyS+PSulT77roAqEA=
 github.com/tklauser/go-sysconf v0.4.0 h1:7H0uAN+7RkwWRaxhYXDLqa5V3LPrJeV8wmD9dRUgPQU=
