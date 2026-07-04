@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DirIO — Filesystem-native S3-compatible object store</title>
+<meta name="description" content="DirIO is a filesystem-native S3-compatible object storage server. Objects are files, buckets are directories. Download the server and CLI client.">
+<link rel="icon" type="image/svg+xml" href="dirio_logo.svg">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="hero">
+  <img class="logo" src="dirio_logo.svg" alt="DirIO logo" width="120" height="120">
+  <h1>DirIO</h1>
+  <p class="tagline">Objects on the outside. Directories on the inside.<br>A filesystem-native S3-compatible object store.</p>
+  <div class="cta-row">
+    <a class="btn btn-primary" id="primary-download" href="https://github.com/DirIO-S3/dirio/releases/latest">Download for your platform</a>
+    <a class="btn btn-secondary" href="https://github.com/DirIO-S3/dirio">View on GitHub</a>
+  </div>
+  <p class="version-banner" id="version-banner">Checking latest release&hellip;</p>
+</header>
+
+<main>
+
+  <section class="panel">
+    <h2>What is DirIO?</h2>
+    <p>
+      DirIO is an S3-compatible object storage server where objects are just files on disk.
+      No chunking, no encoding, no abstraction layers — just directories and files. It's built
+      as a drop-in replacement for MinIO's discontinued single-node filesystem mode.
+    </p>
+    <div class="columns">
+      <div>
+        <h3>What it does</h3>
+        <ul>
+          <li>Serves S3 API requests over HTTP</li>
+          <li>Stores objects as regular files in <code>buckets/</code></li>
+          <li>Maintains metadata in <code>.metadata/</code> (JSON files)</li>
+          <li>Imports from MinIO's <code>.minio.sys/</code> on first boot</li>
+          <li>Runs in a container on your NAS</li>
+        </ul>
+      </div>
+      <div>
+        <h3>What it doesn't do</h3>
+        <ul>
+          <li>Distributed storage / clustering</li>
+          <li>Built-in replication</li>
+          <li>Advanced S3 features (yet)</li>
+          <li>Replace production-grade S3 implementations</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="panel" id="downloads">
+    <h2>Downloads</h2>
+    <p>Two binaries, no dependencies: <code>dirio</code> is the server, <code>dio</code> is the first-party CLI client.</p>
+    <p id="downloads-status" class="muted">Loading the latest release from GitHub&hellip;</p>
+    <div id="downloads-tables"></div>
+    <p class="muted">
+      Can't find your platform, or the list above didn't load?
+      <a href="https://github.com/DirIO-S3/dirio/releases/latest">Browse all release assets on GitHub</a>.
+    </p>
+  </section>
+
+  <section class="panel">
+    <h2>Use cases</h2>
+    <ul class="use-cases">
+      <li><strong>Homelab NAS storage</strong> — host S3 buckets on your NAS without MinIO overhead</li>
+      <li><strong>Static site assets</strong> — serve website media files via the S3 API</li>
+      <li><strong>Backup targets</strong> — use S3-compatible tools with local filesystem storage</li>
+      <li><strong>Development</strong> — test S3 integrations locally with real files</li>
+    </ul>
+  </section>
+
+  <section class="panel">
+    <h2>Quick start</h2>
+    <pre><code># Run the server
+dirio serve --data-dir /path/to/data --port 9000
+
+# Talk to it with the aws CLI
+aws --endpoint-url http://localhost:9000 s3 mb s3://test
+aws --endpoint-url http://localhost:9000 s3 cp file.txt s3://test/
+
+# Or with dio, the first-party client
+dio cp file.txt dirio://test/</code></pre>
+    <p><a href="https://github.com/DirIO-S3/dirio">See the full README and docs on GitHub &rarr;</a></p>
+  </section>
+
+</main>
+
+<footer>
+  <p>MIT licensed &middot; <a href="https://github.com/DirIO-S3/dirio">DirIO-S3/dirio</a></p>
+</footer>
+
+<script src="script.js"></script>
+</body>
+</html>
