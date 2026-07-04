@@ -6,8 +6,8 @@ require (
 	github.com/Oudwins/tailwind-merge-go v0.2.1
 	github.com/a-h/templ v0.3.1020
 	github.com/google/uuid v1.6.0
+	github.com/mallardduck/dirio/api v0.0.0-20260608005525-2f53ba8ad90d
 	github.com/mallardduck/teapot-router v0.14.2
-	github.com/stretchr/testify v1.11.1
 )
 
 require (
