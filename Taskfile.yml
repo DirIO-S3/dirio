@@ -201,6 +201,14 @@ tasks:
       - go mod download
       - go mod tidy
 
+  workspace-init:
+    desc: Set up the local go.work multi-module workspace (not committed — see go.work.example)
+    status:
+      - test -f go.work
+    cmds:
+      - cp go.work.example go.work
+      - echo "Created go.work — 'go build ./...' and your IDE now resolve api/common/console/sdk from their local directories instead of the versions pinned in go.mod."
+
   sync-test-deps:
     desc: Sync test framework versions (testify etc.) across all workspace sub-modules to match root go.mod
     cmds:

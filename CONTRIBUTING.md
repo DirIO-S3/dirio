@@ -21,6 +21,25 @@ task build
 
 Run `task --list` to see all available tasks.
 
+### Multi-module workspace
+
+This repo is a multi-module workspace (`.`, `api/`, `common/`, `console/`, `sdk/`). The root
+`go.mod` depends on the others via pinned versions, not local paths, so changes you make in
+`api/` or `sdk/` won't be picked up by the root module until you either bump those pins or use
+a local Go workspace.
+
+Run this once per clone so cross-module edits build and your IDE resolves them locally:
+
+```bash
+task workspace-init
+```
+
+This creates a local, uncommitted `go.work` (from `go.work.example`). We deliberately don't
+commit `go.work` itself: with it checked in, CI and any `go build`/`go vet ./...` at the repo
+root would silently use the local module directories instead of the versions actually pinned
+in `go.mod` — masking real version-mismatch bugs that downstream consumers of these modules
+would hit.
+
 ## Making Changes
 
 1. **Pick a task** from [TODO.md](TODO.md) or fix a bug
