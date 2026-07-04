@@ -1,4 +1,4 @@
-//go:build perf
+//go:build docker && perf
 
 // Package perf_test contains opt-in profiling tests for performance analysis.
 //

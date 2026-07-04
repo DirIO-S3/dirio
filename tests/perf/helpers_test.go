@@ -1,4 +1,4 @@
-//go:build perf
+//go:build docker && perf
 
 package perf_test
 
