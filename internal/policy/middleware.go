@@ -2,6 +2,7 @@ package policy
 
 import (
 	stdcontext "context"
+	"log/slog"
 	"net/http"
 	"strings"
 	"time"
@@ -21,7 +22,9 @@ import (
 	"github.com/mallardduck/dirio/sdk/s3types"
 )
 
-var authzLogger = logging.Component("authz")
+func authzLogger(ctx stdcontext.Context) *slog.Logger {
+	return logging.ComponentWithContext(ctx, "authz")
+}
 
 // AdminKeyChecker provides the current admin access keys for authorization
 // bypass decisions. auth.Authenticator implements this interface, allowing
@@ -93,7 +96,7 @@ func AuthorizationMiddleware(config *AuthorizationConfig) func(http.Handler) htt
 
 			// Admin bypass - skip all policy checks
 			if principal.IsAdmin {
-				authzLogger.With("action", routeAction, "user", user.AccessKey).
+				authzLogger(r.Context()).With("action", routeAction, "user", user.AccessKey).
 					Debug("admin bypass - skipping authorization")
 				setLogAuthz(r, "allow")
 				next.ServeHTTP(w, r)
@@ -163,7 +166,7 @@ func AuthorizationMiddleware(config *AuthorizationConfig) func(http.Handler) htt
 				decision := config.Engine.Evaluate(r.Context(), reqCtx)
 
 				if !decision.IsAllowed() {
-					authzLogger.With(
+					authzLogger(r.Context()).With(
 						"action", routeAction,
 						"permission", permission,
 						"bucket", bucket,
@@ -218,7 +221,7 @@ func evaluateMultiResourceAction(
 
 	if sourceBucket == "" {
 		// No copy source header - this shouldn't happen for CopyObject
-		authzLogger.Warn("CopyObject without X-Amz-Copy-Source header")
+		authzLogger(r.Context()).Warn("CopyObject without X-Amz-Copy-Source header")
 		return DecisionDeny
 	}
 
@@ -237,7 +240,7 @@ func evaluateMultiResourceAction(
 	}
 	sourceDecision := engine.Evaluate(r.Context(), sourceCtx)
 	if !sourceDecision.IsAllowed() {
-		authzLogger.With(
+		authzLogger(r.Context()).With(
 			"permission", permissions[0],
 			"bucket", sourceBucket,
 			"key", sourceKey,
@@ -261,7 +264,7 @@ func evaluateMultiResourceAction(
 	}
 	destDecision := engine.Evaluate(r.Context(), destCtx)
 	if !destDecision.IsAllowed() {
-		authzLogger.With(
+		authzLogger(r.Context()).With(
 			"permission", permissions[1],
 			"bucket", destBucket,
 			"key", destKey,
@@ -383,6 +386,6 @@ func writeAccessDenied(w http.ResponseWriter, r *http.Request) {
 		response.Resource = r.URL.Path
 		return response
 	}); writeErr != nil {
-		authzLogger.With("error", writeErr).Error("failed to write access denied response")
+		authzLogger(r.Context()).With("error", writeErr).Error("failed to write access denied response")
 	}
 }

@@ -1,6 +1,7 @@
 package http
 
 import (
+	"context"
 	"errors"
 	"io"
 	"log/slog"
@@ -13,6 +14,7 @@ import (
 
 	"github.com/mallardduck/dirio/internal/http/auth"
 	"github.com/mallardduck/dirio/internal/jsonutil"
+	"github.com/mallardduck/dirio/internal/logging"
 	svcerrors "github.com/mallardduck/dirio/internal/service/errors"
 	"github.com/mallardduck/dirio/internal/service/group"
 	"github.com/mallardduck/dirio/internal/service/policy"
@@ -35,21 +37,25 @@ type PolicyHTTPService struct {
 	log      *slog.Logger
 }
 
+func (s PolicyHTTPService) ctxLog(ctx context.Context) *slog.Logger {
+	return logging.WithContext(s.log, ctx)
+}
+
 func (s PolicyHTTPService) AddCannedPolicy(w nethttp.ResponseWriter, r *nethttp.Request) {
 	// Get policy name from query parameter (MinIO API format)
 	policyName := query.String(r, "name", "")
 	if policyName == "" {
-		s.log.Error("Missing policy name in query parameter")
+		s.ctxLog(r.Context()).Error("Missing policy name in query parameter")
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
 
-	s.log.Debug("Received request to add canned policy", "name", policyName)
+	s.ctxLog(r.Context()).Debug("Received request to add canned policy", "name", policyName)
 
 	// Read the policy document from the request body
 	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
-		s.log.Error("Failed to read request body", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to read request body", "error", err)
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
@@ -57,7 +63,7 @@ func (s PolicyHTTPService) AddCannedPolicy(w nethttp.ResponseWriter, r *nethttp.
 	// Parse the policy document
 	var policyDoc iam.PolicyDocument
 	if err := jsonutil.Unmarshal(bodyBytes, &policyDoc); err != nil {
-		s.log.Error("Failed to parse policy document", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to parse policy document", "error", err)
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
@@ -70,7 +76,7 @@ func (s PolicyHTTPService) AddCannedPolicy(w nethttp.ResponseWriter, r *nethttp.
 
 	if err != nil {
 		// Map service errors to HTTP status codes
-		s.log.Error("Failed to create policy", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to create policy", "error", err)
 
 		if svcerrors.IsAlreadyExists(err) {
 			w.WriteHeader(nethttp.StatusConflict)
@@ -84,14 +90,14 @@ func (s PolicyHTTPService) AddCannedPolicy(w nethttp.ResponseWriter, r *nethttp.
 		return
 	}
 
-	s.log.Info("Policy created successfully", "name", policyName)
+	s.ctxLog(r.Context()).Info("Policy created successfully", "name", policyName)
 	w.WriteHeader(nethttp.StatusOK)
 }
 
 func (s PolicyHTTPService) ListCannedPolicies(w nethttp.ResponseWriter, r *nethttp.Request) {
 	policies, err := s.policies.List(r.Context())
 	if err != nil {
-		s.log.Error("Failed to list policies", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to list policies", "error", err)
 		w.WriteHeader(nethttp.StatusInternalServerError)
 		return
 	}
@@ -107,13 +113,13 @@ func (s PolicyHTTPService) ListCannedPolicies(w nethttp.ResponseWriter, r *netht
 	w.Header().Set(headers.ContentType, "application/json")
 	data, err := jsonutil.Marshal(docs)
 	if err != nil {
-		s.log.Error("Failed to marshal response", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to marshal response", "error", err)
 		w.WriteHeader(nethttp.StatusInternalServerError)
 		return
 	}
 	_, err = w.Write(data)
 	if err != nil {
-		s.log.Error("Failed to write response", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to write response", "error", err)
 		return
 	}
 }
@@ -121,14 +127,14 @@ func (s PolicyHTTPService) ListCannedPolicies(w nethttp.ResponseWriter, r *netht
 func (s PolicyHTTPService) RemoveCannedPolicy(w nethttp.ResponseWriter, r *nethttp.Request) {
 	policyName := query.String(r, "name", "")
 	if policyName == "" {
-		s.log.Error("Missing policy name in query parameter")
+		s.ctxLog(r.Context()).Error("Missing policy name in query parameter")
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
 
 	err := s.policies.Delete(r.Context(), policyName)
 	if err != nil {
-		s.log.Error("Failed to delete policy", "error", err, "name", policyName)
+		s.ctxLog(r.Context()).Error("Failed to delete policy", "error", err, "name", policyName)
 
 		if errors.Is(err, svcerrors.ErrPolicyIsBuiltin) {
 			w.WriteHeader(nethttp.StatusForbidden)
@@ -146,21 +152,21 @@ func (s PolicyHTTPService) RemoveCannedPolicy(w nethttp.ResponseWriter, r *netht
 		return
 	}
 
-	s.log.Info("Policy deleted successfully", "name", policyName)
+	s.ctxLog(r.Context()).Info("Policy deleted successfully", "name", policyName)
 	w.WriteHeader(nethttp.StatusOK)
 }
 
 func (s PolicyHTTPService) InfoCannedPolicy(w nethttp.ResponseWriter, r *nethttp.Request) {
 	policyName := query.String(r, "name", "")
 	if policyName == "" {
-		s.log.Error("Missing policy name in query parameter")
+		s.ctxLog(r.Context()).Error("Missing policy name in query parameter")
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
 
 	cannedPolicy, err := s.policies.Get(r.Context(), policyName)
 	if err != nil {
-		s.log.Error("Failed to get policy", "error", err, "name", policyName)
+		s.ctxLog(r.Context()).Error("Failed to get policy", "error", err, "name", policyName)
 
 		if svcerrors.IsNotFound(err) {
 			w.WriteHeader(nethttp.StatusNotFound)
@@ -190,13 +196,13 @@ func (s PolicyHTTPService) InfoCannedPolicy(w nethttp.ResponseWriter, r *nethttp
 	w.Header().Set(headers.ContentType, "application/json")
 	data, err := jsonutil.Marshal(payload)
 	if err != nil {
-		s.log.Error("Failed to marshal response", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to marshal response", "error", err)
 		w.WriteHeader(nethttp.StatusInternalServerError)
 		return
 	}
 	_, err = w.Write(data)
 	if err != nil {
-		s.log.Error("Failed to write response", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to write response", "error", err)
 		return
 	}
 }
@@ -213,7 +219,7 @@ func (s PolicyHTTPService) SetPolicy(w nethttp.ResponseWriter, r *nethttp.Reques
 	}
 
 	if policyName == "" || userOrGroup == "" {
-		s.log.Error("Missing required parameters", "policyName", policyName, "userOrGroup", userOrGroup)
+		s.ctxLog(r.Context()).Error("Missing required parameters", "policyName", policyName, "userOrGroup", userOrGroup)
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
@@ -225,7 +231,7 @@ func (s PolicyHTTPService) SetPolicy(w nethttp.ResponseWriter, r *nethttp.Reques
 		// Translate access key → UUID at the HTTP boundary.
 		u, err := s.users.GetByAccessKey(r.Context(), userOrGroup)
 		if err != nil {
-			s.log.Error("Failed to find user", "error", err, "accessKey", userOrGroup)
+			s.ctxLog(r.Context()).Error("Failed to find user", "error", err, "accessKey", userOrGroup)
 			if svcerrors.IsNotFound(err) {
 				w.WriteHeader(nethttp.StatusNotFound)
 				return
@@ -236,7 +242,7 @@ func (s PolicyHTTPService) SetPolicy(w nethttp.ResponseWriter, r *nethttp.Reques
 		attachErr = s.users.AttachPolicy(r.Context(), u.UUID, policyName)
 	}
 	if err := attachErr; err != nil {
-		s.log.Error("Failed to attach policy", "error", err, "userOrGroup", userOrGroup, "policy", policyName, "isGroup", isGroup)
+		s.ctxLog(r.Context()).Error("Failed to attach policy", "error", err, "userOrGroup", userOrGroup, "policy", policyName, "isGroup", isGroup)
 
 		if svcerrors.IsNotFound(err) {
 			w.WriteHeader(nethttp.StatusNotFound)
@@ -250,7 +256,7 @@ func (s PolicyHTTPService) SetPolicy(w nethttp.ResponseWriter, r *nethttp.Reques
 		return
 	}
 
-	s.log.Info("Policy attached successfully", "userOrGroup", userOrGroup, "policy", policyName, "isGroup", isGroup)
+	s.ctxLog(r.Context()).Info("Policy attached successfully", "userOrGroup", userOrGroup, "policy", policyName, "isGroup", isGroup)
 
 	// For encrypted requests, return encrypted response (MinIO format)
 	if r.Header.Get(headers.ContentType) == "application/octet-stream" {
@@ -269,7 +275,7 @@ func (s PolicyHTTPService) SetPolicy(w nethttp.ResponseWriter, r *nethttp.Reques
 
 		encrypted, err := marshalAndEncrypt(adminUser.SecretKey, response)
 		if err != nil {
-			s.log.Error("Failed to marshal/encrypt response", "error", err)
+			s.ctxLog(r.Context()).Error("Failed to marshal/encrypt response", "error", err)
 			w.WriteHeader(nethttp.StatusInternalServerError)
 			return
 		}
@@ -278,7 +284,7 @@ func (s PolicyHTTPService) SetPolicy(w nethttp.ResponseWriter, r *nethttp.Reques
 		w.WriteHeader(nethttp.StatusOK)
 		_, err = w.Write(encrypted)
 		if err != nil {
-			s.log.Error("Failed to write response", "error", err)
+			s.ctxLog(r.Context()).Error("Failed to write response", "error", err)
 			return
 		}
 	} else {
@@ -294,7 +300,7 @@ func (s PolicyHTTPService) DetachPolicy(w nethttp.ResponseWriter, r *nethttp.Req
 	}
 
 	if policyName == "" || userOrGroup == "" {
-		s.log.Error("Missing required parameters", "policyName", policyName, "userOrGroup", userOrGroup)
+		s.ctxLog(r.Context()).Error("Missing required parameters", "policyName", policyName, "userOrGroup", userOrGroup)
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
@@ -306,7 +312,7 @@ func (s PolicyHTTPService) DetachPolicy(w nethttp.ResponseWriter, r *nethttp.Req
 		// Translate access key → UUID at the HTTP boundary.
 		u, err := s.users.GetByAccessKey(r.Context(), userOrGroup)
 		if err != nil {
-			s.log.Error("Failed to find user", "error", err, "accessKey", userOrGroup)
+			s.ctxLog(r.Context()).Error("Failed to find user", "error", err, "accessKey", userOrGroup)
 			if svcerrors.IsNotFound(err) {
 				w.WriteHeader(nethttp.StatusNotFound)
 				return
@@ -317,7 +323,7 @@ func (s PolicyHTTPService) DetachPolicy(w nethttp.ResponseWriter, r *nethttp.Req
 		detachErr = s.users.DetachPolicy(r.Context(), u.UUID, policyName)
 	}
 	if err := detachErr; err != nil {
-		s.log.Error("Failed to detach policy", "error", err, "userOrGroup", userOrGroup, "policy", policyName, "isGroup", isGroup)
+		s.ctxLog(r.Context()).Error("Failed to detach policy", "error", err, "userOrGroup", userOrGroup, "policy", policyName, "isGroup", isGroup)
 
 		if svcerrors.IsNotFound(err) {
 			w.WriteHeader(nethttp.StatusNotFound)
@@ -331,7 +337,7 @@ func (s PolicyHTTPService) DetachPolicy(w nethttp.ResponseWriter, r *nethttp.Req
 		return
 	}
 
-	s.log.Info("Policy detached successfully", "userOrGroup", userOrGroup, "policy", policyName, "isGroup", isGroup)
+	s.ctxLog(r.Context()).Info("Policy detached successfully", "userOrGroup", userOrGroup, "policy", policyName, "isGroup", isGroup)
 
 	if r.Header.Get(headers.ContentType) == "application/octet-stream" {
 		adminUser := auth.GetRequestUser(r.Context())
@@ -348,7 +354,7 @@ func (s PolicyHTTPService) DetachPolicy(w nethttp.ResponseWriter, r *nethttp.Req
 
 		encrypted, err := marshalAndEncrypt(adminUser.SecretKey, response)
 		if err != nil {
-			s.log.Error("Failed to marshal/encrypt response", "error", err)
+			s.ctxLog(r.Context()).Error("Failed to marshal/encrypt response", "error", err)
 			w.WriteHeader(nethttp.StatusInternalServerError)
 			return
 		}
@@ -357,7 +363,7 @@ func (s PolicyHTTPService) DetachPolicy(w nethttp.ResponseWriter, r *nethttp.Req
 		w.WriteHeader(nethttp.StatusOK)
 		_, err = w.Write(encrypted)
 		if err != nil {
-			s.log.Error("Failed to write response", "error", err)
+			s.ctxLog(r.Context()).Error("Failed to write response", "error", err)
 			return
 		}
 	} else {
@@ -368,7 +374,7 @@ func (s PolicyHTTPService) DetachPolicy(w nethttp.ResponseWriter, r *nethttp.Req
 func (s PolicyHTTPService) PolicyEntitiesList(w nethttp.ResponseWriter, r *nethttp.Request) {
 	policyName := query.String(r, "policy", "")
 	if policyName == "" {
-		s.log.Error("Missing policy name in query parameter")
+		s.ctxLog(r.Context()).Error("Missing policy name in query parameter")
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
@@ -377,7 +383,7 @@ func (s PolicyHTTPService) PolicyEntitiesList(w nethttp.ResponseWriter, r *netht
 	// Translate back to access keys for the MinIO wire format.
 	uids, err := s.users.List(r.Context())
 	if err != nil {
-		s.log.Error("Failed to list users", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to list users", "error", err)
 		w.WriteHeader(nethttp.StatusInternalServerError)
 		return
 	}
@@ -396,7 +402,7 @@ func (s PolicyHTTPService) PolicyEntitiesList(w nethttp.ResponseWriter, r *netht
 	// Get all groups and filter by those with this policy attached
 	groupNames, err := s.groups.List(r.Context())
 	if err != nil {
-		s.log.Error("Failed to list groups", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to list groups", "error", err)
 		w.WriteHeader(nethttp.StatusInternalServerError)
 		return
 	}
@@ -420,13 +426,13 @@ func (s PolicyHTTPService) PolicyEntitiesList(w nethttp.ResponseWriter, r *netht
 	w.Header().Set(headers.ContentType, "application/json")
 	data, err := jsonutil.Marshal(response)
 	if err != nil {
-		s.log.Error("Failed to marshal response", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to marshal response", "error", err)
 		w.WriteHeader(nethttp.StatusInternalServerError)
 		return
 	}
 	_, err = w.Write(data)
 	if err != nil {
-		s.log.Error("Failed to write response", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to write response", "error", err)
 		return
 	}
 }
@@ -436,7 +442,7 @@ func (s PolicyHTTPService) PolicyEntitiesList(w nethttp.ResponseWriter, r *netht
 // the legacy query-parameter format, writing an HTTP error and returning false on failure.
 func (s PolicyHTTPService) parsePolicyAssocParams(w nethttp.ResponseWriter, r *nethttp.Request) (policyName, userOrGroup string, isGroup, ok bool) {
 	if r.Header.Get(headers.ContentType) != "application/octet-stream" || r.ContentLength <= 0 {
-		s.log.Debug("Parsed query parameters", "policy", query.String(r, "policyName", ""), "userOrGroup", query.String(r, "userOrGroup", ""))
+		s.ctxLog(r.Context()).Debug("Parsed query parameters", "policy", query.String(r, "policyName", ""), "userOrGroup", query.String(r, "userOrGroup", ""))
 		return query.String(r, "policyName", ""),
 			query.String(r, "userOrGroup", ""),
 			query.Bool(r, "isGroup", false),
@@ -445,7 +451,7 @@ func (s PolicyHTTPService) parsePolicyAssocParams(w nethttp.ResponseWriter, r *n
 
 	adminUser := auth.GetRequestUser(r.Context())
 	if adminUser == nil {
-		s.log.Error("No authenticated user in context")
+		s.ctxLog(r.Context()).Error("No authenticated user in context")
 		w.WriteHeader(nethttp.StatusUnauthorized)
 		return "", "", false, false
 	}
@@ -456,12 +462,12 @@ func (s PolicyHTTPService) parsePolicyAssocParams(w nethttp.ResponseWriter, r *n
 		Policies []string `json:"Policies"`
 	}
 	if err := decryptAndUnmarshal(adminUser.SecretKey, r.Body, &req); err != nil {
-		s.log.Error("Failed to decrypt/parse request body", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to decrypt/parse request body", "error", err)
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return "", "", false, false
 	}
 
-	s.log.Debug("Decrypted request", "user", req.User, "group", req.Group, "policies", req.Policies)
+	s.ctxLog(r.Context()).Debug("Decrypted request", "user", req.User, "group", req.Group, "policies", req.Policies)
 
 	if req.User != "" {
 		userOrGroup = req.User
@@ -473,6 +479,6 @@ func (s PolicyHTTPService) parsePolicyAssocParams(w nethttp.ResponseWriter, r *n
 		policyName = req.Policies[0]
 	}
 
-	s.log.Debug("Parsed encrypted request", "policy", policyName, "userOrGroup", userOrGroup, "isGroup", isGroup)
+	s.ctxLog(r.Context()).Debug("Parsed encrypted request", "policy", policyName, "userOrGroup", userOrGroup, "isGroup", isGroup)
 	return policyName, userOrGroup, isGroup, true
 }

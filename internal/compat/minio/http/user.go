@@ -2,6 +2,7 @@ package http
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"log/slog"
@@ -15,6 +16,7 @@ import (
 	"github.com/mallardduck/dirio/internal/http/auth"
 	httpMiddleware "github.com/mallardduck/dirio/internal/http/middleware"
 	"github.com/mallardduck/dirio/internal/jsonutil"
+	"github.com/mallardduck/dirio/internal/logging"
 	svcerrors "github.com/mallardduck/dirio/internal/service/errors"
 	"github.com/mallardduck/dirio/internal/service/policy"
 	"github.com/mallardduck/dirio/internal/service/user"
@@ -27,17 +29,21 @@ type UserHTTPService struct {
 	log      *slog.Logger
 }
 
+func (s *UserHTTPService) ctxLog(ctx context.Context) *slog.Logger {
+	return logging.WithContext(s.log, ctx)
+}
+
 func (s *UserHTTPService) ListUsers(w nethttp.ResponseWriter, r *nethttp.Request) {
 	adminUser := auth.GetRequestUser(r.Context())
 	if adminUser == nil {
-		s.log.Error("No authenticated user in context")
+		s.ctxLog(r.Context()).Error("No authenticated user in context")
 		w.WriteHeader(nethttp.StatusUnauthorized)
 		return
 	}
 
 	uids, err := s.users.List(r.Context())
 	if err != nil {
-		s.log.Error("Failed to list users", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to list users", "error", err)
 		w.WriteHeader(nethttp.StatusInternalServerError)
 		return
 	}
@@ -52,7 +58,7 @@ func (s *UserHTTPService) ListUsers(w nethttp.ResponseWriter, r *nethttp.Request
 
 		groups := make([]string, 0)
 		if gs, err := s.users.GetGroups(r.Context(), uid); err != nil {
-			s.log.Error("Failed to list groups for user", "error", err)
+			s.ctxLog(r.Context()).Error("Failed to list groups for user", "error", err)
 		} else {
 			groups = gs
 		}
@@ -66,7 +72,7 @@ func (s *UserHTTPService) ListUsers(w nethttp.ResponseWriter, r *nethttp.Request
 
 	encrypted, err := marshalAndEncrypt(adminUser.SecretKey, result)
 	if err != nil {
-		s.log.Error("Failed to encrypt response", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to encrypt response", "error", err)
 		w.WriteHeader(nethttp.StatusInternalServerError)
 		return
 	}
@@ -79,33 +85,33 @@ func (s *UserHTTPService) ListUsers(w nethttp.ResponseWriter, r *nethttp.Request
 func (s *UserHTTPService) CreateUser(w nethttp.ResponseWriter, r *nethttp.Request) {
 	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
-		s.log.Error("Failed to read request body", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to read request body", "error", err)
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
 
 	accessKey := query.String(r, "accessKey", "")
 	if accessKey == "" {
-		s.log.Error("Missing accessKey parameter")
+		s.ctxLog(r.Context()).Error("Missing accessKey parameter")
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
 
 	adminUser := auth.GetRequestUser(r.Context())
 	if adminUser == nil {
-		s.log.Error("No authenticated user in context")
+		s.ctxLog(r.Context()).Error("No authenticated user in context")
 		w.WriteHeader(nethttp.StatusUnauthorized)
 		return
 	}
 
 	var body map[string]string
 	if err := decryptAndUnmarshal(adminUser.SecretKey, bytes.NewReader(bodyBytes), &body); err != nil {
-		s.log.Error("Failed to parse request body as JSON", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to parse request body as JSON", "error", err)
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
 
-	s.log.With(
+	s.ctxLog(r.Context()).With(
 		"request_host", r.URL.Host,
 		"request_query", r.URL.Query(),
 		"content_type", r.Header.Get("Content-Type"),
@@ -117,7 +123,7 @@ func (s *UserHTTPService) CreateUser(w nethttp.ResponseWriter, r *nethttp.Reques
 
 	secretKey := body["secretKey"]
 	enabled := body["status"] == "enabled"
-	s.log.With("accessKey", accessKey, "adminUser", adminUser.AccessKey).Info("Creating user")
+	s.ctxLog(r.Context()).With("accessKey", accessKey, "adminUser", adminUser.AccessKey).Info("Creating user")
 
 	status := iamPkg.UserStatusDisabled
 	if enabled {
@@ -130,7 +136,7 @@ func (s *UserHTTPService) CreateUser(w nethttp.ResponseWriter, r *nethttp.Reques
 		Status:    status,
 	})
 	if err != nil {
-		s.log.Error("Failed to create user", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to create user", "error", err)
 		if svcerrors.IsAlreadyExists(err) {
 			w.WriteHeader(nethttp.StatusConflict)
 			return
@@ -143,7 +149,7 @@ func (s *UserHTTPService) CreateUser(w nethttp.ResponseWriter, r *nethttp.Reques
 		return
 	}
 
-	s.log.With("accessKey", accessKey).Info("User created successfully")
+	s.ctxLog(r.Context()).With("accessKey", accessKey).Info("User created successfully")
 	w.WriteHeader(nethttp.StatusOK)
 }
 
@@ -153,7 +159,7 @@ func (s *UserHTTPService) RemoveUser(w nethttp.ResponseWriter, r *nethttp.Reques
 	// Translate access key → UUID at the HTTP boundary.
 	u, err := s.users.GetByAccessKey(r.Context(), accessKey)
 	if err != nil {
-		s.log.Error("Failed to find user", "error", err, "accessKey", accessKey)
+		s.ctxLog(r.Context()).Error("Failed to find user", "error", err, "accessKey", accessKey)
 		if svcerrors.IsNotFound(err) {
 			// MinIO 2022+ returns 404 with a JSON error body.
 			errBody := map[string]string{
@@ -179,26 +185,26 @@ func (s *UserHTTPService) RemoveUser(w nethttp.ResponseWriter, r *nethttp.Reques
 	}
 
 	if err := s.users.Delete(r.Context(), u.UUID); err != nil {
-		s.log.Error("Failed to delete user", "error", err, "accessKey", accessKey)
+		s.ctxLog(r.Context()).Error("Failed to delete user", "error", err, "accessKey", accessKey)
 		w.WriteHeader(nethttp.StatusInternalServerError)
 		return
 	}
 
-	s.log.With("accessKey", accessKey).Info("User deleted successfully")
+	s.ctxLog(r.Context()).With("accessKey", accessKey).Info("User deleted successfully")
 	w.WriteHeader(nethttp.StatusOK)
 }
 
 func (s *UserHTTPService) InfoUser(w nethttp.ResponseWriter, r *nethttp.Request) {
 	accessKey := query.String(r, "accessKey", "")
 	if accessKey == "" {
-		s.log.Error("Missing accessKey parameter")
+		s.ctxLog(r.Context()).Error("Missing accessKey parameter")
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
 
 	userEntity, err := s.users.GetByAccessKey(r.Context(), accessKey)
 	if err != nil {
-		s.log.Error("Failed to get user", "error", err, "accessKey", accessKey)
+		s.ctxLog(r.Context()).Error("Failed to get user", "error", err, "accessKey", accessKey)
 		if svcerrors.IsNotFound(err) {
 			errBody := map[string]string{
 				"Code":      "XMinioAdminNoSuchUser",
@@ -223,7 +229,7 @@ func (s *UserHTTPService) InfoUser(w nethttp.ResponseWriter, r *nethttp.Request)
 
 	groups := make([]string, 0)
 	if gs, err := s.users.GetGroups(r.Context(), userEntity.UUID); err != nil {
-		s.log.Error("Failed to list groups for user", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to list groups for user", "error", err)
 	} else {
 		groups = gs
 	}
@@ -239,7 +245,7 @@ func (s *UserHTTPService) InfoUser(w nethttp.ResponseWriter, r *nethttp.Request)
 
 	w.Header().Set(headers.ContentType, "application/json")
 	if err := json.NewEncoder(w).Encode(response); err != nil {
-		s.log.Error("Failed to encode response", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to encode response", "error", err)
 	}
 }
 
@@ -248,12 +254,12 @@ func (s *UserHTTPService) SetUserStatus(w nethttp.ResponseWriter, r *nethttp.Req
 	status := query.String(r, "status", "")
 
 	if accessKey == "" {
-		s.log.Error("Missing accessKey parameter")
+		s.ctxLog(r.Context()).Error("Missing accessKey parameter")
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
 	if status == "" {
-		s.log.Error("Missing status parameter")
+		s.ctxLog(r.Context()).Error("Missing status parameter")
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
@@ -265,7 +271,7 @@ func (s *UserHTTPService) SetUserStatus(w nethttp.ResponseWriter, r *nethttp.Req
 	case "disabled":
 		userStatus = iamPkg.UserStatusDisabled
 	default:
-		s.log.Error("Invalid status value", "status", status)
+		s.ctxLog(r.Context()).Error("Invalid status value", "status", status)
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
@@ -273,7 +279,7 @@ func (s *UserHTTPService) SetUserStatus(w nethttp.ResponseWriter, r *nethttp.Req
 	// Translate access key → UUID at the HTTP boundary.
 	u, err := s.users.GetByAccessKey(r.Context(), accessKey)
 	if err != nil {
-		s.log.Error("Failed to find user", "error", err, "accessKey", accessKey)
+		s.ctxLog(r.Context()).Error("Failed to find user", "error", err, "accessKey", accessKey)
 		if svcerrors.IsNotFound(err) {
 			w.WriteHeader(nethttp.StatusNotFound)
 			return
@@ -287,7 +293,7 @@ func (s *UserHTTPService) SetUserStatus(w nethttp.ResponseWriter, r *nethttp.Req
 	}
 
 	if _, err := s.users.Update(r.Context(), u.UUID, &user.UpdateUserRequest{Status: &userStatus}); err != nil {
-		s.log.Error("Failed to update user status", "error", err, "accessKey", accessKey)
+		s.ctxLog(r.Context()).Error("Failed to update user status", "error", err, "accessKey", accessKey)
 		if svcerrors.IsNotFound(err) {
 			w.WriteHeader(nethttp.StatusNotFound)
 			return
@@ -300,6 +306,6 @@ func (s *UserHTTPService) SetUserStatus(w nethttp.ResponseWriter, r *nethttp.Req
 		return
 	}
 
-	s.log.Info("User status updated successfully", "accessKey", accessKey, "status", userStatus)
+	s.ctxLog(r.Context()).Info("User status updated successfully", "accessKey", accessKey, "status", userStatus)
 	w.WriteHeader(nethttp.StatusOK)
 }

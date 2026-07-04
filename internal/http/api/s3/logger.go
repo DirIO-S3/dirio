@@ -1,5 +1,12 @@
 package s3
 
-import "github.com/mallardduck/dirio/internal/logging"
+import (
+	"context"
+	"log/slog"
 
-var s3Logger = logging.Default().With("component", "s3")
+	"github.com/mallardduck/dirio/internal/logging"
+)
+
+func s3Logger(ctx context.Context) *slog.Logger {
+	return logging.ComponentWithContext(ctx, "s3")
+}

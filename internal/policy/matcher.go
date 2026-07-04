@@ -1,6 +1,7 @@
 package policy
 
 import (
+	"context"
 	"strings"
 
 	"github.com/mallardduck/dirio/internal/policy/conditions"
@@ -306,7 +307,7 @@ func matchNotResourceWithVariables(stmtNotResource any, reqResource *Resource, v
 
 // evaluateStatement evaluates a single policy statement against a request.
 // Returns the decision based on the statement's Effect if all conditions match.
-func evaluateStatement(stmt *iam.Statement, req *RequestContext) Decision {
+func evaluateStatement(ctx context.Context, stmt *iam.Statement, req *RequestContext) Decision {
 	// 1. Check if principal matches
 	// Use NotPrincipal if Principal is nil, otherwise use Principal
 	if stmt.Principal != nil {
@@ -357,11 +358,11 @@ func evaluateStatement(stmt *iam.Statement, req *RequestContext) Decision {
 		match, err := evaluator.Evaluate(stmt.Condition)
 		if err != nil {
 			// Fail-closed: treat errors as non-match
-			authzLogger.With("error", err, "statement_sid", stmt.Sid).Warn("condition evaluation error")
+			authzLogger(ctx).With("error", err, "statement_sid", stmt.Sid).Warn("condition evaluation error")
 			return DecisionDeny
 		}
 		if !match {
-			authzLogger.With("statement_sid", stmt.Sid).Debug("condition did not match")
+			authzLogger(ctx).With("statement_sid", stmt.Sid).Debug("condition did not match")
 			return DecisionDeny
 		}
 	}

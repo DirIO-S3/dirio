@@ -23,10 +23,10 @@ func (h *HTTPHandler) PutObjectTagging(w http.ResponseWriter, r *http.Request, b
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
 		if writeErr := WriteErrorResponse(w, requestID, s3types.ErrCodeInternalError, response.SetErrAsMessage(err)); writeErr != nil {
-			s3Logger.With("err", err, "write_err", writeErr).Warn("failed to read tagging request body and failed to write error response")
+			s3Logger(r.Context()).With("err", err, "write_err", writeErr).Warn("failed to read tagging request body and failed to write error response")
 			return
 		}
-		s3Logger.With("err", err).Warn("failed to read tagging request body")
+		s3Logger(r.Context()).With("err", err).Warn("failed to read tagging request body")
 		return
 	}
 
@@ -34,10 +34,10 @@ func (h *HTTPHandler) PutObjectTagging(w http.ResponseWriter, r *http.Request, b
 	var taggingReq s3types.PutObjectTaggingRequest
 	if err := xml.Unmarshal(body, &taggingReq); err != nil {
 		if writeErr := WriteErrorResponse(w, requestID, s3types.ErrCodeMalformedXML, response.SetErrAsMessage(err)); writeErr != nil {
-			s3Logger.With("err", err, "write_err", writeErr).Warn("failed to parse tagging XML and failed to write error response")
+			s3Logger(r.Context()).With("err", err, "write_err", writeErr).Warn("failed to parse tagging XML and failed to write error response")
 			return
 		}
-		s3Logger.With("err", err).Warn("failed to parse tagging XML")
+		s3Logger(r.Context()).With("err", err).Warn("failed to parse tagging XML")
 		return
 	}
 
@@ -56,11 +56,11 @@ func (h *HTTPHandler) PutObjectTagging(w http.ResponseWriter, r *http.Request, b
 	if err != nil {
 		switch {
 		case errors.Is(err, s3types.ErrObjectNotFound):
-			respondError(w, requestID, err, s3types.ErrCodeNoSuchKey, "object not found for tagging", response.SetErrAsMessage(err))
+			respondError(r.Context(), w, requestID, err, s3types.ErrCodeNoSuchKey, "object not found for tagging", response.SetErrAsMessage(err))
 		case errors.Is(err, s3types.ErrBucketNotFound):
-			respondError(w, requestID, err, s3types.ErrCodeNoSuchBucket, "bucket not found for tagging", response.SetErrAsMessage(err))
+			respondError(r.Context(), w, requestID, err, s3types.ErrCodeNoSuchBucket, "bucket not found for tagging", response.SetErrAsMessage(err))
 		default:
-			respondError(w, requestID, err, s3types.ErrCodeInternalError, "failed to set object tags", response.SetErrAsMessage(err))
+			respondError(r.Context(), w, requestID, err, s3types.ErrCodeInternalError, "failed to set object tags", response.SetErrAsMessage(err))
 		}
 		return
 	}
@@ -82,11 +82,11 @@ func (h *HTTPHandler) GetObjectTagging(w http.ResponseWriter, r *http.Request, b
 	if err != nil {
 		switch {
 		case errors.Is(err, s3types.ErrObjectNotFound):
-			respondError(w, requestID, err, s3types.ErrCodeNoSuchKey, "object not found for getting tags", response.SetErrAsMessage(err))
+			respondError(r.Context(), w, requestID, err, s3types.ErrCodeNoSuchKey, "object not found for getting tags", response.SetErrAsMessage(err))
 		case errors.Is(err, s3types.ErrBucketNotFound):
-			respondError(w, requestID, err, s3types.ErrCodeNoSuchBucket, "bucket not found for getting tags", response.SetErrAsMessage(err))
+			respondError(r.Context(), w, requestID, err, s3types.ErrCodeNoSuchBucket, "bucket not found for getting tags", response.SetErrAsMessage(err))
 		default:
-			respondError(w, requestID, err, s3types.ErrCodeInternalError, "failed to get object tags", response.SetErrAsMessage(err))
+			respondError(r.Context(), w, requestID, err, s3types.ErrCodeInternalError, "failed to get object tags", response.SetErrAsMessage(err))
 		}
 		return
 	}
@@ -108,6 +108,6 @@ func (h *HTTPHandler) GetObjectTagging(w http.ResponseWriter, r *http.Request, b
 	// Return XML response
 	w.Header().Set(headers.ContentType, "application/xml")
 	if writeErr := WriteXMLResponse(w, http.StatusOK, taggingResp); writeErr != nil {
-		s3Logger.With("err", writeErr).Warn("failed to write tagging XML response")
+		s3Logger(r.Context()).With("err", writeErr).Warn("failed to write tagging XML response")
 	}
 }
