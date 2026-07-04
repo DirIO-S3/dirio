@@ -2,6 +2,13 @@ module github.com/mallardduck/dirio
 
 go 1.26
 
+replace (
+	github.com/mallardduck/dirio/api => ./api
+	github.com/mallardduck/dirio/common => ./common
+	github.com/mallardduck/dirio/console => ./console
+	github.com/mallardduck/dirio/sdk => ./sdk
+)
+
 replace github.com/brutella/dnssd => github.com/mallardduck/dnssd v0.0.0-20260320220649-bc4db50b7db8
 
 require (
@@ -13,10 +20,10 @@ require (
 	github.com/go-chi/chi/v5 v5.3.0
 	github.com/go-git/go-billy/v5 v5.9.0
 	github.com/google/uuid v1.6.0
-	github.com/mallardduck/dirio/api v0.0.0-20260608005525-2f53ba8ad90d
-	github.com/mallardduck/dirio/common v0.0.0-20260608005525-2f53ba8ad90d
-	github.com/mallardduck/dirio/console v0.0.0-20260608005525-2f53ba8ad90d
-	github.com/mallardduck/dirio/sdk v0.0.0-20260608005525-2f53ba8ad90d
+	github.com/mallardduck/dirio/api v0.0.0
+	github.com/mallardduck/dirio/common v0.0.0
+	github.com/mallardduck/dirio/console v0.0.0
+	github.com/mallardduck/dirio/sdk v0.0.0
 	github.com/mallardduck/go-http-helpers v0.1.0
 	github.com/mallardduck/teapot-router v0.15.2
 	github.com/minio/madmin-go/v3 v3.0.110

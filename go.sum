@@ -291,14 +291,6 @@ github.com/lufia/plan9stats v0.0.0-20260627054121-477a66015f15 h1:YkjVPl/YH5XlJ+
 github.com/lufia/plan9stats v0.0.0-20260627054121-477a66015f15/go.mod h1:autxFIvghDt3jPTLoqZ9OZ7s9qTGNAWmYCjVFWPX/zg=
 github.com/magiconair/properties v1.8.10 h1:s31yESBquKXCV9a/ScB3ESkOjUYYv+X0rg8SYxI99mE=
 github.com/magiconair/properties v1.8.10/go.mod h1:Dhd985XPs7jluiymwWYZ0G4Z61jb3vdS329zhj2hYo0=
-github.com/mallardduck/dirio/api v0.0.0-20260608005525-2f53ba8ad90d h1:Pbp6Epg45tqNF1sWRXCVnPsTnp1rf6a4DnplWdKjTto=
-github.com/mallardduck/dirio/api v0.0.0-20260608005525-2f53ba8ad90d/go.mod h1:kV0GE6PFjUopMjJxdbz2pALeER+dg+L2qyvooKWHtGQ=
-github.com/mallardduck/dirio/common v0.0.0-20260608005525-2f53ba8ad90d h1:q5/rLrh/DcBdKjNUWP7o7WQ5ZQWqOLqhNMfTTLe4L1g=
-github.com/mallardduck/dirio/common v0.0.0-20260608005525-2f53ba8ad90d/go.mod h1:sF+HNVcBKXSeDJNpa2CEHN5N/gIIqeiLiH1MnmuhDTU=
-github.com/mallardduck/dirio/console v0.0.0-20260608005525-2f53ba8ad90d h1:RoPLF8Ns2VCWPvy2ho6K2iqNU12db+KbgLLHtG9ivPE=
-github.com/mallardduck/dirio/console v0.0.0-20260608005525-2f53ba8ad90d/go.mod h1:DbthQVvMvyupj7CGEa+s+V/m6Xvm7NVYd+UvNctf45g=
-github.com/mallardduck/dirio/sdk v0.0.0-20260608005525-2f53ba8ad90d h1:QF8VJaHXq9Dc850hD+Ws/x3ch7GrLt1Tx8d2Q//43tI=
-github.com/mallardduck/dirio/sdk v0.0.0-20260608005525-2f53ba8ad90d/go.mod h1:dDr+SJUc+DeWTYwD5NQl+sPeZ7ASBYFx7B0ylgS62QU=
 github.com/mallardduck/dnssd v0.0.0-20260320220649-bc4db50b7db8 h1:uE15L7jNiGBgF77kGRK8xBOOyEp5tV7YyO6xrul4RVE=
 github.com/mallardduck/dnssd v0.0.0-20260320220649-bc4db50b7db8/go.mod h1:tG4GE8orv6+irE5rdsNgb6MJSxm6cyMUKdC5jmD22gk=
 github.com/mallardduck/go-http-helpers v0.1.0 h1:jRDoVnPahYuOOsX7nS0S9YAWkC9R6RFvDSfIck828yk=
