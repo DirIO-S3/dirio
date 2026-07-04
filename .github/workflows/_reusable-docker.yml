@@ -66,6 +66,7 @@ on:
 permissions:
   contents: read
   packages: write
+  actions: write
 
 jobs:
   docker:
@@ -109,3 +110,9 @@ jobs:
           GIT_TREE_STATE=${{ inputs.git_tree_state }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
+
+    - name: Cancel workflow run on failure
+      if: failure()
+      run: gh run cancel ${{ github.run_id }}
+      env:
+        GH_TOKEN: ${{ github.token }}

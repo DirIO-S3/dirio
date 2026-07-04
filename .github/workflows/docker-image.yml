@@ -9,6 +9,7 @@ on:
 permissions:
   contents: read
   packages: write
+  actions: write
 
 jobs:
   # Compute image tags using the SHA of the commit that was actually tested.

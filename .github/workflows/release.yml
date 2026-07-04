@@ -8,6 +8,7 @@ on:
 permissions:
   contents: write
   packages: write
+  actions: write
 
 jobs:
   # ── Gate ─────────────────────────────────────────────────────────────────────
@@ -47,6 +48,12 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+    - name: Cancel workflow run on failure
+      if: failure()
+      run: gh run cancel ${{ github.run_id }}
+      env:
+        GH_TOKEN: ${{ github.token }}
+
   # ── Container image release ───────────────────────────────────────────────────
   # Metadata computation runs in parallel with goreleaser (both need only tests).
   # The undraft job acts as the final gate — nothing is public until both
@@ -72,6 +79,12 @@ jobs:
           type=semver,pattern={{major}}.{{minor}}
           type=semver,pattern={{major}}
           type=raw,value=latest,enable=${{ !contains(github.ref_name, '-') }}
+
+    - name: Cancel workflow run on failure
+      if: failure()
+      run: gh run cancel ${{ github.run_id }}
+      env:
+        GH_TOKEN: ${{ github.token }}
 
   docker:
     name: Release Image
