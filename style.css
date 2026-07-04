@@ -107,6 +107,14 @@ main {
   margin-top: 0;
 }
 
+.callout {
+  border: 1px solid var(--teal);
+  background: rgba(0, 162, 146, 0.08);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  margin: 1.25rem 0;
+}
+
 .columns {
   display: grid;
   grid-template-columns: 1fr 1fr;

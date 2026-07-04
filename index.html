@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DirIO — Filesystem-native S3-compatible object store</title>
-<meta name="description" content="DirIO is a filesystem-native S3-compatible object storage server. Objects are files, buckets are directories. Download the server and CLI client.">
+<meta name="description" content="DirIO is a filesystem-native S3-compatible object storage server, a drop-in replacement for MinIO's legacy single-node filesystem (FS) mode — not MinIO's current erasure-coded/distributed backend. Download the server and CLI client.">
 <link rel="icon" type="image/svg+xml" href="dirio_logo.svg">
 <link rel="stylesheet" href="style.css">
 </head>
@@ -28,7 +28,14 @@
     <p>
       DirIO is an S3-compatible object storage server where objects are just files on disk.
       No chunking, no encoding, no abstraction layers — just directories and files. It's built
-      as a drop-in replacement for MinIO's discontinued single-node filesystem mode.
+      as a drop-in replacement for MinIO's discontinued <strong>single-node filesystem (FS) mode</strong>
+      — the old mode where objects were stored as plain files.
+    </p>
+    <p class="callout">
+      <strong>Not related to MinIO's current erasure-coded/distributed backend.</strong>
+      Modern MinIO (its default since FS mode was removed) splits objects into shards across
+      drives — a completely different on-disk format that DirIO cannot read. DirIO only reads
+      data from MinIO's legacy single-node FS-mode installs.
     </p>
     <div class="columns">
       <div>
@@ -37,7 +44,7 @@
           <li>Serves S3 API requests over HTTP</li>
           <li>Stores objects as regular files in <code>buckets/</code></li>
           <li>Maintains metadata in <code>.metadata/</code> (JSON files)</li>
-          <li>Imports from MinIO's <code>.minio.sys/</code> on first boot</li>
+          <li>Imports from a legacy MinIO FS-mode <code>.minio.sys/</code> on first boot</li>
           <li>Runs in a container on your NAS</li>
         </ul>
       </div>
@@ -48,6 +55,7 @@
           <li>Built-in replication</li>
           <li>Advanced S3 features (yet)</li>
           <li>Replace production-grade S3 implementations</li>
+          <li>Read MinIO's erasure-coded/distributed backend data</li>
         </ul>
       </div>
     </div>
