@@ -120,7 +120,7 @@ func (ps *perfServer) listObjectsV2(t *testing.T, bucket, prefix string, maxKeys
 		url += "&prefix=" + prefix
 	}
 
-	req, err := http.NewRequest(http.MethodGet, url, nil)
+	req, err := http.NewRequest(http.MethodGet, url, http.NoBody)
 	if err != nil {
 		t.Fatalf("build ListObjectsV2 request: %v", err)
 	}
@@ -131,7 +131,7 @@ func (ps *perfServer) listObjectsV2(t *testing.T, bucket, prefix string, maxKeys
 		t.Fatalf("ListObjectsV2: %v", err)
 	}
 	defer resp.Body.Close()
-	io.Copy(io.Discard, resp.Body) //nolint:errcheck
+	io.Copy(io.Discard, resp.Body) //nolint:errcheck // best-effort drain to allow connection reuse
 	return resp.StatusCode
 }
 
@@ -235,7 +235,7 @@ echo "total objects in bucket: $TOTAL"
 	if err != nil {
 		t.Fatalf("start mc seeding container: %v", err)
 	}
-	defer container.Terminate(ctx) //nolint:errcheck
+	defer container.Terminate(ctx) //nolint:errcheck // best-effort cleanup, test already reported any real failure
 
 	logs, err := container.Logs(ctx)
 	if err != nil {
@@ -261,7 +261,7 @@ echo "total objects in bucket: $TOTAL"
 func captureProfile(t *testing.T, ps *perfServer, profileType string, seconds int) string {
 	t.Helper()
 
-	outDir := filepath.Join("profiles")
+	outDir := "profiles"
 	if err := os.MkdirAll(outDir, 0o755); err != nil {
 		t.Fatalf("create profiles dir: %v", err)
 	}
