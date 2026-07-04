@@ -18,6 +18,7 @@ import (
 	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/osfs"
+	"github.com/mallardduck/teapot-router/pkg/dispatch"
 	"github.com/mallardduck/teapot-router/pkg/teapot"
 
 	minioHTTP "github.com/mallardduck/dirio/internal/compat/minio/http"
@@ -37,7 +38,6 @@ import (
 	"github.com/mallardduck/dirio/internal/http/auth"
 	"github.com/mallardduck/dirio/internal/http/middleware"
 	"github.com/mallardduck/dirio/internal/http/urlbuilder"
-	"github.com/mallardduck/dirio/internal/http/vhost"
 	"github.com/mallardduck/dirio/internal/policy"
 
 	"github.com/mallardduck/dirio/internal/config/data"
@@ -285,25 +285,6 @@ func (s *Server) newRouter() *teapot.Router {
 	return r
 }
 
-// hostRouter dispatches each request to either the vhost-style or
-// path-style router based on the request's Host header. This is the only
-// place that decides which addressing style serves a given request.
-type hostRouter struct {
-	canonicalDomain string
-	pathRouter      http.Handler
-	vhostRouter     http.Handler // nil if vhost-style is disabled
-}
-
-func (h *hostRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if h.vhostRouter != nil {
-		if _, ok := vhost.BucketFromHost(r.Host, h.canonicalDomain); ok {
-			h.vhostRouter.ServeHTTP(w, r)
-			return
-		}
-	}
-	h.pathRouter.ServeHTTP(w, r)
-}
-
 // trackRequest is a middleware that increments requestCount for each
 // in-flight request and decrements it when the handler returns.  It also
 // returns 503 early for any request that arrives after shutdown has begun,
@@ -340,11 +321,10 @@ func (s *Server) buildHandler() http.Handler {
 		return s.router
 	}
 
-	return &hostRouter{
-		canonicalDomain: s.config.CanonicalDomain,
-		pathRouter:      s.router,
-		vhostRouter:     s.vhostRouter,
-	}
+	return dispatch.New(func(b *dispatch.Builder) {
+		b.When(dispatch.HostHasSubdomain(s.config.CanonicalDomain)).Do(s.vhostRouter.ServeHTTP)
+		b.Default(s.router.ServeHTTP)
+	})
 }
 
 // Start begins serving HTTP requests with graceful shutdown support.

@@ -18,7 +18,8 @@ import (
 	"github.com/mallardduck/dirio/internal/http/server/favicon"
 	"github.com/mallardduck/dirio/internal/http/server/health"
 	"github.com/mallardduck/dirio/internal/http/server/metrics"
-	"github.com/mallardduck/dirio/internal/http/vhost"
+
+	teapoturlbuilder "github.com/mallardduck/teapot-router/pkg/urlbuilder"
 
 	"github.com/mallardduck/dirio/internal/consts"
 	"github.com/mallardduck/dirio/internal/persistence/metadata"
@@ -209,7 +210,7 @@ func vhostStyle(canonicalDomain string) routeStyle {
 	return routeStyle{
 		bucketSegment: "",
 		resolveBucket: func(r *http.Request) string {
-			b, _ := vhost.BucketFromHost(r.Host, canonicalDomain)
+			b, _ := teapoturlbuilder.SubdomainFromHost(r.Host, canonicalDomain)
 			return b
 		},
 	}

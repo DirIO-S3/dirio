@@ -303,8 +303,8 @@ github.com/mallardduck/dnssd v0.0.0-20260320220649-bc4db50b7db8 h1:uE15L7jNiGBgF
 github.com/mallardduck/dnssd v0.0.0-20260320220649-bc4db50b7db8/go.mod h1:tG4GE8orv6+irE5rdsNgb6MJSxm6cyMUKdC5jmD22gk=
 github.com/mallardduck/go-http-helpers v0.1.0 h1:jRDoVnPahYuOOsX7nS0S9YAWkC9R6RFvDSfIck828yk=
 github.com/mallardduck/go-http-helpers v0.1.0/go.mod h1:eO0jzR/8OqxIeLGgeRCTYRB5Q8yHH+pndXwQYJH2LVg=
-github.com/mallardduck/teapot-router v0.14.2 h1:3YzAJeLWu8LR8Jlr3f7Up7LHQh9pMHlEUXOKagJw8YU=
-github.com/mallardduck/teapot-router v0.14.2/go.mod h1:eDvmnDnUToo8yas+sM0LLwu53nE4xmWo1Q/uNVK68GU=
+github.com/mallardduck/teapot-router v0.15.2 h1:MUvi/+lHD77outSYLDK4K3j1VmHrFfGY743ck0D7Yj8=
+github.com/mallardduck/teapot-router v0.15.2/go.mod h1:2yupCDC+F9KIoi+AjOF5py4WBwhFY4uwUDSa8VqlB8I=
 github.com/mattn/go-colorable v0.1.14 h1:9A9LHSqF/7dyVVX6g0U9cwm9pG3kP9gSzcuIPHPsaIE=
 github.com/mattn/go-colorable v0.1.14/go.mod h1:6LmQG8QLFO4G5z1gPvYEzlUgJ2wF+stgPZH1UqBm1s8=
 github.com/mattn/go-isatty v0.0.22 h1:j8l17JJ9i6VGPUFUYoTUKPSgKe/83EYU2zBC7YNKMw4=
