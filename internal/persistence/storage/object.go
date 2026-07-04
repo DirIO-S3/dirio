@@ -84,6 +84,9 @@ func (s *Storage) GetObject(ctx context.Context, bucket, key string) (*Object, e
 	// Open file for reading
 	file, err := bucketFS.Open(objectPath)
 	if err != nil {
+		if isNotExist(err) {
+			return nil, ErrNoSuchKey
+		}
 		return nil, err
 	}
 
