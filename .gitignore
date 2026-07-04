@@ -44,3 +44,6 @@ vendor/
 # Local multi-module workspace (see go.work.example)
 /go.work
 /go.work.sum
+
+# gh-pages worktree (see Taskfile.yml pages:* targets)
+/.worktree/

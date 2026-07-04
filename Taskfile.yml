@@ -302,3 +302,21 @@ tasks:
       - task: download-tailwind
       - task: vendor-htmx
       - task: build-ui
+
+  # ── Pages ─────────────────────────────────────────────────────────────────
+  # Site source lives entirely on the gh-pages branch (not here) — these are
+  # generic worktree/preview helpers, not the site generator.
+
+  pages:worktree:
+    desc: Add a git worktree at .worktree/gh-pages checked out to the gh-pages branch
+    status:
+      - test -d .worktree/gh-pages
+    cmds:
+      - git fetch origin gh-pages
+      - git worktree add .worktree/gh-pages gh-pages
+
+  pages:preview:
+    desc: Serve the gh-pages worktree locally for preview
+    deps: [pages:worktree]
+    cmds:
+      - python3 -m http.server 8000 --directory .worktree/gh-pages
