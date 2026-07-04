@@ -1,4 +1,4 @@
-FROM alpine:3.19
+FROM alpine:3.24
 
 # MC_RELEASE: a specific mc release tag, e.g. RELEASE.2025-08-13T08-35-41Z
 # Browse available releases: https://github.com/minio/mc/releases
