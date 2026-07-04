@@ -40,3 +40,7 @@ Thumbs.db
 
 # Vendor directory
 vendor/
+
+# Local multi-module workspace (see go.work.example)
+/go.work
+/go.work.sum
