@@ -211,6 +211,44 @@ func NewDataConfigOnly(t *testing.T, dataAccessKey, dataSecretKey string) *TestS
 	return startServer(t, dataDir, cfg, cancel)
 }
 
+// NewWithCanonicalDomain starts a server with CanonicalDomain configured,
+// enabling virtual-hosted-style routing in addition to path-style. Use the
+// default test credentials.
+func NewWithCanonicalDomain(t *testing.T, canonicalDomain string) *TestServer {
+	t.Helper()
+
+	dataDir, err := os.MkdirTemp("", "dirio-test-*")
+	if err != nil {
+		t.Fatalf("testutil: create temp dir: %v", err)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+
+	s, err := startup.Init(dataDir)
+	if err != nil {
+		os.RemoveAll(dataDir)
+		cancel()
+		t.Fatalf("testutil: startup.Init: %v", err)
+	}
+	if err := s.Prepare(ctx, "", DefaultAccessKey, DefaultSecretKey, true); err != nil {
+		os.RemoveAll(dataDir)
+		cancel()
+		t.Fatalf("testutil: startup.Prepare: %v", err)
+	}
+
+	cfg := &server.Config{
+		DataDir:                     dataDir,
+		Port:                        FindFreePort(t),
+		AccessKey:                   DefaultAccessKey,
+		SecretKey:                   DefaultSecretKey,
+		CLICredentialsExplicitlySet: true,
+		RootFS:                      s.RootFS(),
+		Metadata:                    s.MetadataManager(),
+		CanonicalDomain:             canonicalDomain,
+	}
+	return startServer(t, dataDir, cfg, cancel)
+}
+
 // NewWithPreStartHook starts a server with the default test credentials and
 // calls hook on the *server.Server after New but before Start.  This is used
 // by the console test package so it can call SetConsole before the HTTP

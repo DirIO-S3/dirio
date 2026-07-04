@@ -19,7 +19,6 @@ import (
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/osfs"
 	"github.com/mallardduck/teapot-router/pkg/teapot"
-	"github.com/mallardduck/teapot-router/pkg/urlbuilder"
 
 	minioHTTP "github.com/mallardduck/dirio/internal/compat/minio/http"
 	"github.com/mallardduck/dirio/internal/consts"
@@ -37,6 +36,8 @@ import (
 	"github.com/mallardduck/dirio/internal/http/api"
 	"github.com/mallardduck/dirio/internal/http/auth"
 	"github.com/mallardduck/dirio/internal/http/middleware"
+	"github.com/mallardduck/dirio/internal/http/urlbuilder"
+	"github.com/mallardduck/dirio/internal/http/vhost"
 	"github.com/mallardduck/dirio/internal/policy"
 
 	"github.com/mallardduck/dirio/internal/config/data"
@@ -96,6 +97,7 @@ type Config struct {
 type Server struct {
 	config       *Config
 	router       *teapot.Router
+	vhostRouter  *teapot.Router // nil unless config.CanonicalDomain is set
 	storage      *storage.Storage
 	metadata     *metadata.Manager
 	auth         *auth.Authenticator
@@ -217,27 +219,11 @@ func New(config *Config) (*Server, error) {
 	return srv, nil
 }
 
-// setupRoutes configures HTTP routing.
+// setupRoutes configures HTTP routing. It always builds the path-style
+// router; a second, vhost-style router is built only when CanonicalDomain
+// is configured — see docs/design/VHOST-ROUTING.md.
 func (s *Server) setupRoutes() {
-	s.router = teapot.New()
-
-	s.router.Use(loggingHttp.RecoveryMiddleware)
-	s.router.Use(chiMiddleware.StripSlashes)
-	s.router.Use(middleware.Timing)
-	s.router.Use(s.trackRequest) // count in-flight requests; check inShutdown
-	s.router.Use(middleware.TraceID)
-	s.router.Use(middleware.RequestID)
-	s.router.Use(teapot.RouteContextMiddleware(s.router))
-	s.router.Use(miniomiddleware.CompatHeaders)
-	s.router.Use(loggingHttp.PrepareAccessLogMiddleware(s.log))
-
-	// OTel HTTP instrumentation — records http.server.request.duration histogram
-	// and http.server.active_requests gauge automatically.
-	if s.telemetry != nil {
-		s.router.Use(otelhttp.NewMiddleware("dirio.server",
-			otelhttp.WithMeterProvider(s.telemetry.MeterProvider()),
-		))
-	}
+	s.router = s.newRouter()
 
 	serviceFactory := service.NewServiceFactory(s.storage, s.metadata, s.policyEngine, s.auth)
 	apiHandler := api.New(
@@ -264,6 +250,58 @@ func (s *Server) setupRoutes() {
 	}
 
 	SetupRoutes(s.router, deps)
+
+	if s.config.CanonicalDomain != "" {
+		s.vhostRouter = s.newRouter()
+		SetupVHostRoutes(s.vhostRouter, deps, s.config.CanonicalDomain)
+	}
+}
+
+// newRouter builds a teapot.Router with the standard middleware chain
+// applied. Both the path-style and vhost-style routers share this same
+// chain — the only thing that ever differs between them is which routes
+// get registered on top.
+func (s *Server) newRouter() *teapot.Router {
+	r := teapot.New()
+
+	r.Use(loggingHttp.RecoveryMiddleware)
+	r.Use(chiMiddleware.StripSlashes)
+	r.Use(middleware.Timing)
+	r.Use(s.trackRequest) // count in-flight requests; check inShutdown
+	r.Use(middleware.TraceID)
+	r.Use(middleware.RequestID)
+	r.Use(teapot.RouteContextMiddleware(r))
+	r.Use(miniomiddleware.CompatHeaders)
+	r.Use(loggingHttp.PrepareAccessLogMiddleware(s.log))
+
+	// OTel HTTP instrumentation — records http.server.request.duration histogram
+	// and http.server.active_requests gauge automatically.
+	if s.telemetry != nil {
+		r.Use(otelhttp.NewMiddleware("dirio.server",
+			otelhttp.WithMeterProvider(s.telemetry.MeterProvider()),
+		))
+	}
+
+	return r
+}
+
+// hostRouter dispatches each request to either the vhost-style or
+// path-style router based on the request's Host header. This is the only
+// place that decides which addressing style serves a given request.
+type hostRouter struct {
+	canonicalDomain string
+	pathRouter      http.Handler
+	vhostRouter     http.Handler // nil if vhost-style is disabled
+}
+
+func (h *hostRouter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if h.vhostRouter != nil {
+		if _, ok := vhost.BucketFromHost(r.Host, h.canonicalDomain); ok {
+			h.vhostRouter.ServeHTTP(w, r)
+			return
+		}
+	}
+	h.pathRouter.ServeHTTP(w, r)
 }
 
 // trackRequest is a middleware that increments requestCount for each
@@ -288,15 +326,25 @@ func (s *Server) consoleSamePort() bool {
 }
 
 // buildHandler constructs the top-level http.Handler, mounting the console
-// when it is configured for same-port operation.
+// when it is configured for same-port operation, and wrapping both routers
+// in a hostRouter when vhost-style addressing is enabled. The console is
+// only ever mounted on the path router — there is no vhost equivalent of
+// "the admin UI bucket".
 func (s *Server) buildHandler() http.Handler {
-	if s.consoleRouter == nil || !s.consoleSamePort() {
+	if s.consoleRouter != nil && s.consoleSamePort() {
+		s.router.MountNamed(ui.DefaultBasePath, "dirio", s.consoleRouter)
+		s.log.Info("console mounted on main port", "path", ui.DefaultBasePath+"/")
+	}
+
+	if s.vhostRouter == nil {
 		return s.router
 	}
 
-	s.router.MountNamed(ui.DefaultBasePath, "dirio", s.consoleRouter)
-	s.log.Info("console mounted on main port", "path", ui.DefaultBasePath+"/")
-	return s.router
+	return &hostRouter{
+		canonicalDomain: s.config.CanonicalDomain,
+		pathRouter:      s.router,
+		vhostRouter:     s.vhostRouter,
+	}
 }
 
 // Start begins serving HTTP requests with graceful shutdown support.

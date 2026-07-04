@@ -400,6 +400,34 @@ admin.example.com {
 
 ---
 
+## Virtual-Hosted-Style Bucket Addressing (Optional)
+
+Setting `--canonical-domain` (or `DIRIO_CANONICAL_DOMAIN`) enables
+virtual-hosted-style requests — `{bucket}.s3.example.com/{key}` — in
+addition to the default path-style `s3.example.com/{bucket}/{key}`. Both
+styles are always served side by side; there is no mode switch, and
+path-style access (including by raw IP) keeps working unchanged.
+
+Requirements and limitations:
+
+- **A real DNS wildcard is required.** Point `*.s3.example.com` (and
+  `s3.example.com` itself) at DirIO. mDNS discovery only covers the bare S3
+  and admin endpoints, not arbitrary bucket subdomains.
+- **The `Host` header must reach DirIO unmodified.** DirIO resolves the
+  bucket name from `Host` and nothing else — it never trusts
+  `X-Forwarded-Host` or similar. If you terminate TLS at a reverse proxy (as
+  in the nginx/Caddy examples above), keep `proxy_set_header Host $host;` (or
+  Caddy's default passthrough) so the original Host reaches DirIO. A proxy
+  config that rewrites `Host` to an upstream service name will silently
+  break vhost-style bucket resolution.
+- **Wildcard TLS certificates don't cover dotted bucket names.** A cert for
+  `*.s3.example.com` matches `mybucket.s3.example.com` but not
+  `my.dotted.bucket.s3.example.com` — this is the same limitation AWS
+  documents for S3 itself. Buckets with dots in their name remain reachable
+  via vhost-style over plain HTTP, or via path-style always.
+
+---
+
 ## Monitoring
 
 ### Health Check
