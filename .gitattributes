@@ -4,4 +4,18 @@
 # Shell scripts and Python scripts must always use LF
 *.sh text eol=lf
 *.py text eol=lf
-*.css text eol=lf
+
+# Explicitly treat web assets as text and normalize to LF in the repo
+*.js text
+*.jsx text
+*.ts text
+*.tsx text
+*.css text
+*.scss text
+*.html text
+*.json text
+
+# Denote binary files (so Git doesn't try to fix line endings in images)
+*.png binary
+*.jpg binary
+*.gif binary
