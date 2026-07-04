@@ -1,8 +1,5 @@
 // Package urlbuilder wraps teapot-router's urlbuilder.Builder to add
-// virtual-hosted-style URL generation. It is a thin, local wrapper rather
-// than an upstream extension (see docs/design/VHOST-ROUTING.md open decision
-// #1) — DirIO doesn't currently vendor/replace teapot-router locally, so
-// extending it isn't practical without an upstream release cycle.
+// virtual-hosted-style URL generation.
 //
 // Whichever style a generated URL uses mirrors the *inbound* request's
 // style: if the client already reached us via vhost, it gets vhost URLs
@@ -12,12 +9,9 @@
 package urlbuilder
 
 import (
-	"fmt"
 	"net/http"
 
 	upstream "github.com/mallardduck/teapot-router/pkg/urlbuilder"
-
-	"github.com/mallardduck/dirio/internal/http/vhost"
 )
 
 // Builder generates URLs for S3 API responses, choosing path-style or
@@ -40,8 +34,10 @@ func New(canonicalDomain string) *Builder {
 // BucketURL generates a URL for bucket operations, mirroring whether the
 // inbound request itself was vhost- or path-style.
 func (b *Builder) BucketURL(r *http.Request, bucket string) string {
-	if _, ok := vhost.BucketFromHost(r.Host, b.canonicalDomain); ok {
-		return fmt.Sprintf("https://%s.%s", bucket, b.canonicalDomain)
+	if b.isVHostRequest(r) {
+		if url, ok := b.pathBuilder.SubdomainURL(bucket, ""); ok {
+			return url
+		}
 	}
 	return b.pathBuilder.BucketURL(r, bucket)
 }
@@ -49,8 +45,16 @@ func (b *Builder) BucketURL(r *http.Request, bucket string) string {
 // ObjectURL generates a URL for object operations, mirroring whether the
 // inbound request itself was vhost- or path-style.
 func (b *Builder) ObjectURL(r *http.Request, bucket, key string) string {
-	if _, ok := vhost.BucketFromHost(r.Host, b.canonicalDomain); ok {
-		return fmt.Sprintf("https://%s.%s/%s", bucket, b.canonicalDomain, key)
+	if b.isVHostRequest(r) {
+		if url, ok := b.pathBuilder.SubdomainURL(bucket, "/"+key); ok {
+			return url
+		}
 	}
 	return b.pathBuilder.ObjectURL(r, bucket, key)
+}
+
+// isVHostRequest reports whether r was itself addressed vhost-style.
+func (b *Builder) isVHostRequest(r *http.Request) bool {
+	_, ok := upstream.SubdomainFromHost(r.Host, b.canonicalDomain)
+	return ok
 }

@@ -18,7 +18,7 @@ require (
 	github.com/mallardduck/dirio/console v0.0.0-20260608005525-2f53ba8ad90d
 	github.com/mallardduck/dirio/sdk v0.0.0-20260608005525-2f53ba8ad90d
 	github.com/mallardduck/go-http-helpers v0.1.0
-	github.com/mallardduck/teapot-router v0.14.2
+	github.com/mallardduck/teapot-router v0.15.2
 	github.com/minio/madmin-go/v3 v3.0.110
 	github.com/minio/minio-go/v7 v7.2.1
 	github.com/moby/moby/api v1.55.0
