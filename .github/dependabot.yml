@@ -25,7 +25,18 @@ updates:
 
   # Docker
   - package-ecosystem: "docker"
-    directory: "/"
+    directory: "/package"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "docker"
+
+  # Docker (test client fixtures)
+  - package-ecosystem: "docker"
+    directory: "/tests/clients/docker"
     schedule:
       interval: "weekly"
       day: "monday"
