@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"sync"
 	"time"
@@ -13,7 +14,9 @@ import (
 	"github.com/mallardduck/dirio/sdk/iam"
 )
 
-var authLogger = logging.Component("auth")
+func authLogger(ctx context.Context) *slog.Logger {
+	return logging.ComponentWithContext(ctx, "auth")
+}
 
 var (
 	// ErrAuthenticationFailed is returned when authentication fails

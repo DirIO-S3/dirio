@@ -9,6 +9,7 @@ import (
 	"github.com/mallardduck/go-http-helpers/pkg/headers"
 	"github.com/mallardduck/go-http-helpers/pkg/query"
 
+	"github.com/mallardduck/dirio/internal/logging"
 	svcerrors "github.com/mallardduck/dirio/internal/service/errors"
 	"github.com/mallardduck/dirio/internal/service/group"
 	iamPkg "github.com/mallardduck/dirio/sdk/iam"
@@ -19,12 +20,16 @@ type GroupHTTPService struct {
 	log    *slog.Logger
 }
 
+func (s *GroupHTTPService) ctxLog(ctx context.Context) *slog.Logger {
+	return logging.WithContext(s.log, ctx)
+}
+
 // ListGroups handles GET /minio/admin/v3/groups
 // Returns a JSON array of group names.
 func (s *GroupHTTPService) ListGroups(w nethttp.ResponseWriter, r *nethttp.Request) {
 	names, err := s.groups.List(r.Context())
 	if err != nil {
-		s.log.Error("Failed to list groups", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to list groups", "error", err)
 		w.WriteHeader(nethttp.StatusInternalServerError)
 		return
 	}
@@ -35,7 +40,7 @@ func (s *GroupHTTPService) ListGroups(w nethttp.ResponseWriter, r *nethttp.Reque
 
 	w.Header().Set(headers.ContentType, "application/json")
 	if err := json.NewEncoder(w).Encode(names); err != nil {
-		s.log.Error("Failed to encode group list", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to encode group list", "error", err)
 	}
 }
 
@@ -44,14 +49,14 @@ func (s *GroupHTTPService) ListGroups(w nethttp.ResponseWriter, r *nethttp.Reque
 func (s *GroupHTTPService) GetGroupInfo(w nethttp.ResponseWriter, r *nethttp.Request) {
 	name := query.String(r, "group", "")
 	if name == "" {
-		s.log.Error("Missing group parameter")
+		s.ctxLog(r.Context()).Error("Missing group parameter")
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
 
 	g, err := s.groups.Get(r.Context(), name)
 	if err != nil {
-		s.log.Error("Failed to get group", "error", err, "group", name)
+		s.ctxLog(r.Context()).Error("Failed to get group", "error", err, "group", name)
 		if svcerrors.IsNotFound(err) {
 			w.WriteHeader(nethttp.StatusNotFound)
 			return
@@ -67,7 +72,7 @@ func (s *GroupHTTPService) GetGroupInfo(w nethttp.ResponseWriter, r *nethttp.Req
 	// Resolve stored UUIDs to access keys for the MinIO-compatible response.
 	memberKeys, err := s.groups.GetMemberAccessKeys(r.Context(), name)
 	if err != nil {
-		s.log.Error("Failed to resolve group member access keys", "error", err, "group", name)
+		s.ctxLog(r.Context()).Error("Failed to resolve group member access keys", "error", err, "group", name)
 		w.WriteHeader(nethttp.StatusInternalServerError)
 		return
 	}
@@ -82,7 +87,7 @@ func (s *GroupHTTPService) GetGroupInfo(w nethttp.ResponseWriter, r *nethttp.Req
 
 	w.Header().Set(headers.ContentType, "application/json")
 	if err := json.NewEncoder(w).Encode(response); err != nil {
-		s.log.Error("Failed to encode group info", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to encode group info", "error", err)
 	}
 }
 
@@ -99,13 +104,13 @@ func (s *GroupHTTPService) UpdateGroupMembers(w nethttp.ResponseWriter, r *netht
 	}
 
 	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-		s.log.Error("Failed to decode request body", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to decode request body", "error", err)
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
 
 	if body.Group == "" {
-		s.log.Error("Missing group field in request body")
+		s.ctxLog(r.Context()).Error("Missing group field in request body")
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
@@ -136,7 +141,7 @@ func (s *GroupHTTPService) handleRemove(w nethttp.ResponseWriter, ctx context.Co
 // deleteGroup deletes the named group. Writes an HTTP error and returns false on failure.
 func (s *GroupHTTPService) deleteGroup(w nethttp.ResponseWriter, ctx context.Context, groupName string) bool {
 	if err := s.groups.Delete(ctx, groupName); err != nil {
-		s.log.Error("Failed to delete group", "error", err, "group", groupName)
+		s.ctxLog(ctx).Error("Failed to delete group", "error", err, "group", groupName)
 		if svcerrors.IsNotFound(err) {
 			w.WriteHeader(nethttp.StatusNotFound)
 			return false
@@ -152,7 +157,7 @@ func (s *GroupHTTPService) deleteGroup(w nethttp.ResponseWriter, ctx context.Con
 func (s *GroupHTTPService) removeGroupMembers(w nethttp.ResponseWriter, ctx context.Context, groupName string, members []string) bool {
 	for _, accessKey := range members {
 		if err := s.groups.RemoveMemberByAccessKey(ctx, groupName, accessKey); err != nil {
-			s.log.Error("Failed to remove member from group", "error", err, "group", groupName, "accessKey", accessKey)
+			s.ctxLog(ctx).Error("Failed to remove member from group", "error", err, "group", groupName, "accessKey", accessKey)
 			if svcerrors.IsNotFound(err) {
 				w.WriteHeader(nethttp.StatusNotFound)
 				return false
@@ -171,20 +176,20 @@ func (s *GroupHTTPService) ensureGroupAndAddMembers(w nethttp.ResponseWriter, ct
 	if svcerrors.IsNotFound(err) {
 		if _, createErr := s.groups.Create(ctx, &group.CreateGroupRequest{Name: groupName}); createErr != nil {
 			if !svcerrors.IsAlreadyExists(createErr) {
-				s.log.Error("Failed to create group", "error", createErr, "group", groupName)
+				s.ctxLog(ctx).Error("Failed to create group", "error", createErr, "group", groupName)
 				w.WriteHeader(nethttp.StatusInternalServerError)
 				return false
 			}
 		}
 	} else if err != nil {
-		s.log.Error("Failed to get group", "error", err, "group", groupName)
+		s.ctxLog(ctx).Error("Failed to get group", "error", err, "group", groupName)
 		w.WriteHeader(nethttp.StatusInternalServerError)
 		return false
 	}
 
 	for _, accessKey := range members {
 		if err := s.groups.AddMemberByAccessKey(ctx, groupName, accessKey); err != nil {
-			s.log.Error("Failed to add member to group", "error", err, "group", groupName, "accessKey", accessKey)
+			s.ctxLog(ctx).Error("Failed to add member to group", "error", err, "group", groupName, "accessKey", accessKey)
 			if svcerrors.IsNotFound(err) {
 				w.WriteHeader(nethttp.StatusNotFound)
 				return false
@@ -202,12 +207,12 @@ func (s *GroupHTTPService) SetGroupStatus(w nethttp.ResponseWriter, r *nethttp.R
 	status := query.String(r, "status", "")
 
 	if name == "" {
-		s.log.Error("Missing group parameter")
+		s.ctxLog(r.Context()).Error("Missing group parameter")
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
 	if status == "" {
-		s.log.Error("Missing status parameter")
+		s.ctxLog(r.Context()).Error("Missing status parameter")
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
@@ -220,13 +225,13 @@ func (s *GroupHTTPService) SetGroupStatus(w nethttp.ResponseWriter, r *nethttp.R
 	case "disabled":
 		groupStatus = iamPkg.GroupStatusDisabled
 	default:
-		s.log.Error("Invalid status value", "status", status)
+		s.ctxLog(r.Context()).Error("Invalid status value", "status", status)
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
 
 	if err := s.groups.SetStatus(r.Context(), name, groupStatus); err != nil {
-		s.log.Error("Failed to set group status", "error", err, "group", name)
+		s.ctxLog(r.Context()).Error("Failed to set group status", "error", err, "group", name)
 		if svcerrors.IsNotFound(err) {
 			w.WriteHeader(nethttp.StatusNotFound)
 			return

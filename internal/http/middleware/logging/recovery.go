@@ -13,7 +13,7 @@ func RecoveryMiddleware(next http.Handler) http.Handler {
 		defer func() {
 			if err := recover(); err != nil {
 				// Log the panic
-				logging.Default().Error(fmt.Sprintf("Panic recovered: %v", err))
+				logging.FromContext(r.Context()).Error(fmt.Sprintf("Panic recovered: %v", err))
 
 				// Write a generic error response
 				w.WriteHeader(http.StatusInternalServerError)

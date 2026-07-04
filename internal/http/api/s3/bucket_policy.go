@@ -22,7 +22,7 @@ func (h *HTTPHandler) PutBucketPolicy(w http.ResponseWriter, r *http.Request, bu
 	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
 		requestID := middleware.GetRequestID(r.Context())
-		s3Logger.With("err", err).Warn("failed to read bucket policy request body")
+		s3Logger(r.Context()).With("err", err).Warn("failed to read bucket policy request body")
 		_ = WriteErrorResponse(w, requestID, s3types.ErrCodeInvalidRequest, response.SetErrAsMessage(err))
 		return
 	}
@@ -31,7 +31,7 @@ func (h *HTTPHandler) PutBucketPolicy(w http.ResponseWriter, r *http.Request, bu
 	var policyDoc iam.PolicyDocument
 	if err := jsonutil.Unmarshal(bodyBytes, &policyDoc); err != nil {
 		requestID := middleware.GetRequestID(r.Context())
-		s3Logger.With("err", err).Warn("failed to parse bucket policy JSON")
+		s3Logger(r.Context()).With("err", err).Warn("failed to parse bucket policy JSON")
 		_ = WriteErrorResponse(w, requestID, s3types.ErrCodeMalformedPolicy, response.SetErrAsMessage(err))
 		return
 	}
@@ -42,12 +42,12 @@ func (h *HTTPHandler) PutBucketPolicy(w http.ResponseWriter, r *http.Request, bu
 		PolicyDocument: &policyDoc,
 	}); err != nil {
 		requestID := middleware.GetRequestID(r.Context())
-		s3Logger.With("err", err, "bucket", bucket).Warn("failed to set bucket policy")
+		s3Logger(r.Context()).With("err", err, "bucket", bucket).Warn("failed to set bucket policy")
 		_ = WriteErrorResponse(w, requestID, s3types.ErrCodeInternalError, response.SetErrAsMessage(err))
 		return
 	}
 
-	s3Logger.With("bucket", bucket).Debug("set bucket policy")
+	s3Logger(r.Context()).With("bucket", bucket).Debug("set bucket policy")
 	w.WriteHeader(http.StatusNoContent)
 }
 
@@ -60,7 +60,7 @@ func (h *HTTPHandler) GetBucketPolicy(w http.ResponseWriter, r *http.Request, bu
 			_ = WriteErrorResponse(w, requestID, s3types.ErrCodeNoSuchBucketPolicy, response.SetErrAsMessage(err))
 			return
 		}
-		s3Logger.With("err", err, "bucket", bucket).Warn("failed to get bucket policy")
+		s3Logger(r.Context()).With("err", err, "bucket", bucket).Warn("failed to get bucket policy")
 		_ = WriteErrorResponse(w, requestID, s3types.ErrCodeInternalError, response.SetErrAsMessage(err))
 		return
 	}
@@ -75,7 +75,7 @@ func (h *HTTPHandler) GetBucketPolicy(w http.ResponseWriter, r *http.Request, bu
 	policyJSON, err := jsonutil.Marshal(policy)
 	if err != nil {
 		requestID := middleware.GetRequestID(r.Context())
-		s3Logger.With("err", err).Warn("failed to marshal bucket policy")
+		s3Logger(r.Context()).With("err", err).Warn("failed to marshal bucket policy")
 		_ = WriteErrorResponse(w, requestID, s3types.ErrCodeInternalError, response.SetErrAsMessage(err))
 		return
 	}
@@ -89,11 +89,11 @@ func (h *HTTPHandler) GetBucketPolicy(w http.ResponseWriter, r *http.Request, bu
 func (h *HTTPHandler) DeleteBucketPolicy(w http.ResponseWriter, r *http.Request, bucket string) {
 	if err := h.s3Service.DeleteBucketPolicy(r.Context(), bucket); err != nil {
 		requestID := middleware.GetRequestID(r.Context())
-		s3Logger.With("err", err, "bucket", bucket).Warn("failed to delete bucket policy")
+		s3Logger(r.Context()).With("err", err, "bucket", bucket).Warn("failed to delete bucket policy")
 		_ = WriteErrorResponse(w, requestID, s3types.ErrCodeInternalError, response.SetErrAsMessage(err))
 		return
 	}
 
-	s3Logger.With("bucket", bucket).Debug("deleted bucket policy")
+	s3Logger(r.Context()).With("bucket", bucket).Debug("deleted bucket policy")
 	w.WriteHeader(http.StatusNoContent)
 }

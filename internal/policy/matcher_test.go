@@ -1,6 +1,7 @@
 package policy
 
 import (
+	"context"
 	"testing"
 
 	"github.com/google/uuid"
@@ -273,7 +274,7 @@ func TestEvaluateStatement(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := evaluateStatement(tt.stmt, tt.req)
+			got := evaluateStatement(context.Background(), tt.stmt, tt.req)
 			if got != tt.expected {
 				t.Errorf("evaluateStatement() = %v, want %v", got, tt.expected)
 			}
@@ -484,7 +485,7 @@ func TestEvaluateStatementWithVariables(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := evaluateStatement(tt.stmt, tt.req)
+			got := evaluateStatement(context.Background(), tt.stmt, tt.req)
 			if got != tt.expected {
 				t.Errorf("evaluateStatement() = %v, want %v", got, tt.expected)
 			}
@@ -734,7 +735,7 @@ func TestEvaluateStatementWithNotAction(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := evaluateStatement(tt.stmt, tt.req)
+			got := evaluateStatement(context.Background(), tt.stmt, tt.req)
 			if got != tt.expected {
 				t.Errorf("evaluateStatement() = %v, want %v", got, tt.expected)
 			}
@@ -819,7 +820,7 @@ func TestEvaluateStatementWithNotResource(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := evaluateStatement(tt.stmt, tt.req)
+			got := evaluateStatement(context.Background(), tt.stmt, tt.req)
 			if got != tt.expected {
 				t.Errorf("evaluateStatement() = %v, want %v", got, tt.expected)
 			}
@@ -908,7 +909,7 @@ func TestEvaluateStatementWithNotPrincipal(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := evaluateStatement(tt.stmt, tt.req)
+			got := evaluateStatement(context.Background(), tt.stmt, tt.req)
 			if got != tt.expected {
 				t.Errorf("evaluateStatement() = %v, want %v", got, tt.expected)
 			}

@@ -58,7 +58,7 @@ func (e *Engine) Evaluate(ctx context.Context, req *RequestContext) Decision {
 
 	// 2. Bucket policy evaluation (if bucket specified)
 	if req.Resource != nil && req.Resource.Bucket != "" {
-		if d := e.checkBucketPolicy(req); d != DecisionDeny {
+		if d := e.checkBucketPolicy(ctx, req); d != DecisionDeny {
 			return d
 		}
 	}
@@ -91,7 +91,7 @@ func (e *Engine) Evaluate(ctx context.Context, req *RequestContext) Decision {
 func (e *Engine) evaluateIAMPolicies(ctx context.Context, req *RequestContext) (Decision, bool) {
 	if req.Principal.IsServiceAccount && req.Principal.PolicyMode == iam.PolicyModeOverride {
 		// Override mode is always final: the embedded policy is the only grant source.
-		return e.evaluateEmbeddedPolicy(req), true
+		return e.evaluateEmbeddedPolicy(ctx, req), true
 	}
 	d := e.evaluateNamedPolicies(ctx, req)
 	return d, d != DecisionDeny
@@ -99,7 +99,7 @@ func (e *Engine) evaluateIAMPolicies(ctx context.Context, req *RequestContext) (
 
 // evaluateEmbeddedPolicy evaluates the inline policy JSON on a SA in override mode.
 // Returns DecisionDeny when no policy is set or the JSON is unparseable.
-func (e *Engine) evaluateEmbeddedPolicy(req *RequestContext) Decision {
+func (e *Engine) evaluateEmbeddedPolicy(ctx context.Context, req *RequestContext) Decision {
 	if req.Principal.EmbeddedPolicyJSON == "" {
 		return DecisionDeny
 	}
@@ -107,7 +107,7 @@ func (e *Engine) evaluateEmbeddedPolicy(req *RequestContext) Decision {
 	if json.Unmarshal([]byte(req.Principal.EmbeddedPolicyJSON), &doc) != nil {
 		return DecisionDeny
 	}
-	return e.evaluatePolicy(&doc, req)
+	return e.evaluatePolicy(ctx, &doc, req)
 }
 
 // evaluateNamedPolicies resolves and evaluates named IAM policies for inherit-mode principals.
@@ -121,7 +121,7 @@ func (e *Engine) evaluateNamedPolicies(ctx context.Context, req *RequestContext)
 		if err != nil {
 			continue // skip missing or inaccessible policies
 		}
-		if d := e.evaluatePolicy(doc, req); d != DecisionDeny {
+		if d := e.evaluatePolicy(ctx, doc, req); d != DecisionDeny {
 			return d
 		}
 	}
@@ -130,24 +130,24 @@ func (e *Engine) evaluateNamedPolicies(ctx context.Context, req *RequestContext)
 
 // checkBucketPolicy evaluates the bucket policy for the request's bucket.
 // Returns DecisionDeny if no bucket policy is set (caller should continue evaluation).
-func (e *Engine) checkBucketPolicy(req *RequestContext) Decision {
+func (e *Engine) checkBucketPolicy(ctx context.Context, req *RequestContext) Decision {
 	bucketPolicy := e.cache.GetBucketPolicy(req.Resource.Bucket)
 	if bucketPolicy == nil {
 		return DecisionDeny
 	}
-	return e.evaluatePolicy(bucketPolicy, req)
+	return e.evaluatePolicy(ctx, bucketPolicy, req)
 }
 
 // evaluatePolicy evaluates a single policy document against a request.
 // Returns DecisionExplicitDeny if any statement explicitly denies.
 // Returns DecisionAllow if any statement allows (and no explicit deny).
 // Returns DecisionDeny if no statements match.
-func (e *Engine) evaluatePolicy(policy *iam.PolicyDocument, req *RequestContext) Decision {
+func (e *Engine) evaluatePolicy(ctx context.Context, policy *iam.PolicyDocument, req *RequestContext) Decision {
 	hasAllow := false
 
 	for i := range policy.Statement {
 		stmt := &policy.Statement[i]
-		result := evaluateStatement(stmt, req)
+		result := evaluateStatement(ctx, stmt, req)
 
 		// Explicit deny always wins immediately
 		if result == DecisionExplicitDeny {

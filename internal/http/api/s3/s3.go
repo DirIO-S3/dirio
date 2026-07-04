@@ -1,6 +1,7 @@
 package s3
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/mallardduck/dirio/internal/http/middleware"
@@ -51,10 +52,10 @@ func (h *HTTPHandler) ListBuckets(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		requestID := middleware.GetRequestID(r.Context())
 		if writeErr := WriteErrorResponse(w, requestID, s3types.ErrCodeInternalError, httpresponse.SetErrAsMessage(err)); writeErr != nil {
-			s3Logger.With("err", err, "write_err", writeErr).Warn("encountered error listing buckets and additional error writing XML error response")
+			s3Logger(r.Context()).With("err", err, "write_err", writeErr).Warn("encountered error listing buckets and additional error writing XML error response")
 			return
 		}
-		s3Logger.With("err", err).Warn("encountered error listing buckets")
+		s3Logger(r.Context()).With("err", err).Warn("encountered error listing buckets")
 		return
 	}
 
@@ -70,7 +71,7 @@ func (h *HTTPHandler) ListBuckets(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if writeErr := WriteXMLResponse(w, http.StatusOK, response); writeErr != nil {
-		s3Logger.With("err", writeErr).Warn("encountered error writing XML OK response")
+		s3Logger(r.Context()).With("err", writeErr).Warn("encountered error writing XML OK response")
 	}
 }
 
@@ -84,10 +85,10 @@ var WriteErrorResponse = httpresponse.WriteErrorResponse
 
 // respondError writes an S3 XML error response and logs the outcome.
 // The caller must return after this call.
-func respondError(w http.ResponseWriter, requestID string, err error, errCode s3types.ErrorCode, msg string, mods ...httpresponse.ErrorModifier) {
+func respondError(ctx context.Context, w http.ResponseWriter, requestID string, err error, errCode s3types.ErrorCode, msg string, mods ...httpresponse.ErrorModifier) {
 	if writeErr := WriteErrorResponse(w, requestID, errCode, mods...); writeErr != nil {
-		s3Logger.With("err", err, "write_err", writeErr).Warn(msg + " and additional error writing XML error response")
+		s3Logger(ctx).With("err", err, "write_err", writeErr).Warn(msg + " and additional error writing XML error response")
 		return
 	}
-	s3Logger.With("err", err).Warn(msg)
+	s3Logger(ctx).With("err", err).Warn(msg)
 }

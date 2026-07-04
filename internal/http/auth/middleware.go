@@ -87,10 +87,10 @@ func writeAuthError(w http.ResponseWriter, r *http.Request, err error, msg strin
 	errCode := mapAuthErrCode(err)
 	requestID := middleware.GetRequestID(r.Context())
 	if writeErr := httpresponse.WriteErrorResponse(w, requestID, errCode); writeErr != nil {
-		authLogger.With("err", err, "error_code", errCode, "write_err", writeErr).Warn(msg + " and additional error writing XML error response")
+		authLogger(r.Context()).With("err", err, "error_code", errCode, "write_err", writeErr).Warn(msg + " and additional error writing XML error response")
 		return
 	}
-	authLogger.With("err", err, "error_code", errCode).Warn(msg)
+	authLogger(r.Context()).With("err", err, "error_code", errCode).Warn(msg)
 }
 
 // handleHeaderAuth handles standard AWS SigV4 Authorization-header auth.

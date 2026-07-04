@@ -1,6 +1,7 @@
 package policy
 
 import (
+	"context"
 	"net"
 	"testing"
 	"time"
@@ -362,7 +363,7 @@ func TestEvaluateStatementWithConditions(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got := evaluateStatement(tt.stmt, tt.req)
+			got := evaluateStatement(context.Background(), tt.stmt, tt.req)
 			if got != tt.expected {
 				t.Errorf("evaluateStatement() = %v, want %v", got, tt.expected)
 			}

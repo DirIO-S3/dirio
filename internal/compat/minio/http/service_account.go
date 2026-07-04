@@ -2,6 +2,7 @@ package http
 
 import (
 	"bytes"
+	"context"
 	"io"
 	"log/slog"
 	nethttp "net/http"
@@ -11,6 +12,7 @@ import (
 	"github.com/mallardduck/go-http-helpers/pkg/query"
 
 	"github.com/mallardduck/dirio/internal/http/auth"
+	"github.com/mallardduck/dirio/internal/logging"
 	svcerrors "github.com/mallardduck/dirio/internal/service/errors"
 	"github.com/mallardduck/dirio/internal/service/serviceaccount"
 	iamPkg "github.com/mallardduck/dirio/sdk/iam"
@@ -19,6 +21,10 @@ import (
 type ServiceAccountHTTPService struct {
 	serviceAccounts *serviceaccount.Service
 	log             *slog.Logger
+}
+
+func (s *ServiceAccountHTTPService) ctxLog(ctx context.Context) *slog.Logger {
+	return logging.WithContext(s.log, ctx)
 }
 
 // ListServiceAccounts handles GET /minio/admin/v3/list-service-accounts
@@ -32,7 +38,7 @@ func (s *ServiceAccountHTTPService) ListServiceAccounts(w nethttp.ResponseWriter
 
 	keys, err := s.serviceAccounts.List(r.Context())
 	if err != nil {
-		s.log.Error("Failed to list service accounts", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to list service accounts", "error", err)
 		w.WriteHeader(nethttp.StatusInternalServerError)
 		return
 	}
@@ -80,7 +86,7 @@ func (s *ServiceAccountHTTPService) ListServiceAccounts(w nethttp.ResponseWriter
 func (s *ServiceAccountHTTPService) AddServiceAccount(w nethttp.ResponseWriter, r *nethttp.Request) {
 	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
-		s.log.Error("Failed to read request body", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to read request body", "error", err)
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
@@ -101,7 +107,7 @@ func (s *ServiceAccountHTTPService) AddServiceAccount(w nethttp.ResponseWriter, 
 		Expiration  *time.Time `json:"expiration"`
 	}
 	if err := decryptAndUnmarshal(adminUser.SecretKey, bytes.NewReader(bodyBytes), &body); err != nil {
-		s.log.Error("Failed to decrypt/parse request body", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to decrypt/parse request body", "error", err)
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
@@ -121,7 +127,7 @@ func (s *ServiceAccountHTTPService) AddServiceAccount(w nethttp.ResponseWriter, 
 		ExpiresAt:   body.Expiration,
 	})
 	if err != nil {
-		s.log.Error("Failed to create service account", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to create service account", "error", err)
 		if svcerrors.IsAlreadyExists(err) {
 			w.WriteHeader(nethttp.StatusConflict)
 			return
@@ -160,7 +166,7 @@ func (s *ServiceAccountHTTPService) DeleteServiceAccount(w nethttp.ResponseWrite
 	}
 
 	if err := s.serviceAccounts.Delete(r.Context(), accessKey); err != nil {
-		s.log.Error("Failed to delete service account", "error", err, "accessKey", accessKey)
+		s.ctxLog(r.Context()).Error("Failed to delete service account", "error", err, "accessKey", accessKey)
 		if svcerrors.IsNotFound(err) {
 			w.WriteHeader(nethttp.StatusNotFound)
 			return
@@ -193,7 +199,7 @@ func (s *ServiceAccountHTTPService) InfoServiceAccount(w nethttp.ResponseWriter,
 
 	sa, err := s.serviceAccounts.Get(r.Context(), accessKey)
 	if err != nil {
-		s.log.Error("Failed to get service account", "error", err, "accessKey", accessKey)
+		s.ctxLog(r.Context()).Error("Failed to get service account", "error", err, "accessKey", accessKey)
 		if svcerrors.IsNotFound(err) {
 			w.WriteHeader(nethttp.StatusNotFound)
 			return
@@ -227,7 +233,7 @@ func (s *ServiceAccountHTTPService) UpdateServiceAccount(w nethttp.ResponseWrite
 
 	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
-		s.log.Error("Failed to read request body", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to read request body", "error", err)
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return
 	}
@@ -238,7 +244,7 @@ func (s *ServiceAccountHTTPService) UpdateServiceAccount(w nethttp.ResponseWrite
 	}
 
 	if _, err := s.serviceAccounts.Update(r.Context(), accessKey, req); err != nil {
-		s.log.Error("Failed to update service account", "error", err, "accessKey", accessKey)
+		s.ctxLog(r.Context()).Error("Failed to update service account", "error", err, "accessKey", accessKey)
 		if svcerrors.IsNotFound(err) {
 			w.WriteHeader(nethttp.StatusNotFound)
 			return
@@ -274,7 +280,7 @@ func (s *ServiceAccountHTTPService) parseUpdateBody(w nethttp.ResponseWriter, r 
 		NewExpiration  *time.Time `json:"newExpiration"`
 	}
 	if err := decryptAndUnmarshal(adminUser.SecretKey, bytes.NewReader(bodyBytes), &body); err != nil {
-		s.log.Error("Failed to decrypt/parse request body", "error", err)
+		s.ctxLog(r.Context()).Error("Failed to decrypt/parse request body", "error", err)
 		w.WriteHeader(nethttp.StatusBadRequest)
 		return nil, false
 	}
