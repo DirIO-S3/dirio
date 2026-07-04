@@ -6,7 +6,7 @@
 ARG BCI_VERSION=16.0
 
 # ── Stage 1: Compile ──────────────────────────────────────────────────────────
-FROM registry.suse.com/bci/golang:1.26 AS builder
+FROM rancher/hardened-build-base:v1.26.4b1 AS builder
 
 WORKDIR /build
 
@@ -26,7 +26,7 @@ RUN set -eux; \
         *)             TWARCH=x64   ;; \
     esac; \
     curl -fsSLo /usr/local/bin/tailwindcss \
-        "https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-${TWARCH}"; \
+        "https://github.com/tailwindlabs/tailwindcss/releases/latest/download/tailwindcss-linux-${TWARCH}-musl"; \
     chmod +x /usr/local/bin/tailwindcss; \
     go tool templ generate ./console/...; \
     /usr/local/bin/tailwindcss -i ./console/ui/input.css -o ./console/static/style.css --minify
