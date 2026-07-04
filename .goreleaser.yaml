@@ -7,7 +7,9 @@ project_name: dirio
 
 before:
   hooks:
-    # Sync workspace before anything else so all go.work.sum entries are current.
+    # go.work is gitignored (see go.work.example); CI checkouts don't have one, so create it first.
+    - task workspace-init
+    # Sync workspace so all go.work.sum entries are current.
     - go work sync
     - go mod tidy
     # Install templ CLI pinned to the version in go.mod.
