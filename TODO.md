@@ -524,18 +524,23 @@ The `dio` ownership and simulation commands require HTTP endpoints that do not y
 
 ### Virtual-Hosted-Style Buckets (Future)
 
-**Architecture:** Path-style and virtual-hosted-style are **not mutually exclusive modes** — both are active simultaneously, like two doors to the same handlers. The router exposes the same S3 handler registrations twice:
+**Design doc:** [docs/design/VHOST-ROUTING.md](docs/design/VHOST-ROUTING.md)
+
+**Architecture:** Path-style and virtual-hosted-style are **not mutually exclusive modes** — both are active simultaneously, chosen per-request by the `Host` header, like two doors to the same handlers. `CanonicalDomain` (already in config) is the pivot — without it configured, only path-style routes are registered and the current behavior is unchanged. When set, a second route table is registered for vhost-style requests; a thin `hostRouter` in front picks which table serves each request based on whether `Host` is `{bucket}.{CanonicalDomain}`.
 
 - **Path-style routes** (current): `/{bucket}/{key}` — bucket extracted from path
 - **Virtual-hosted-style routes**: `{bucket}.{canonical-domain}/{key}` — bucket extracted from the subdomain, same handlers
-
-Handlers are written once and receive the same inputs regardless of which route matched. `CanonicalDomain` (already in config) is the pivot — without it configured, only path-style routes are registered and the current behavior is unchanged.
+- Bucket resolution logic is factored into its own unit (`internal/http/vhost.BucketFromHost`), not duplicated per style; only route *registration* (path pattern + bucket extractor) is parameterized per style via a small `routeStyle` struct — handler signatures are unaffected.
 
 **Items:**
-- [ ] Register all S3 routes a second time on a virtual-hosted pattern using `CanonicalDomain`
-- [ ] Update URL generation helpers to emit virtual-hosted-style URLs when `CanonicalDomain` is set (pre-signed URLs, `Location` headers, CopyObject source)
-- [ ] DNS: virtual-hosted style requires a real DNS wildcard or reverse proxy — mDNS covers the S3/admin endpoints only; document this clearly
-- [ ] Document both styles in `docs/DEPLOYMENT.md`
+- ✅ `internal/http/vhost` package — `BucketFromHost(host, canonicalDomain string) (bucket string, ok bool)` + unit tests
+- ✅ Refactor `routes.go`: `routeStyle` struct (bucket path segment + resolver func), parameterize `setupS3Routes`/`bucket()`/`object()`
+- ✅ Second `teapot.Router` instance for vhost-style S3 data-plane routes, built only when `CanonicalDomain != ""`
+- ✅ `hostRouter` — thin `http.Handler` in front of both routers, dispatches by `Host` via `vhost.BucketFromHost`
+- ✅ URL generation for vhost-style — local wrapper (`internal/http/urlbuilder`) rather than an upstream `teapot-router` extension, since teapot-router isn't vendored/replaced locally; mirrors the inbound request's style for `Location` headers and bucket/object URLs. CopyObject source parsing is still `NotImplemented` (Phase 3.2 #4), so nothing to wire there yet.
+- ✅ DNS: virtual-hosted style requires a real DNS wildcard or reverse proxy — documented in `docs/DEPLOYMENT.md` (mDNS covers the S3/admin endpoints only)
+- ✅ Document both styles in `docs/DEPLOYMENT.md`
+- ✅ Integration tests: same object round-trips via both styles; `/.dirio/*` and `/minio/admin/*` never served by the vhost router; full existing suite passes unmodified with `CanonicalDomain == ""`
 
 **Note:** Virtual-hosted routing is a hard prerequisite for S3 Static Website Hosting (see below). Both share the subdomain route registration pattern and the same DNS/proxy requirement.
 

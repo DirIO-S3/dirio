@@ -83,6 +83,27 @@ func (ts *TestServer) NewRequest(method, url string, body []byte) (*http.Request
 	return req, nil
 }
 
+// NewVHostRequest builds a signed HTTP request that connects to the server's
+// listener but carries vhostHost as the Host header, for exercising
+// virtual-hosted-style bucket resolution. path should contain only the key
+// (no bucket segment) since the bucket is conveyed via vhostHost.
+func (ts *TestServer) NewVHostRequest(method, vhostHost, path string, body []byte) (*http.Request, error) {
+	var r io.Reader
+	if body != nil {
+		r = bytes.NewReader(body)
+	}
+	req, err := http.NewRequest(method, ts.BaseURL+path, r)
+	if err != nil {
+		return nil, err
+	}
+	if body != nil {
+		req.ContentLength = int64(len(body))
+	}
+	req.Host = vhostHost
+	ts.SignRequest(req, body)
+	return req, nil
+}
+
 // CreateBucket creates a bucket via the S3 API and fails the test on error.
 func (ts *TestServer) CreateBucket(t *testing.T, bucket string) {
 	t.Helper()
