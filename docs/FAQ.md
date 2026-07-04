@@ -10,6 +10,16 @@ DirIO is an S3-compatible server where objects are stored as regular files on yo
 
 MinIO removed single-node filesystem mode after version `RELEASE.2022-10-24T18-35-07Z`. If you want that feature with newer updates, DirIO is your option.
 
+### Does DirIO work with MinIO's erasure coding / distributed mode?
+
+No. DirIO is only compatible with MinIO's old **single-node filesystem (FS)
+mode** — the mode removed after `RELEASE.2022-10-24T18-35-07Z`, where objects
+were stored as plain files. MinIO's current default (erasure-coded,
+multi-drive/distributed) splits objects into shards across drives; that
+on-disk format is unrelated and DirIO cannot read it. If you're running
+modern MinIO in erasure-coded mode, DirIO is not a migration target for that
+data.
+
 ### Why not use [other S3 implementation]?
 
 Most S3 implementations either:
