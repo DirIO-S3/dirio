@@ -31,6 +31,7 @@ func TestErrorCode_String(t *testing.T) {
 		{ErrCodeNoSuchUpload, "NoSuchUpload"},
 		{ErrCodeInvalidPart, "InvalidPart"},
 		{ErrCodeNotImplemented, "NotImplemented"},
+		{ErrCodePreconditionFailed, "PreconditionFailed"},
 		// unknown code falls back to InternalError
 		{ErrorCode(9999), "InternalError"},
 	}
@@ -52,7 +53,7 @@ func TestErrorCode_Description(t *testing.T) {
 		ErrCodeInvalidAccessKeyID, ErrCodeSignatureDoesNotMatch, ErrCodeInvalidBucketName,
 		ErrCodeInvalidObjectKey, ErrCodeAccessDenied, ErrCodeNoSuchBucketPolicy,
 		ErrCodeMalformedPolicy, ErrCodeInvalidRequest, ErrCodeMalformedXML,
-		ErrCodeNoSuchUpload, ErrCodeInvalidPart, ErrCodeNotImplemented,
+		ErrCodeNoSuchUpload, ErrCodeInvalidPart, ErrCodeNotImplemented, ErrCodePreconditionFailed,
 	}
 	for _, c := range definedCodes {
 		assert.NotEmpty(t, c.Description(), "ErrorCode(%d).Description() should not be empty", c)
@@ -85,6 +86,7 @@ func TestErrorCode_HTTPStatus(t *testing.T) {
 		{ErrCodeInvalidPart, http.StatusBadRequest},
 		{ErrCodeNotImplemented, http.StatusNotImplemented},
 		{ErrCodeInternalError, http.StatusInternalServerError},
+		{ErrCodePreconditionFailed, http.StatusPreconditionFailed},
 		// ErrCodeNone and unknown both fall back to 500
 		{ErrCodeNone, http.StatusInternalServerError},
 		{ErrorCode(9999), http.StatusInternalServerError},

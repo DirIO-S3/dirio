@@ -19,6 +19,32 @@ const (
 	// HeaderCopySource is the S3 header for copy operations
 	HeaderCopySource = "X-Amz-Copy-Source"
 
+	// HeaderCopySourceIfMatch fails CopyObject with 412 unless the source
+	// object's ETag matches.
+	HeaderCopySourceIfMatch = "X-Amz-Copy-Source-If-Match"
+
+	// HeaderCopySourceIfNoneMatch fails CopyObject with 412 if the source
+	// object's ETag matches.
+	HeaderCopySourceIfNoneMatch = "X-Amz-Copy-Source-If-None-Match"
+
+	// HeaderCopySourceIfModifiedSince fails CopyObject with 412 unless the
+	// source object was modified after the given time.
+	HeaderCopySourceIfModifiedSince = "X-Amz-Copy-Source-If-Modified-Since"
+
+	// HeaderCopySourceIfUnmodifiedSince fails CopyObject with 412 if the
+	// source object was modified after the given time.
+	HeaderCopySourceIfUnmodifiedSince = "X-Amz-Copy-Source-If-Unmodified-Since"
+
+	// HeaderMetadataDirective selects whether CopyObject copies the source
+	// object's metadata ("COPY", the default) or replaces it with the
+	// metadata headers on the copy request itself ("REPLACE").
+	HeaderMetadataDirective = "X-Amz-Metadata-Directive"
+
+	// MetadataDirectiveReplace is the HeaderMetadataDirective value that
+	// requests destination metadata be taken from the request instead of
+	// copied from the source.
+	MetadataDirectiveReplace = "REPLACE"
+
 	// HeaderBucketRegion is the S3 header for bucket region
 	HeaderBucketRegion = "x-amz-bucket-region"
 

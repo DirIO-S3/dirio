@@ -12,6 +12,7 @@ import (
 
 	"github.com/mallardduck/dirio/internal/consts"
 	"github.com/mallardduck/dirio/internal/context"
+	"github.com/mallardduck/dirio/internal/http/copysource"
 	loggingHttp "github.com/mallardduck/dirio/internal/http/middleware/logging"
 	httpresponse "github.com/mallardduck/dirio/internal/http/response"
 	"github.com/mallardduck/dirio/internal/logging"
@@ -272,28 +273,15 @@ func evaluateMultiResourceAction(
 	return DecisionAllow
 }
 
-// parseCopySource extracts bucket and key from X-Amz-Copy-Source header.
-// Format: /bucket/key or bucket/key (URL-encoded)
+// parseCopySource extracts bucket and key from the X-Amz-Copy-Source header,
+// returning ("", "") if the header is missing or malformed — the caller
+// (evaluateMultiResourceAction) already denies on an empty sourceBucket, so a
+// parse failure and a missing header collapse to the same deny outcome.
 func parseCopySource(r *http.Request) (bucket, key string) {
-	copySource := r.Header.Get(consts.HeaderCopySource)
-	if copySource == "" {
+	bucket, key, err := copysource.Parse(r.Header.Get(consts.HeaderCopySource))
+	if err != nil {
 		return "", ""
 	}
-
-	// Remove leading slash if present
-	copySource = strings.TrimPrefix(copySource, "/")
-
-	// Split into bucket and key
-	parts := strings.SplitN(copySource, "/", 2)
-	if len(parts) < 1 {
-		return "", ""
-	}
-
-	bucket = parts[0]
-	if len(parts) == 2 {
-		key = parts[1]
-	}
-
 	return bucket, key
 }
 

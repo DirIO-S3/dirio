@@ -44,6 +44,7 @@ const (
 	ErrCodeNoSuchUpload
 	ErrCodeInvalidPart
 	ErrCodeNotImplemented
+	ErrCodePreconditionFailed
 )
 
 var (
@@ -67,6 +68,7 @@ var (
 		ErrCodeNoSuchUpload:          "NoSuchUpload",
 		ErrCodeInvalidPart:           "InvalidPart",
 		ErrCodeNotImplemented:        "NotImplemented",
+		ErrCodePreconditionFailed:    "PreconditionFailed",
 	}
 
 	errorCodeDescription = map[ErrorCode]string{
@@ -89,6 +91,7 @@ var (
 		ErrCodeNoSuchUpload:          "The specified multipart upload does not exist.",
 		ErrCodeInvalidPart:           "One or more of the specified parts could not be found.",
 		ErrCodeNotImplemented:        "A header you provided implies functionality that is not implemented.",
+		ErrCodePreconditionFailed:    "At least one of the pre-conditions you specified did not hold.",
 	}
 
 	errCodeStatusMap = map[ErrorCode]int{
@@ -110,6 +113,7 @@ var (
 		ErrCodeInvalidPart:           http.StatusBadRequest,
 		ErrCodeNotImplemented:        http.StatusNotImplemented,
 		ErrCodeInternalError:         http.StatusInternalServerError,
+		ErrCodePreconditionFailed:    http.StatusPreconditionFailed,
 	}
 )
 
