@@ -1,6 +1,7 @@
 package urlbuilder
 
 import (
+	"net/http"
 	"net/http/httptest"
 	"testing"
 )
@@ -39,7 +40,7 @@ func TestBucketURL(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			b := New(tt.canonicalDomain)
-			req := httptest.NewRequest("GET", "http://"+tt.host+"/", nil)
+			req := httptest.NewRequest("GET", "http://"+tt.host+"/", http.NoBody)
 			req.Host = tt.host
 
 			got := b.BucketURL(req, tt.bucket)
@@ -80,7 +81,7 @@ func TestObjectURL(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			b := New(tt.canonicalDomain)
-			req := httptest.NewRequest("GET", "http://"+tt.host+"/", nil)
+			req := httptest.NewRequest("GET", "http://"+tt.host+"/", http.NoBody)
 			req.Host = tt.host
 
 			got := b.ObjectURL(req, tt.bucket, tt.key)
