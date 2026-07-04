@@ -9,7 +9,7 @@ A filesystem-native S3-compatible object store.**
 
 DirIO is an S3-compatible object storage server where objects are just files on disk. No chunking, no encoding, no abstraction layers—just directories and files.
 
-Built as a drop-in replacement for MinIO's discontinued single-node filesystem mode.
+Built as a drop-in replacement for MinIO's discontinued **single-node filesystem (FS) mode** — the old mode where objects were stored as plain files. This is *not* related to and does not read data from MinIO's current erasure-coded/distributed backend.
 
 ## Philosophy
 
@@ -32,6 +32,7 @@ Built as a drop-in replacement for MinIO's discontinued single-node filesystem m
 - Built-in replication
 - Advanced S3 features (yet)
 - Replace production-grade S3 implementations
+- Read MinIO's erasure-coded/distributed backend data (only legacy single-node FS-mode data)
 
 ## Quick Start
 
@@ -78,7 +79,13 @@ See [docs/IAM-ARCHITECTURE.md](docs/design/IAM-ARCHITECTURE.md) for details.
 
 ## MinIO Migration
 
-Point DirIO at your existing MinIO data directory. It will:
+> **Only applies to MinIO's legacy single-node filesystem (FS) mode.** If your
+> MinIO deployment uses the current erasure-coded/distributed backend (the
+> default since FS mode was removed), its on-disk data is split into shards
+> across drives and DirIO cannot read it. This migration path is for data
+> that predates that change, or an install pinned to a pre-FS-removal release.
+
+Point DirIO at your existing MinIO FS-mode data directory. It will:
 
 1. Find `.minio.sys/`
 2. Import users, bucket policies, and object metadata
