@@ -11,6 +11,10 @@ FROM registry.suse.com/bci/golang:1.26 AS builder
 WORKDIR /build
 
 COPY go.mod go.sum ./
+COPY api/go.mod api/go.sum api/
+COPY common/go.mod common/go.sum common/
+COPY console/go.mod console/go.sum console/
+COPY sdk/go.mod sdk/go.sum sdk/
 RUN go mod download
 
 COPY . .
