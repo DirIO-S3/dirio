@@ -39,7 +39,9 @@ jobs:
         (cd console && go mod verify)
 
     - name: Run go vet
-      run: go vet ./...
+      run: |
+        go vet ./...
+        go vet -tags "docker,perf" ./tests/...
 
     - name: Run unit tests
       run: |

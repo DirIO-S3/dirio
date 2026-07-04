@@ -1,7 +1,8 @@
 version: "2"
 run:
   build-tags:
-    - integration
+    - docker
+    - perf
   tests: true
 linters:
   enable:
@@ -42,6 +43,15 @@ linters:
           deny:
             - pkg: "github.com/mallardduck/dirio/internal/testutil"
               desc: "internal/testutil is only for use in test files (*_test.go) or the tests/ directory"
+        testcontainers-quarantine:
+          # testcontainers-go (and Docker test deps generally) are quarantined to the
+          # top-level tests/ tree. Package-local *_test.go files must stay unit/mock-only.
+          files:
+            - "**/*.go"
+            - "!**/tests/**/*.go"
+          deny:
+            - pkg: "github.com/testcontainers/testcontainers-go"
+              desc: "testcontainers-go is quarantined to tests/** — package-local tests must not require Docker"
         console-no-internal:
           files:
             - "**/console/**/*.go"
