@@ -353,43 +353,43 @@ func (s *Service) ObjectExists(ctx context.Context, bucket, key string) (bool, e
 	return true, nil
 }
 
-// CopyObject copies an object from one location to another
-// Note: This is a placeholder for future implementation
-func (s *Service) CopyObject(ctx context.Context, sourceBucket, sourceKey, destBucket, destKey string) error {
+// CopyObject copies an object from one location to another, applying
+// req.ContentType/req.CustomMetadata to the destination regardless of what
+// the source object's own metadata was — see CopyObjectRequest for why that
+// choice is made by the caller, not here.
+func (s *Service) CopyObject(ctx context.Context, req *CopyObjectRequest) (string, error) {
 	// Validate all inputs
-	if err := validation.ValidateBucketName(sourceBucket); err != nil {
-		return err
+	if err := validation.ValidateBucketName(req.SourceBucket); err != nil {
+		return "", err
 	}
-	if err := validation.ValidateObjectKey(sourceKey); err != nil {
-		return err
+	if err := validation.ValidateObjectKey(req.SourceKey); err != nil {
+		return "", err
 	}
-	if err := validation.ValidateBucketName(destBucket); err != nil {
-		return err
+	if err := validation.ValidateBucketName(req.DestBucket); err != nil {
+		return "", err
 	}
-	if err := validation.ValidateObjectKey(destKey); err != nil {
-		return err
+	if err := validation.ValidateObjectKey(req.DestKey); err != nil {
+		return "", err
 	}
 
-	// Get source object
+	// Get source object content
 	obj, err := s.GetObject(ctx, &GetObjectRequest{
-		Bucket: sourceBucket,
-		Key:    sourceKey,
+		Bucket: req.SourceBucket,
+		Key:    req.SourceKey,
 	})
 	if err != nil {
-		return err
+		return "", err
 	}
 	defer obj.Content.Close()
 
 	// Copy to destination
-	_, err = s.PutObject(ctx, &PutObjectRequest{
-		Bucket:         destBucket,
-		Key:            destKey,
+	return s.PutObject(ctx, &PutObjectRequest{
+		Bucket:         req.DestBucket,
+		Key:            req.DestKey,
 		Content:        obj.Content,
-		ContentType:    obj.ContentType,
-		CustomMetadata: obj.CustomMetadata,
+		ContentType:    req.ContentType,
+		CustomMetadata: req.CustomMetadata,
 	})
-
-	return err
 }
 
 // GetObjectWithRange retrieves part of an object (for range requests)

@@ -17,6 +17,8 @@ import (
 
 	"github.com/mallardduck/dirio/internal/http/response"
 
+	"github.com/mallardduck/dirio/internal/consts"
+	"github.com/mallardduck/dirio/internal/http/copysource"
 	"github.com/mallardduck/dirio/internal/http/middleware"
 	"github.com/mallardduck/dirio/internal/logging"
 	"github.com/mallardduck/dirio/internal/service/s3"
@@ -231,22 +233,23 @@ func parseSingleRangePart(part string, fileSize int64) (start, end int64, err er
 	return start, end, nil
 }
 
-// PutObject handles PUT /{bucket}/{key}
-func (h *HTTPHandler) PutObject(w http.ResponseWriter, r *http.Request, bucket, key string) {
-	contentType := r.Header.Get(headers.ContentType)
+// extractObjectMetadataHeaders reads content-type and S3 metadata headers
+// (Cache-Control, Content-Disposition, etc. and x-amz-meta-*) from a request.
+// Shared by PutObject and by CopyObject's metadata-directive=REPLACE case.
+//
+// ✅ FIXED(Phase 3.2 #9): Custom metadata keys now normalized to lowercase
+//   - Go's HTTP package canonicalizes headers to Title-Case
+//   - boto3 and other clients expect lowercase keys in metadata dict
+//   - Solution: Normalize all metadata keys to lowercase for consistent retrieval
+//   - This matches behavior of other S3-compatible systems
+func extractObjectMetadataHeaders(r *http.Request) (contentType string, customMetadata map[string]string) {
+	contentType = r.Header.Get(headers.ContentType)
 	if contentType == "" {
 		contentType = "application/octet-stream"
 	}
 
-	// Extract custom metadata from request headers
-	customMetadata := make(map[string]string)
+	customMetadata = make(map[string]string)
 
-	// Extract S3-standard metadata headers
-	// ✅ FIXED(Phase 3.2 #9): Custom metadata keys now normalized to lowercase
-	//   - Go's HTTP package canonicalizes headers to Title-Case
-	//   - boto3 and other clients expect lowercase keys in metadata dict
-	//   - Solution: Normalize all metadata keys to lowercase for consistent retrieval
-	//   - This matches behavior of other S3-compatible systems
 	metadataHeaders := []string{
 		headers.CacheControl,
 		headers.ContentDisposition,
@@ -270,6 +273,13 @@ func (h *HTTPHandler) PutObject(w http.ResponseWriter, r *http.Request, bucket, 
 			customMetadata[lowerKey] = values[0]
 		}
 	}
+
+	return contentType, customMetadata
+}
+
+// PutObject handles PUT /{bucket}/{key}
+func (h *HTTPHandler) PutObject(w http.ResponseWriter, r *http.Request, bucket, key string) {
+	contentType, customMetadata := extractObjectMetadataHeaders(r)
 
 	putRequest := &s3.PutObjectRequest{
 		Bucket:         bucket,
@@ -367,42 +377,68 @@ func (h *HTTPHandler) DeleteObject(w http.ResponseWriter, r *http.Request, bucke
 	w.WriteHeader(http.StatusNoContent)
 }
 
-// CopyObject handles PUT /{bucket}/{key} with X-Amz-Copy-Source header
+// CopyObject handles PUT /{bucket}/{key} with X-Amz-Copy-Source header.
+//
+// Note on addressing style: the destination bucket/key here are already
+// resolved by the same path- or vhost-style routeStyle as every other object
+// handler (see routes.go's object()/routeStyle) — CopyObject gets no special
+// treatment there. The *source*, however, always comes from the
+// X-Amz-Copy-Source header value, which per the S3 API spec is always a
+// literal "/bucket/key" string — it has no Host component and is never
+// vhost-addressed, even when the request that carries it reached DirIO via
+// vhost-style. That's not a routing gap; there is no vhost equivalent of
+// this header because AWS itself never defined one.
 func (h *HTTPHandler) CopyObject(w http.ResponseWriter, r *http.Request, bucket, key string) {
-	// Parse X-Amz-Copy-Source header (format: /sourceBucket/sourceKey or sourceBucket/sourceKey)
-	copySource := r.Header.Get("X-Amz-Copy-Source")
-	if copySource == "" {
-		requestID := middleware.GetRequestID(r.Context())
-		err := errors.New("missing X-Amz-Copy-Source header")
-		if writeErr := WriteErrorResponse(w, requestID, s3types.ErrCodeInvalidRequest, response.SetErrAsMessage(err)); writeErr != nil {
-			s3Logger.With("err", err, "write_err", writeErr).Warn("missing copy source header")
-			return
-		}
-		return
-	}
+	requestID := middleware.GetRequestID(r.Context())
 
-	// Remove leading slash if present
-	copySource = strings.TrimPrefix(copySource, "/")
-
-	// Split into source bucket and key
-	parts := strings.SplitN(copySource, "/", 2)
-	if len(parts) != 2 {
-		requestID := middleware.GetRequestID(r.Context())
-		err := errors.New("invalid X-Amz-Copy-Source format, expected /bucket/key")
-		if writeErr := WriteErrorResponse(w, requestID, s3types.ErrCodeInvalidRequest, response.SetErrAsMessage(err)); writeErr != nil {
-			s3Logger.With("err", err, "write_err", writeErr).Warn("invalid copy source format")
-			return
-		}
-		return
-	}
-
-	sourceBucket := parts[0]
-	sourceKey := parts[1]
-
-	// Call service layer to copy object
-	err := h.s3Service.CopyObject(r.Context(), sourceBucket, sourceKey, bucket, key)
+	sourceBucket, sourceKey, err := copysource.Parse(r.Header.Get(consts.HeaderCopySource))
 	if err != nil {
-		requestID := middleware.GetRequestID(r.Context())
+		if writeErr := WriteErrorResponse(w, requestID, s3types.ErrCodeInvalidRequest, response.SetErrAsMessage(err)); writeErr != nil {
+			s3Logger.With("err", err, "write_err", writeErr).Warn("invalid copy source header")
+		}
+		return
+	}
+
+	// HeadObject on the source serves two purposes: it gives us the
+	// ETag/LastModified needed to evaluate the copy-source-if-* conditional
+	// headers, and — for the default COPY metadata-directive — it's the
+	// source content-type/metadata that gets applied to the destination.
+	sourceMeta, err := h.s3Service.HeadObject(r.Context(), &s3.HeadObjectRequest{
+		Bucket: sourceBucket,
+		Key:    sourceKey,
+	})
+	if err != nil {
+		switch {
+		case errors.Is(err, s3types.ErrObjectNotFound):
+			respondError(w, requestID, err, s3types.ErrCodeNoSuchKey, "copy source object not found", response.SetErrAsMessage(err))
+		case errors.Is(err, s3types.ErrBucketNotFound):
+			respondError(w, requestID, err, s3types.ErrCodeNoSuchBucket, "copy source bucket not found", response.SetErrAsMessage(err))
+		default:
+			respondError(w, requestID, err, s3types.ErrCodeInternalError, "error reading copy source", response.SetErrAsMessage(err))
+		}
+		return
+	}
+
+	if condErr := checkCopySourceConditions(r, sourceMeta.ETag, sourceMeta.LastModified); condErr != nil {
+		respondError(w, requestID, condErr, s3types.ErrCodePreconditionFailed, "copy source precondition failed", response.SetErrAsMessage(condErr))
+		return
+	}
+
+	contentType := sourceMeta.ContentType
+	customMetadata := sourceMeta.CustomMetadata
+	if r.Header.Get(consts.HeaderMetadataDirective) == consts.MetadataDirectiveReplace {
+		contentType, customMetadata = extractObjectMetadataHeaders(r)
+	}
+
+	_, err = h.s3Service.CopyObject(r.Context(), &s3.CopyObjectRequest{
+		SourceBucket:   sourceBucket,
+		SourceKey:      sourceKey,
+		DestBucket:     bucket,
+		DestKey:        key,
+		ContentType:    contentType,
+		CustomMetadata: customMetadata,
+	})
+	if err != nil {
 		switch {
 		case errors.Is(err, s3types.ErrObjectNotFound):
 			respondError(w, requestID, err, s3types.ErrCodeNoSuchKey, "copy source object not found", response.SetErrAsMessage(err))
@@ -414,28 +450,54 @@ func (h *HTTPHandler) CopyObject(w http.ResponseWriter, r *http.Request, bucket,
 		return
 	}
 
-	// Get the newly copied object to return metadata
-	obj, err := h.s3Service.GetObject(r.Context(), &s3.GetObjectRequest{
+	// HeadObject the destination for its post-copy ETag/LastModified —
+	// lighter than GetObject since we don't need the content stream.
+	destMeta, err := h.s3Service.HeadObject(r.Context(), &s3.HeadObjectRequest{
 		Bucket: bucket,
 		Key:    key,
 	})
 	if err != nil {
-		requestID := middleware.GetRequestID(r.Context())
 		if writeErr := WriteErrorResponse(w, requestID, s3types.ErrCodeInternalError, response.SetErrAsMessage(err)); writeErr != nil {
 			s3Logger.With("err", err, "write_err", writeErr).Warn("error getting copied object metadata")
-			return
 		}
 		return
 	}
-	obj.Content.Close() // We don't need the content, just metadata
 
-	// Return CopyObjectResult XML response
 	result := s3types.CopyObjectResult{
-		LastModified: obj.LastModified.Format(time.RFC3339), // ISO 8601 format for XML responses
-		ETag:         obj.ETag,
+		LastModified: destMeta.LastModified.Format(time.RFC3339), // ISO 8601 format for XML responses
+		ETag:         destMeta.ETag,
 	}
 
 	if err := WriteXMLResponse(w, http.StatusOK, result); err != nil {
 		s3Logger.With("err", err).Warn("error writing CopyObject XML response")
 	}
+}
+
+// checkCopySourceConditions evaluates the x-amz-copy-source-if-* headers
+// against the source object's current ETag/LastModified, mirroring AWS's
+// CopyObject preconditions. The 1-second slack on the modified-since checks
+// matches net/http's own conditional-request handling — HTTP dates only
+// carry whole-second precision, so a source modified within the same second
+// as the header value shouldn't be treated as "modified after" it.
+func checkCopySourceConditions(r *http.Request, etag string, lastModified time.Time) error {
+	trim := func(s string) string { return strings.Trim(s, `"`) }
+	sourceETag := trim(etag)
+
+	if v := r.Header.Get(consts.HeaderCopySourceIfMatch); v != "" && trim(v) != sourceETag {
+		return errors.New("copy source ETag does not match If-Match")
+	}
+	if v := r.Header.Get(consts.HeaderCopySourceIfNoneMatch); v != "" && trim(v) == sourceETag {
+		return errors.New("copy source ETag matches If-None-Match")
+	}
+	if v := r.Header.Get(consts.HeaderCopySourceIfUnmodifiedSince); v != "" {
+		if t, err := http.ParseTime(v); err == nil && lastModified.After(t.Add(time.Second)) {
+			return errors.New("copy source modified after If-Unmodified-Since")
+		}
+	}
+	if v := r.Header.Get(consts.HeaderCopySourceIfModifiedSince); v != "" {
+		if t, err := http.ParseTime(v); err == nil && !lastModified.After(t.Add(time.Second)) {
+			return errors.New("copy source not modified since If-Modified-Since")
+		}
+	}
+	return nil
 }

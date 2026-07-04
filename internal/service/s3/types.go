@@ -84,6 +84,22 @@ type HeadObjectResponse struct {
 	CustomMetadata map[string]string
 }
 
+// CopyObjectRequest represents a request to copy an object between locations.
+// ContentType and CustomMetadata are always applied verbatim to the
+// destination object — callers wanting AWS's default COPY metadata-directive
+// semantics should pass the source's own content-type/metadata (e.g. from a
+// prior HeadObject), and callers wanting REPLACE semantics should pass the
+// metadata extracted from the copy request instead. The service layer has no
+// opinion on which; that's an HTTP-level (x-amz-metadata-directive) concern.
+type CopyObjectRequest struct {
+	SourceBucket   string
+	SourceKey      string
+	DestBucket     string
+	DestKey        string
+	ContentType    string
+	CustomMetadata map[string]string
+}
+
 // DeleteObjectRequest represents a request to delete an object
 type DeleteObjectRequest struct {
 	Bucket string

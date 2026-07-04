@@ -452,7 +452,26 @@ func (a *Adapter) DeleteObject(ctx context.Context, bucket, key string) error {
 }
 
 func (a *Adapter) CopyObject(ctx context.Context, srcBucket, srcKey, dstBucket, dstKey string) error {
-	return a.services.S3().CopyObject(ctx, srcBucket, srcKey, dstBucket, dstKey)
+	// The console has no request headers to carry a metadata-directive, so
+	// it always uses COPY semantics: source content-type/metadata carried
+	// over to the destination verbatim.
+	srcMeta, err := a.services.S3().HeadObject(ctx, &svcs3.HeadObjectRequest{
+		Bucket: srcBucket,
+		Key:    srcKey,
+	})
+	if err != nil {
+		return err
+	}
+
+	_, err = a.services.S3().CopyObject(ctx, &svcs3.CopyObjectRequest{
+		SourceBucket:   srcBucket,
+		SourceKey:      srcKey,
+		DestBucket:     dstBucket,
+		DestKey:        dstKey,
+		ContentType:    srcMeta.ContentType,
+		CustomMetadata: srcMeta.CustomMetadata,
+	})
+	return err
 }
 
 func (a *Adapter) GeneratePresignedURL(ctx context.Context, req consoleapi.GeneratePresignedURLRequest) (string, error) {
