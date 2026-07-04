@@ -4,3 +4,4 @@
 # Shell scripts and Python scripts must always use LF
 *.sh text eol=lf
 *.py text eol=lf
+*.css text eol=lf
