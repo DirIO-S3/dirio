@@ -1,4 +1,4 @@
-FROM amazon/aws-cli:2.35.15
+FROM amazon/aws-cli:2.35.22
 
 # 1. copy needed scripts
 COPY lib/test_framework.sh ./lib/
