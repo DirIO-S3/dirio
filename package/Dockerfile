@@ -6,7 +6,7 @@
 ARG BCI_VERSION=16.0
 
 # ── Stage 1: Compile ──────────────────────────────────────────────────────────
-FROM rancher/hardened-build-base:v1.26.4b1 AS builder
+FROM rancher/hardened-build-base:v1.26.5b1 AS builder
 
 WORKDIR /build
 
