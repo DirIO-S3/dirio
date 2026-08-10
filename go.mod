@@ -29,7 +29,7 @@ require (
 	github.com/minio/madmin-go/v3 v3.0.110
 	github.com/minio/minio-go/v7 v7.2.1
 	github.com/moby/moby/api v1.55.0
-	github.com/phuslu/lru v1.0.21
+	github.com/phuslu/lru v1.0.22
 	github.com/prometheus/client_golang v1.23.2
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
