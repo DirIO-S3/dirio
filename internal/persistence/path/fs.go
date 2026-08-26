@@ -22,7 +22,7 @@ import (
 	"github.com/go-git/go-billy/v5/osfs"
 	"github.com/go-git/go-billy/v5/util"
 
-	"github.com/mallardduck/dirio/internal/consts"
+	"github.com/DirIO-S3/dirio/internal/consts"
 )
 
 var (

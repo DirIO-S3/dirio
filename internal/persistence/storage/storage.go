@@ -12,12 +12,12 @@ import (
 
 	"github.com/go-git/go-billy/v5"
 
-	"github.com/mallardduck/dirio/internal/consts"
+	"github.com/DirIO-S3/dirio/internal/consts"
 
-	"github.com/mallardduck/dirio/internal/logging"
-	"github.com/mallardduck/dirio/internal/persistence/metadata"
-	"github.com/mallardduck/dirio/internal/persistence/path"
-	"github.com/mallardduck/dirio/sdk/s3types"
+	"github.com/DirIO-S3/dirio/internal/logging"
+	"github.com/DirIO-S3/dirio/internal/persistence/metadata"
+	"github.com/DirIO-S3/dirio/internal/persistence/path"
+	"github.com/DirIO-S3/dirio/sdk/s3types"
 )
 
 // Use s3types errors for consistency across all layers

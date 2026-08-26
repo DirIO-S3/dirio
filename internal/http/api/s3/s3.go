@@ -4,14 +4,14 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/mallardduck/dirio/internal/http/middleware"
-	loggingHttp "github.com/mallardduck/dirio/internal/http/middleware/logging"
-	httpresponse "github.com/mallardduck/dirio/internal/http/response"
-	"github.com/mallardduck/dirio/internal/policy"
-	"github.com/mallardduck/dirio/internal/service"
-	"github.com/mallardduck/dirio/internal/service/observation"
-	svcs3 "github.com/mallardduck/dirio/internal/service/s3"
-	"github.com/mallardduck/dirio/sdk/s3types"
+	"github.com/DirIO-S3/dirio/internal/http/middleware"
+	loggingHttp "github.com/DirIO-S3/dirio/internal/http/middleware/logging"
+	httpresponse "github.com/DirIO-S3/dirio/internal/http/response"
+	"github.com/DirIO-S3/dirio/internal/policy"
+	"github.com/DirIO-S3/dirio/internal/service"
+	"github.com/DirIO-S3/dirio/internal/service/observation"
+	svcs3 "github.com/DirIO-S3/dirio/internal/service/s3"
+	"github.com/DirIO-S3/dirio/sdk/s3types"
 )
 
 // HTTPHandler handles S3 API requests

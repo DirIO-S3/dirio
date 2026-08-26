@@ -9,9 +9,9 @@ import (
 	"sync"
 	"time"
 
-	"github.com/mallardduck/dirio/internal/logging"
-	"github.com/mallardduck/dirio/internal/persistence/metadata"
-	"github.com/mallardduck/dirio/sdk/iam"
+	"github.com/DirIO-S3/dirio/internal/logging"
+	"github.com/DirIO-S3/dirio/internal/persistence/metadata"
+	"github.com/DirIO-S3/dirio/sdk/iam"
 )
 
 func authLogger(ctx context.Context) *slog.Logger {

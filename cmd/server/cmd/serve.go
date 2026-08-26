@@ -6,11 +6,11 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/mallardduck/dirio/internal/config"
-	"github.com/mallardduck/dirio/internal/http/server"
-	"github.com/mallardduck/dirio/internal/logging"
-	"github.com/mallardduck/dirio/internal/startup"
-	"github.com/mallardduck/dirio/internal/telemetry"
+	"github.com/DirIO-S3/dirio/internal/config"
+	"github.com/DirIO-S3/dirio/internal/http/server"
+	"github.com/DirIO-S3/dirio/internal/logging"
+	"github.com/DirIO-S3/dirio/internal/startup"
+	"github.com/DirIO-S3/dirio/internal/telemetry"
 )
 
 var serveCmd = &cobra.Command{

@@ -26,14 +26,14 @@ import (
 
 	"github.com/go-git/go-billy/v5"
 
-	"github.com/mallardduck/dirio/internal/config/data"
-	"github.com/mallardduck/dirio/internal/consts"
-	"github.com/mallardduck/dirio/internal/crypto"
-	"github.com/mallardduck/dirio/internal/global"
-	"github.com/mallardduck/dirio/internal/hostname"
-	"github.com/mallardduck/dirio/internal/logging"
-	"github.com/mallardduck/dirio/internal/persistence/metadata"
-	"github.com/mallardduck/dirio/internal/persistence/path"
+	"github.com/DirIO-S3/dirio/internal/config/data"
+	"github.com/DirIO-S3/dirio/internal/consts"
+	"github.com/DirIO-S3/dirio/internal/crypto"
+	"github.com/DirIO-S3/dirio/internal/global"
+	"github.com/DirIO-S3/dirio/internal/hostname"
+	"github.com/DirIO-S3/dirio/internal/logging"
+	"github.com/DirIO-S3/dirio/internal/persistence/metadata"
+	"github.com/DirIO-S3/dirio/internal/persistence/path"
 )
 
 // Starter holds the pre-server initialisation state.

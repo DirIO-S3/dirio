@@ -9,14 +9,14 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mallardduck/dirio/console"
-	"github.com/mallardduck/dirio/console/ui"
-	consolewire "github.com/mallardduck/dirio/internal/console"
-	"github.com/mallardduck/dirio/internal/http/auth"
-	internalserver "github.com/mallardduck/dirio/internal/http/server"
-	"github.com/mallardduck/dirio/internal/service"
-	"github.com/mallardduck/dirio/internal/testutil"
-	"github.com/mallardduck/dirio/sdk/iam"
+	"github.com/DirIO-S3/dirio/console"
+	"github.com/DirIO-S3/dirio/console/ui"
+	consolewire "github.com/DirIO-S3/dirio/internal/console"
+	"github.com/DirIO-S3/dirio/internal/http/auth"
+	internalserver "github.com/DirIO-S3/dirio/internal/http/server"
+	"github.com/DirIO-S3/dirio/internal/service"
+	"github.com/DirIO-S3/dirio/internal/testutil"
+	"github.com/DirIO-S3/dirio/sdk/iam"
 )
 
 const consolePrefix = ui.DefaultBasePath

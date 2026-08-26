@@ -5,7 +5,7 @@ import (
 
 	"github.com/a-h/templ"
 
-	consoleapi "github.com/mallardduck/dirio/api"
+	consoleapi "github.com/DirIO-S3/dirio/api"
 )
 
 func ServiceAccountUpdateSecretClick(sa *consoleapi.ServiceAccount) templ.ComponentScript {

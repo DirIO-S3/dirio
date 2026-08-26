@@ -6,8 +6,8 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/mallardduck/dirio/internal/persistence/metadata"
-	"github.com/mallardduck/dirio/sdk/s3types"
+	"github.com/DirIO-S3/dirio/internal/persistence/metadata"
+	"github.com/DirIO-S3/dirio/sdk/s3types"
 )
 
 // OwnerInfo carries the resolved ownership of a bucket or object.

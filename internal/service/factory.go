@@ -1,16 +1,16 @@
 package service
 
 import (
-	"github.com/mallardduck/dirio/internal/http/auth"
-	"github.com/mallardduck/dirio/internal/persistence/metadata"
-	"github.com/mallardduck/dirio/internal/persistence/storage"
-	policyEngine "github.com/mallardduck/dirio/internal/policy"
-	"github.com/mallardduck/dirio/internal/service/group"
-	"github.com/mallardduck/dirio/internal/service/observation"
-	"github.com/mallardduck/dirio/internal/service/policy"
-	"github.com/mallardduck/dirio/internal/service/s3"
-	"github.com/mallardduck/dirio/internal/service/serviceaccount"
-	"github.com/mallardduck/dirio/internal/service/user"
+	"github.com/DirIO-S3/dirio/internal/http/auth"
+	"github.com/DirIO-S3/dirio/internal/persistence/metadata"
+	"github.com/DirIO-S3/dirio/internal/persistence/storage"
+	policyEngine "github.com/DirIO-S3/dirio/internal/policy"
+	"github.com/DirIO-S3/dirio/internal/service/group"
+	"github.com/DirIO-S3/dirio/internal/service/observation"
+	"github.com/DirIO-S3/dirio/internal/service/policy"
+	"github.com/DirIO-S3/dirio/internal/service/s3"
+	"github.com/DirIO-S3/dirio/internal/service/serviceaccount"
+	"github.com/DirIO-S3/dirio/internal/service/user"
 )
 
 // ServicesFactory provides access to all service instances

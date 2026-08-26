@@ -7,8 +7,8 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/mallardduck/dirio/internal/http/response"
-	"github.com/mallardduck/dirio/sdk/s3types"
+	"github.com/DirIO-S3/dirio/internal/http/response"
+	"github.com/DirIO-S3/dirio/sdk/s3types"
 )
 
 // ValidateS3BucketNameMiddleware returns a middleware that validates S3 bucket names.

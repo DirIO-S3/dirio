@@ -5,7 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 
-	contextInt "github.com/mallardduck/dirio/internal/context"
+	contextInt "github.com/DirIO-S3/dirio/internal/context"
 )
 
 const (

@@ -6,11 +6,11 @@ import (
 	"github.com/go-git/go-billy/v5/osfs"
 	"github.com/spf13/cobra"
 
-	"github.com/mallardduck/dirio/common/output"
-	"github.com/mallardduck/dirio/internal/config"
-	"github.com/mallardduck/dirio/internal/config/data"
-	"github.com/mallardduck/dirio/internal/crypto"
-	"github.com/mallardduck/dirio/internal/logging"
+	"github.com/DirIO-S3/dirio/common/output"
+	"github.com/DirIO-S3/dirio/internal/config"
+	"github.com/DirIO-S3/dirio/internal/config/data"
+	"github.com/DirIO-S3/dirio/internal/crypto"
+	"github.com/DirIO-S3/dirio/internal/logging"
 )
 
 var credentialsCmd = &cobra.Command{

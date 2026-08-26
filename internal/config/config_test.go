@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mallardduck/dirio/internal/config/data"
+	"github.com/DirIO-S3/dirio/internal/config/data"
 )
 
 func TestValueResolverPriority(t *testing.T) {

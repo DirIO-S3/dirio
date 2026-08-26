@@ -1,4 +1,4 @@
-module github.com/mallardduck/dirio/api
+module github.com/DirIO-S3/dirio/api
 
 go 1.26
 

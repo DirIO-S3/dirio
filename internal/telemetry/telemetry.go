@@ -18,7 +18,7 @@ import (
 	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
-	"github.com/mallardduck/dirio/common/version"
+	"github.com/DirIO-S3/dirio/common/version"
 )
 
 // Config holds telemetry configuration.

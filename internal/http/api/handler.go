@@ -3,10 +3,10 @@ package api
 import (
 	"net/http"
 
-	"github.com/mallardduck/dirio/internal/http/api/s3"
-	"github.com/mallardduck/dirio/internal/http/auth"
-	httpresponse "github.com/mallardduck/dirio/internal/http/response"
-	"github.com/mallardduck/dirio/internal/service"
+	"github.com/DirIO-S3/dirio/internal/http/api/s3"
+	"github.com/DirIO-S3/dirio/internal/http/auth"
+	httpresponse "github.com/DirIO-S3/dirio/internal/http/response"
+	"github.com/DirIO-S3/dirio/internal/service"
 )
 
 // Handler handles S3 API requests

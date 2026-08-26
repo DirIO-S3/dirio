@@ -13,8 +13,8 @@ import (
 	context "context"
 	reflect "reflect"
 
+	metadata "github.com/DirIO-S3/dirio/internal/persistence/metadata"
 	uuid "github.com/google/uuid"
-	metadata "github.com/mallardduck/dirio/internal/persistence/metadata"
 	gomock "go.uber.org/mock/gomock"
 )
 

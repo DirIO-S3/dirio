@@ -7,7 +7,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/mallardduck/dirio/internal/policy/variables"
+	"github.com/DirIO-S3/dirio/internal/policy/variables"
 )
 
 func TestEvaluator_Evaluate_EmptyConditions(t *testing.T) {

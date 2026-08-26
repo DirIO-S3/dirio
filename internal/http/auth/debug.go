@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/mallardduck/dirio/internal/consts"
+	"github.com/DirIO-S3/dirio/internal/consts"
 )
 
 // DebugVerifySignature is like VerifySignature but prints debug information

@@ -8,10 +8,10 @@ import (
 
 	"github.com/mallardduck/go-http-helpers/pkg/headers"
 
-	"github.com/mallardduck/dirio/internal/http/middleware"
-	"github.com/mallardduck/dirio/internal/http/response"
-	"github.com/mallardduck/dirio/internal/service/s3"
-	"github.com/mallardduck/dirio/sdk/s3types"
+	"github.com/DirIO-S3/dirio/internal/http/middleware"
+	"github.com/DirIO-S3/dirio/internal/http/response"
+	"github.com/DirIO-S3/dirio/internal/service/s3"
+	"github.com/DirIO-S3/dirio/sdk/s3types"
 )
 
 // PutObjectTagging handles PUT /{bucket}/{key}?tagging

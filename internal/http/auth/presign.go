@@ -7,7 +7,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/mallardduck/dirio/internal/consts"
+	"github.com/DirIO-S3/dirio/internal/consts"
 )
 
 // GeneratePresignedGetURL builds a pre-signed S3 GET URL for the given object using

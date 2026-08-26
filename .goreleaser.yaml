@@ -34,11 +34,11 @@ builds:
       - arm64
     ldflags:
       - -s -w
-      - -X github.com/mallardduck/dirio/common/version.Version={{.Version}}
-      - -X github.com/mallardduck/dirio/common/version.Commit={{.Commit}}
-      - -X github.com/mallardduck/dirio/common/version.BuildTime={{.Date}}
-      - -X github.com/mallardduck/dirio/common/version.BuiltBy=goreleaser
-      - -X github.com/mallardduck/dirio/common/version.GitTreeState={{.GitTreeState}}
+      - -X github.com/DirIO-S3/dirio/common/version.Version={{.Version}}
+      - -X github.com/DirIO-S3/dirio/common/version.Commit={{.Commit}}
+      - -X github.com/DirIO-S3/dirio/common/version.BuildTime={{.Date}}
+      - -X github.com/DirIO-S3/dirio/common/version.BuiltBy=goreleaser
+      - -X github.com/DirIO-S3/dirio/common/version.GitTreeState={{.GitTreeState}}
 
   - id: client
     main: ./cmd/client
@@ -54,11 +54,11 @@ builds:
       - arm64
     ldflags:
       - -s -w
-      - -X github.com/mallardduck/dirio/common/version.Version={{.Version}}
-      - -X github.com/mallardduck/dirio/common/version.Commit={{.Commit}}
-      - -X github.com/mallardduck/dirio/common/version.BuildTime={{.Date}}
-      - -X github.com/mallardduck/dirio/common/version.BuiltBy=goreleaser
-      - -X github.com/mallardduck/dirio/common/version.GitTreeState={{.GitTreeState}}
+      - -X github.com/DirIO-S3/dirio/common/version.Version={{.Version}}
+      - -X github.com/DirIO-S3/dirio/common/version.Commit={{.Commit}}
+      - -X github.com/DirIO-S3/dirio/common/version.BuildTime={{.Date}}
+      - -X github.com/DirIO-S3/dirio/common/version.BuiltBy=goreleaser
+      - -X github.com/DirIO-S3/dirio/common/version.GitTreeState={{.GitTreeState}}
 
 archives:
   - id: server-archive

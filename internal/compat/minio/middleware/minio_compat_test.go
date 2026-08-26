@@ -8,7 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 
-	"github.com/mallardduck/dirio/internal/global"
+	"github.com/DirIO-S3/dirio/internal/global"
 )
 
 func TestIsMinioClient(t *testing.T) {

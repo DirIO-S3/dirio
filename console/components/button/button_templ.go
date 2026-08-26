@@ -13,7 +13,7 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"github.com/mallardduck/dirio/console/utils"
+	"github.com/DirIO-S3/dirio/console/utils"
 	"strings"
 )
 

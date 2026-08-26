@@ -11,11 +11,11 @@ import (
 	"github.com/mallardduck/go-http-helpers/pkg/headers"
 	"github.com/mallardduck/go-http-helpers/pkg/query"
 
-	"github.com/mallardduck/dirio/internal/http/auth"
-	"github.com/mallardduck/dirio/internal/logging"
-	svcerrors "github.com/mallardduck/dirio/internal/service/errors"
-	"github.com/mallardduck/dirio/internal/service/serviceaccount"
-	iamPkg "github.com/mallardduck/dirio/sdk/iam"
+	"github.com/DirIO-S3/dirio/internal/http/auth"
+	"github.com/DirIO-S3/dirio/internal/logging"
+	svcerrors "github.com/DirIO-S3/dirio/internal/service/errors"
+	"github.com/DirIO-S3/dirio/internal/service/serviceaccount"
+	iamPkg "github.com/DirIO-S3/dirio/sdk/iam"
 )
 
 type ServiceAccountHTTPService struct {

@@ -3,7 +3,7 @@ package policy
 import (
 	"context"
 
-	"github.com/mallardduck/dirio/internal/persistence/metadata"
+	"github.com/DirIO-S3/dirio/internal/persistence/metadata"
 )
 
 //go:generate mockgen -source=repo.go -destination=mock/mock_repo.go -package=mock

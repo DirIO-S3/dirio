@@ -9,8 +9,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/mallardduck/go-http-helpers/pkg/headers"
 
-	contextInt "github.com/mallardduck/dirio/internal/context"
-	"github.com/mallardduck/dirio/sdk/iam"
+	contextInt "github.com/DirIO-S3/dirio/internal/context"
+	"github.com/DirIO-S3/dirio/sdk/iam"
 )
 
 // FromRequest builds a variable context from an HTTP request

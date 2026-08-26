@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mallardduck/dirio/internal/http/response"
-	"github.com/mallardduck/dirio/sdk/s3types"
+	"github.com/DirIO-S3/dirio/internal/http/response"
+	"github.com/DirIO-S3/dirio/sdk/s3types"
 )
 
 // ── ValidateS3BucketName ─────────────────────────────────────────────────────

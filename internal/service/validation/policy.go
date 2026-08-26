@@ -3,8 +3,8 @@ package validation
 import (
 	"fmt"
 
-	svcerrors "github.com/mallardduck/dirio/internal/service/errors"
-	"github.com/mallardduck/dirio/sdk/iam"
+	svcerrors "github.com/DirIO-S3/dirio/internal/service/errors"
+	"github.com/DirIO-S3/dirio/sdk/iam"
 )
 
 const (

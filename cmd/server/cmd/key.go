@@ -5,9 +5,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/mallardduck/dirio/common/output"
-	"github.com/mallardduck/dirio/internal/config"
-	"github.com/mallardduck/dirio/internal/crypto"
+	"github.com/DirIO-S3/dirio/common/output"
+	"github.com/DirIO-S3/dirio/internal/config"
+	"github.com/DirIO-S3/dirio/internal/crypto"
 )
 
 var keyCmd = &cobra.Command{

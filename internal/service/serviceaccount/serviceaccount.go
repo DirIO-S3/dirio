@@ -8,11 +8,11 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/mallardduck/dirio/internal/crypto"
-	"github.com/mallardduck/dirio/internal/persistence/metadata"
-	svcerrors "github.com/mallardduck/dirio/internal/service/errors"
-	"github.com/mallardduck/dirio/internal/service/validation"
-	"github.com/mallardduck/dirio/sdk/iam"
+	"github.com/DirIO-S3/dirio/internal/crypto"
+	"github.com/DirIO-S3/dirio/internal/persistence/metadata"
+	svcerrors "github.com/DirIO-S3/dirio/internal/service/errors"
+	"github.com/DirIO-S3/dirio/internal/service/validation"
+	"github.com/DirIO-S3/dirio/sdk/iam"
 )
 
 // Service provides service account management operations

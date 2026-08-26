@@ -4,7 +4,7 @@ import (
 	"context"
 	"log/slog"
 
-	"github.com/mallardduck/dirio/internal/logging"
+	"github.com/DirIO-S3/dirio/internal/logging"
 )
 
 func s3Logger(ctx context.Context) *slog.Logger {

@@ -14,7 +14,7 @@ Unified JSON encoding package that automatically formats JSON output based on en
 ### Basic Encoding
 
 ```go
-import "github.com/mallardduck/dirio/internal/jsonutil"
+import "github.com/DirIO-S3/dirio/internal/jsonutil"
 
 data := MyStruct{Name: "example", Count: 42}
 
@@ -25,7 +25,7 @@ bytes, err := jsonutil.Marshal(data)
 ### Encoding to File
 
 ```go
-import "github.com/mallardduck/dirio/internal/jsonutil"
+import "github.com/DirIO-S3/dirio/internal/jsonutil"
 
 data := MyStruct{Name: "example", Count: 42}
 
@@ -36,7 +36,7 @@ err := jsonutil.MarshalToFile(fs, "config.json", data)
 ### Decoding
 
 ```go
-import "github.com/mallardduck/dirio/internal/jsonutil"
+import "github.com/DirIO-S3/dirio/internal/jsonutil"
 
 var data MyStruct
 err := jsonutil.Unmarshal(bytes, &data)
@@ -124,7 +124,7 @@ data3, err := json.MarshalIndent(config, "", "  ") // Data config
 ### After
 
 ```go
-import "github.com/mallardduck/dirio/internal/jsonutil"
+import "github.com/DirIO-S3/dirio/internal/jsonutil"
 
 // Consistent API, automatic formatting
 data1, err := jsonutil.Marshal(user)    // Auto-formatted
@@ -137,7 +137,7 @@ data3, err := jsonutil.Marshal(config)  // Auto-formatted
 ```go
 import (
     "encoding/json"
-    "github.com/mallardduck/dirio/internal/util"
+    "github.com/DirIO-S3/dirio/internal/util"
 )
 
 data, err := json.Marshal(meta)
@@ -150,7 +150,7 @@ return util.WriteFile(m.metadataFS, metaPath, data, 0644)
 ### File Writing - After
 
 ```go
-import "github.com/mallardduck/dirio/internal/jsonutil"
+import "github.com/DirIO-S3/dirio/internal/jsonutil"
 
 return jsonutil.MarshalToFile(m.metadataFS, metaPath, meta)
 ```

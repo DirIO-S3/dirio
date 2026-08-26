@@ -2,7 +2,7 @@
 
 package cmd
 
-import "github.com/mallardduck/dirio/internal/http/server"
+import "github.com/DirIO-S3/dirio/internal/http/server"
 
 // setupConsole is a no-op when the noconsole build tag is set.
 // Build without console: go build -tags noconsole ./...

@@ -10,10 +10,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 
-	"github.com/mallardduck/dirio/internal/persistence/metadata"
-	svcerrors "github.com/mallardduck/dirio/internal/service/errors"
-	"github.com/mallardduck/dirio/internal/service/user/mock"
-	"github.com/mallardduck/dirio/sdk/iam"
+	"github.com/DirIO-S3/dirio/internal/persistence/metadata"
+	svcerrors "github.com/DirIO-S3/dirio/internal/service/errors"
+	"github.com/DirIO-S3/dirio/internal/service/user/mock"
+	"github.com/DirIO-S3/dirio/sdk/iam"
 )
 
 func newMockService(t *testing.T) (*Service, *mock.MockRepository) {

@@ -1,4 +1,4 @@
-module github.com/mallardduck/dirio/common
+module github.com/DirIO-S3/dirio/common
 
 go 1.26
 

@@ -11,8 +11,8 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"fmt"
 
+	"github.com/DirIO-S3/dirio/api"
 	"github.com/google/uuid"
-	"github.com/mallardduck/dirio/api"
 )
 
 // memberKey returns the access key for a member UUID, falling back to the UUID string.

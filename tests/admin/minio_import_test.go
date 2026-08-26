@@ -11,8 +11,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	miniopkg "github.com/mallardduck/dirio/internal/compat/minio/import"
-	"github.com/mallardduck/dirio/internal/consts"
+	miniopkg "github.com/DirIO-S3/dirio/internal/compat/minio/import"
+	"github.com/DirIO-S3/dirio/internal/consts"
 )
 
 // buildMinIOSys creates a .minio.sys directory structure within dataDir and returns the path.

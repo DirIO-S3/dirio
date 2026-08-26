@@ -5,7 +5,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/mallardduck/dirio/internal/policy/variables"
+	"github.com/DirIO-S3/dirio/internal/policy/variables"
 )
 
 // Build constructs a condition evaluation context from pre-extracted request attributes.

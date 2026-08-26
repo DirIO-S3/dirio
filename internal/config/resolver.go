@@ -6,7 +6,7 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 
-	"github.com/mallardduck/dirio/internal/config/option"
+	"github.com/DirIO-S3/dirio/internal/config/option"
 )
 
 // ValueResolver handles the resolution of configuration values from multiple sources.

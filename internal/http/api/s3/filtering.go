@@ -8,11 +8,11 @@ import (
 
 	"github.com/mallardduck/go-http-helpers/pkg/headers"
 
-	"github.com/mallardduck/dirio/internal/context"
-	"github.com/mallardduck/dirio/internal/policy"
-	"github.com/mallardduck/dirio/internal/policy/variables"
-	"github.com/mallardduck/dirio/sdk/iam"
-	"github.com/mallardduck/dirio/sdk/s3types"
+	"github.com/DirIO-S3/dirio/internal/context"
+	"github.com/DirIO-S3/dirio/internal/policy"
+	"github.com/DirIO-S3/dirio/internal/policy/variables"
+	"github.com/DirIO-S3/dirio/sdk/iam"
+	"github.com/DirIO-S3/dirio/sdk/s3types"
 )
 
 // filterBuckets extracts request context and delegates to the observation service.

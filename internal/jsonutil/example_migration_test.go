@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-git/go-billy/v5/memfs"
 
-	"github.com/mallardduck/dirio/internal/jsonutil"
+	"github.com/DirIO-S3/dirio/internal/jsonutil"
 )
 
 // ExampleMarshal demonstrates automatic formatting based on environment

@@ -4,9 +4,9 @@ import (
 	"context"
 	"strings"
 
-	"github.com/mallardduck/dirio/internal/policy/conditions"
-	"github.com/mallardduck/dirio/internal/policy/variables"
-	"github.com/mallardduck/dirio/sdk/iam"
+	"github.com/DirIO-S3/dirio/internal/policy/conditions"
+	"github.com/DirIO-S3/dirio/internal/policy/variables"
+	"github.com/DirIO-S3/dirio/sdk/iam"
 )
 
 // matchPrincipal checks if the request principal matches the statement principal.

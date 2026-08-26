@@ -41,7 +41,7 @@ linters:
             - "!**/*_test.go"
             - "!**/tests/**/*.go"
           deny:
-            - pkg: "github.com/mallardduck/dirio/internal/testutil"
+            - pkg: "github.com/DirIO-S3/dirio/internal/testutil"
               desc: "internal/testutil is only for use in test files (*_test.go) or the tests/ directory"
         testcontainers-quarantine:
           # testcontainers-go (and Docker test deps generally) are quarantined to the
@@ -56,7 +56,7 @@ linters:
           files:
             - "**/console/**/*.go"
           deny:
-            - pkg: "github.com/mallardduck/dirio/internal"
+            - pkg: "github.com/DirIO-S3/dirio/internal"
               desc: "console/ must not import internal/ — use dirio/api interface only"
         metadata-only-via-service:
           # Deny direct metadata imports in handler/adapter/CLI layers.
@@ -76,7 +76,7 @@ linters:
             - "**/sdk/**/*.go"
             - "**/tests/**/*.go"
           deny:
-            - pkg: "github.com/mallardduck/dirio/internal/persistence/metadata"
+            - pkg: "github.com/DirIO-S3/dirio/internal/persistence/metadata"
               desc: "import metadata only via the service layer (ServicesFactory); HTTP handlers and console adapters must not access metadata directly"
         api-no-minio:
           files:
@@ -120,27 +120,27 @@ linters:
           files:
             - "**/cmd/client/**/*.go"
           deny:
-            - pkg: "github.com/mallardduck/dirio/internal/service"
+            - pkg: "github.com/DirIO-S3/dirio/internal/service"
               desc: "cmd/client must not import server service layer — use sdk/dioclient"
-            - pkg: "github.com/mallardduck/dirio/internal/http"
+            - pkg: "github.com/DirIO-S3/dirio/internal/http"
               desc: "cmd/client must not import server HTTP — use sdk/dioclient"
-            - pkg: "github.com/mallardduck/dirio/internal/persistence"
+            - pkg: "github.com/DirIO-S3/dirio/internal/persistence"
               desc: "cmd/client must not import server persistence layer"
-            - pkg: "github.com/mallardduck/dirio/internal/policy"
+            - pkg: "github.com/DirIO-S3/dirio/internal/policy"
               desc: "cmd/client must not import server policy engine"
-            - pkg: "github.com/mallardduck/dirio/internal/startup"
+            - pkg: "github.com/DirIO-S3/dirio/internal/startup"
               desc: "cmd/client must not import server startup"
-            - pkg: "github.com/mallardduck/dirio/internal/telemetry"
+            - pkg: "github.com/DirIO-S3/dirio/internal/telemetry"
               desc: "cmd/client must not import server telemetry"
-            - pkg: "github.com/mallardduck/dirio/internal/compat/minio"
+            - pkg: "github.com/DirIO-S3/dirio/internal/compat/minio"
               desc: "cmd/client must not import server MinIO compat layer"
-            - pkg: "github.com/mallardduck/dirio/internal/console"
+            - pkg: "github.com/DirIO-S3/dirio/internal/console"
               desc: "cmd/client must not import server console adapter"
-            - pkg: "github.com/mallardduck/dirio/internal/config"
+            - pkg: "github.com/DirIO-S3/dirio/internal/config"
               desc: "cmd/client must not import server config — use sdk/dioclient profile"
-            - pkg: "github.com/mallardduck/dirio/internal/crypto"
+            - pkg: "github.com/DirIO-S3/dirio/internal/crypto"
               desc: "cmd/client must not import server crypto"
-            - pkg: "github.com/mallardduck/dirio/internal/logging"
+            - pkg: "github.com/DirIO-S3/dirio/internal/logging"
               desc: "cmd/client must not import server logging"
         server-no-client-internals:
           # Server code and shared internal/ packages must not import client-only
@@ -150,7 +150,7 @@ linters:
             - "**/internal/**/*.go"
             - "!**/internal/dioclient/**/*.go"
           deny:
-            - pkg: "github.com/mallardduck/dirio/internal/dioclient"
+            - pkg: "github.com/DirIO-S3/dirio/internal/dioclient"
               desc: "server code must not import client internals (internal/dioclient/)"
         common-no-internal:
           # common/ must remain standalone — no internal/ dependencies.
@@ -158,7 +158,7 @@ linters:
           files:
             - "**/common/**/*.go"
           deny:
-            - pkg: "github.com/mallardduck/dirio/internal"
+            - pkg: "github.com/DirIO-S3/dirio/internal"
               desc: "common/ must not import internal/ — it must remain standalone for both binaries"
         sdk-no-common:
           # sdk/ is a neutral S3/admin client library. It must not import
@@ -167,14 +167,14 @@ linters:
           files:
             - "**/sdk/**/*.go"
           deny:
-            - pkg: "github.com/mallardduck/dirio/common"
+            - pkg: "github.com/DirIO-S3/dirio/common"
               desc: "sdk/ must stay neutral — no dirio-specific common/ imports"
         api-no-common:
           # api/ is a neutral contract module with no dirio-specific dependencies.
           files:
             - "**/api/**/*.go"
           deny:
-            - pkg: "github.com/mallardduck/dirio/common"
+            - pkg: "github.com/DirIO-S3/dirio/common"
               desc: "api/ must stay neutral — no dirio-specific common/ imports"
         console-no-common:
           # console/ is a neutral UI module. It interacts with the server only
@@ -182,7 +182,7 @@ linters:
           files:
             - "**/console/**/*.go"
           deny:
-            - pkg: "github.com/mallardduck/dirio/common"
+            - pkg: "github.com/DirIO-S3/dirio/common"
               desc: "console/ must stay neutral — no dirio-specific common/ imports"
         server-no-stray-minio:
           # MinIO libs are quarantined to two zones in internal/:
@@ -243,7 +243,7 @@ formatters:
   settings:
     goimports:
       local-prefixes:
-        - github.com/mallardduck/dirio
+        - github.com/DirIO-S3/dirio
   exclusions:
     generated: lax
     paths:

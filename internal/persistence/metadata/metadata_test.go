@@ -13,9 +13,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mallardduck/dirio/internal/consts"
+	"github.com/DirIO-S3/dirio/internal/consts"
 
-	"github.com/mallardduck/dirio/sdk/iam"
+	"github.com/DirIO-S3/dirio/sdk/iam"
 )
 
 func TestObjectMetadata_PutAndGet(t *testing.T) {

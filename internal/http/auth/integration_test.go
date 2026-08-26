@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mallardduck/dirio/internal/consts"
+	"github.com/DirIO-S3/dirio/internal/consts"
 )
 
 // TestAWSCLICompatibility tests that our implementation matches AWS CLI's signature

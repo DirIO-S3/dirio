@@ -10,7 +10,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/mallardduck/dirio/internal/testutil"
+	"github.com/DirIO-S3/dirio/internal/testutil"
 )
 
 // TestServer is an alias so test files need no direct testutil import.

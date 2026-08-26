@@ -6,7 +6,7 @@ import (
 	"encoding/hex"
 	"net/http"
 
-	contextInt "github.com/mallardduck/dirio/internal/context"
+	contextInt "github.com/DirIO-S3/dirio/internal/context"
 )
 
 const (

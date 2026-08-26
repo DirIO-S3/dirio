@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/mallardduck/dirio/api"
+	"github.com/DirIO-S3/dirio/api"
 )
 
 // ServiceAccountsPageData holds all data for the service accounts list page.

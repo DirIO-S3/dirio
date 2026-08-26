@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/mallardduck/dirio/internal/config"
+	"github.com/DirIO-S3/dirio/internal/config"
 )
 
 // rootCmd represents the base command when called without any subcommands

@@ -11,7 +11,7 @@ import (
 	"testing"
 	"time"
 
-	svcs3 "github.com/mallardduck/dirio/internal/service/s3"
+	svcs3 "github.com/DirIO-S3/dirio/internal/service/s3"
 )
 
 // testReader wraps bytes.Reader to satisfy ObjectReader (io.ReadCloser + io.ReaderAt).

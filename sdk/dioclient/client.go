@@ -10,7 +10,7 @@ import (
 	"fmt"
 	"net/url"
 
-	compatminio "github.com/mallardduck/dirio/sdk/dioclient/compat/minio"
+	compatminio "github.com/DirIO-S3/dirio/sdk/dioclient/compat/minio"
 )
 
 // Config holds the connection parameters for a single DirIO server.

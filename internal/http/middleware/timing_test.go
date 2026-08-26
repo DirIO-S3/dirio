@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	contextInt "github.com/mallardduck/dirio/internal/context"
+	contextInt "github.com/DirIO-S3/dirio/internal/context"
 )
 
 func TestTiming(t *testing.T) {

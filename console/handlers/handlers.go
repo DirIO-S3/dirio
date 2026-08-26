@@ -10,11 +10,11 @@ import (
 	"github.com/a-h/templ"
 	"github.com/mallardduck/teapot-router/pkg/teapot"
 
-	"github.com/mallardduck/dirio/console/components/toast"
+	"github.com/DirIO-S3/dirio/console/components/toast"
 
-	consoleapi "github.com/mallardduck/dirio/api"
-	"github.com/mallardduck/dirio/console/auth"
-	"github.com/mallardduck/dirio/console/ui"
+	consoleapi "github.com/DirIO-S3/dirio/api"
+	"github.com/DirIO-S3/dirio/console/auth"
+	"github.com/DirIO-S3/dirio/console/ui"
 )
 
 // Handler holds the console API reference used by all handler methods.

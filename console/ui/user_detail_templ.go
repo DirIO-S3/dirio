@@ -11,7 +11,7 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"fmt"
 
-	"github.com/mallardduck/dirio/api"
+	"github.com/DirIO-S3/dirio/api"
 )
 
 // UserDetailData holds all data for the user detail page.

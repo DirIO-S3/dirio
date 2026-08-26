@@ -20,11 +20,11 @@ import (
 
 	"github.com/mallardduck/teapot-router/pkg/teapot"
 
-	consoleapi "github.com/mallardduck/dirio/api"
-	consoleauth "github.com/mallardduck/dirio/console/auth"
-	"github.com/mallardduck/dirio/console/handlers"
-	"github.com/mallardduck/dirio/console/middleware"
-	"github.com/mallardduck/dirio/console/ui"
+	consoleapi "github.com/DirIO-S3/dirio/api"
+	consoleauth "github.com/DirIO-S3/dirio/console/auth"
+	"github.com/DirIO-S3/dirio/console/handlers"
+	"github.com/DirIO-S3/dirio/console/middleware"
+	"github.com/DirIO-S3/dirio/console/ui"
 )
 
 //go:embed static

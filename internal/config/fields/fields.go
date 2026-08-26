@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mallardduck/dirio/internal/config/data"
+	"github.com/DirIO-S3/dirio/internal/config/data"
 )
 
 // configField defines how to read and write a single data-config key via the CLI.

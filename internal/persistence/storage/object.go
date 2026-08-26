@@ -12,10 +12,10 @@ import (
 	"github.com/go-git/go-billy/v5"
 	"github.com/google/uuid"
 
-	contextInt "github.com/mallardduck/dirio/internal/context"
-	"github.com/mallardduck/dirio/internal/persistence/metadata"
-	"github.com/mallardduck/dirio/internal/persistence/path"
-	"github.com/mallardduck/dirio/sdk/iam"
+	contextInt "github.com/DirIO-S3/dirio/internal/context"
+	"github.com/DirIO-S3/dirio/internal/persistence/metadata"
+	"github.com/DirIO-S3/dirio/internal/persistence/path"
+	"github.com/DirIO-S3/dirio/sdk/iam"
 )
 
 // ObjectContent is the interface for readable object content.

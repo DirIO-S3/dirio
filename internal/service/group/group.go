@@ -6,9 +6,9 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/mallardduck/dirio/internal/persistence/metadata"
-	svcerrors "github.com/mallardduck/dirio/internal/service/errors"
-	"github.com/mallardduck/dirio/sdk/iam"
+	"github.com/DirIO-S3/dirio/internal/persistence/metadata"
+	svcerrors "github.com/DirIO-S3/dirio/internal/service/errors"
+	"github.com/DirIO-S3/dirio/sdk/iam"
 )
 
 // Service provides group management operations

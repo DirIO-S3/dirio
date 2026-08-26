@@ -10,7 +10,7 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 
-	"github.com/mallardduck/dirio/internal/config/data"
+	"github.com/DirIO-S3/dirio/internal/config/data"
 )
 
 // Settings represents all configuration values that dirio relies on to run.

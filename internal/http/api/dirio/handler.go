@@ -7,10 +7,10 @@ import (
 
 	"github.com/mallardduck/teapot-router/pkg/teapot"
 
-	consoleapi "github.com/mallardduck/dirio/api"
-	dcontext "github.com/mallardduck/dirio/internal/context"
-	svcerrors "github.com/mallardduck/dirio/internal/service/errors"
-	"github.com/mallardduck/dirio/sdk/s3types"
+	consoleapi "github.com/DirIO-S3/dirio/api"
+	dcontext "github.com/DirIO-S3/dirio/internal/context"
+	svcerrors "github.com/DirIO-S3/dirio/internal/service/errors"
+	"github.com/DirIO-S3/dirio/sdk/s3types"
 )
 
 // stub returns a 200 OK handler used when the real api is unavailable (CLI listing).

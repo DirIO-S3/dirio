@@ -2,7 +2,7 @@
 // and the DirIO server. This package is the only coupling point: the console/
 // package imports only this package, never internal/.
 //
-// Module path: github.com/mallardduck/dirio/api
+// Module path: github.com/DirIO-S3/dirio/api
 // Package name stays consoleapi so all callers keep using consoleapi.Foo unchanged.
 package consoleapi
 

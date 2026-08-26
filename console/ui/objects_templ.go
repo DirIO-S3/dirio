@@ -12,7 +12,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/mallardduck/dirio/api"
+	"github.com/DirIO-S3/dirio/api"
 )
 
 // ObjectsPage renders the full bucket object browser page.

@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/mallardduck/dirio/internal/policy"
-	"github.com/mallardduck/dirio/sdk/iam"
+	"github.com/DirIO-S3/dirio/internal/policy"
+	"github.com/DirIO-S3/dirio/sdk/iam"
 )
 
 // Example showing how to validate a policy document after unmarshaling

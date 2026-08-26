@@ -6,7 +6,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/mallardduck/dirio/internal/policy/variables"
+	"github.com/DirIO-S3/dirio/internal/policy/variables"
 )
 
 // Operator represents a condition operator type

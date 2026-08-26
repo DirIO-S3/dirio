@@ -5,7 +5,7 @@ import (
 
 	"github.com/mallardduck/teapot-router/pkg/teapot"
 
-	"github.com/mallardduck/dirio/internal/telemetry"
+	"github.com/DirIO-S3/dirio/internal/telemetry"
 )
 
 var _ RouteHandlers = (*Handler)(nil)

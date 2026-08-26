@@ -18,16 +18,16 @@ import (
 	"github.com/phuslu/lru"
 	bbolt "go.etcd.io/bbolt"
 
-	"github.com/mallardduck/dirio/internal/consts"
-	"github.com/mallardduck/dirio/internal/logging"
+	"github.com/DirIO-S3/dirio/internal/consts"
+	"github.com/DirIO-S3/dirio/internal/logging"
 
-	contextInt "github.com/mallardduck/dirio/internal/context"
+	contextInt "github.com/DirIO-S3/dirio/internal/context"
 
-	"github.com/mallardduck/dirio/internal/crypto"
-	"github.com/mallardduck/dirio/internal/persistence/path"
+	"github.com/DirIO-S3/dirio/internal/crypto"
+	"github.com/DirIO-S3/dirio/internal/persistence/path"
 
-	"github.com/mallardduck/dirio/internal/jsonutil"
-	"github.com/mallardduck/dirio/sdk/iam"
+	"github.com/DirIO-S3/dirio/internal/jsonutil"
+	"github.com/DirIO-S3/dirio/sdk/iam"
 )
 
 // Metadata format versions

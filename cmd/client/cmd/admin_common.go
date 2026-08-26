@@ -7,9 +7,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mallardduck/dirio/cmd/client/internal/dioclient/profile"
-	"github.com/mallardduck/dirio/cmd/client/internal/dioclient/serverdetect"
-	"github.com/mallardduck/dirio/sdk/dioclient"
+	"github.com/DirIO-S3/dirio/cmd/client/internal/dioclient/profile"
+	"github.com/DirIO-S3/dirio/cmd/client/internal/dioclient/serverdetect"
+	"github.com/DirIO-S3/dirio/sdk/dioclient"
 )
 
 // resolveClientConfig loads the profile config and resolves clientCfg for the

@@ -20,8 +20,8 @@ import (
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
 
-	"github.com/mallardduck/dirio/internal/http/auth"
-	"github.com/mallardduck/dirio/internal/http/server"
+	"github.com/DirIO-S3/dirio/internal/http/auth"
+	"github.com/DirIO-S3/dirio/internal/http/server"
 )
 
 const (

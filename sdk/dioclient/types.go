@@ -1,7 +1,7 @@
 package dioclient
 
 import (
-	compatminio "github.com/mallardduck/dirio/sdk/dioclient/compat/minio"
+	compatminio "github.com/DirIO-S3/dirio/sdk/dioclient/compat/minio"
 )
 
 // S3 types — defined in compat/minio, re-exported as type aliases so callers

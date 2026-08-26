@@ -11,15 +11,15 @@ import (
 	"github.com/mallardduck/go-http-helpers/pkg/headers"
 	"github.com/mallardduck/teapot-router/pkg/teapot"
 
-	"github.com/mallardduck/dirio/internal/consts"
-	"github.com/mallardduck/dirio/internal/context"
-	"github.com/mallardduck/dirio/internal/http/copysource"
-	loggingHttp "github.com/mallardduck/dirio/internal/http/middleware/logging"
-	httpresponse "github.com/mallardduck/dirio/internal/http/response"
-	"github.com/mallardduck/dirio/internal/logging"
-	"github.com/mallardduck/dirio/internal/persistence/metadata"
-	"github.com/mallardduck/dirio/internal/policy/variables"
-	"github.com/mallardduck/dirio/sdk/s3types"
+	"github.com/DirIO-S3/dirio/internal/consts"
+	"github.com/DirIO-S3/dirio/internal/context"
+	"github.com/DirIO-S3/dirio/internal/http/copysource"
+	loggingHttp "github.com/DirIO-S3/dirio/internal/http/middleware/logging"
+	httpresponse "github.com/DirIO-S3/dirio/internal/http/response"
+	"github.com/DirIO-S3/dirio/internal/logging"
+	"github.com/DirIO-S3/dirio/internal/persistence/metadata"
+	"github.com/DirIO-S3/dirio/internal/policy/variables"
+	"github.com/DirIO-S3/dirio/sdk/s3types"
 )
 
 func authzLogger(ctx stdcontext.Context) *slog.Logger {

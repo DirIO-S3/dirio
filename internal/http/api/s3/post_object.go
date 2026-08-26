@@ -7,12 +7,12 @@ import (
 	"net/url"
 	"strings"
 
-	contextInt "github.com/mallardduck/dirio/internal/context"
-	authpkg "github.com/mallardduck/dirio/internal/http/auth"
-	"github.com/mallardduck/dirio/internal/http/middleware"
-	"github.com/mallardduck/dirio/internal/http/response"
-	svcs3 "github.com/mallardduck/dirio/internal/service/s3"
-	"github.com/mallardduck/dirio/sdk/s3types"
+	contextInt "github.com/DirIO-S3/dirio/internal/context"
+	authpkg "github.com/DirIO-S3/dirio/internal/http/auth"
+	"github.com/DirIO-S3/dirio/internal/http/middleware"
+	"github.com/DirIO-S3/dirio/internal/http/response"
+	svcs3 "github.com/DirIO-S3/dirio/internal/service/s3"
+	"github.com/DirIO-S3/dirio/sdk/s3types"
 )
 
 // PostObject handles POST /{bucket} — S3 POST policy browser-based form upload.

@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 
-	"github.com/mallardduck/dirio/sdk/iam"
+	"github.com/DirIO-S3/dirio/sdk/iam"
 )
 
 // Ensure MetadataResolver satisfies PolicyResolver at compile time.

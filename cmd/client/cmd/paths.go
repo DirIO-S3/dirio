@@ -4,7 +4,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/mallardduck/dirio/cmd/client/internal/dioclient/profile"
+	"github.com/DirIO-S3/dirio/cmd/client/internal/dioclient/profile"
 )
 
 // endpoint is a resolved source or destination for cp/sync.

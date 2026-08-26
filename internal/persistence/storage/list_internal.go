@@ -8,8 +8,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/mallardduck/dirio/internal/persistence/metadata"
-	"github.com/mallardduck/dirio/sdk/s3types"
+	"github.com/DirIO-S3/dirio/internal/persistence/metadata"
+	"github.com/DirIO-S3/dirio/sdk/s3types"
 )
 
 // fetchBucketOwner retrieves owner information for a bucket.

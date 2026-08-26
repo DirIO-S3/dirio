@@ -5,11 +5,11 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/mallardduck/dirio/common/output"
-	"github.com/mallardduck/dirio/internal/config"
-	"github.com/mallardduck/dirio/internal/config/data"
-	"github.com/mallardduck/dirio/internal/logging"
-	"github.com/mallardduck/dirio/internal/startup"
+	"github.com/DirIO-S3/dirio/common/output"
+	"github.com/DirIO-S3/dirio/internal/config"
+	"github.com/DirIO-S3/dirio/internal/config/data"
+	"github.com/DirIO-S3/dirio/internal/logging"
+	"github.com/DirIO-S3/dirio/internal/startup"
 )
 
 var initCmd = &cobra.Command{

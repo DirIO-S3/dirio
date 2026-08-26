@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mallardduck/dirio/sdk/dioclient"
+	"github.com/DirIO-S3/dirio/sdk/dioclient"
 )
 
 var bucketSeq atomic.Int64

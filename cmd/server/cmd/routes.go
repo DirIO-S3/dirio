@@ -6,8 +6,8 @@ import (
 	"github.com/mallardduck/teapot-router/pkg/teapot"
 	"github.com/spf13/cobra"
 
-	"github.com/mallardduck/dirio/internal/http/server"
-	"github.com/mallardduck/dirio/internal/http/server/stubs"
+	"github.com/DirIO-S3/dirio/internal/http/server"
+	"github.com/DirIO-S3/dirio/internal/http/server/stubs"
 )
 
 var routesCmd = &cobra.Command{

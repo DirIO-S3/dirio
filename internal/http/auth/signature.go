@@ -47,7 +47,7 @@ import (
 
 	"github.com/mallardduck/go-http-helpers/pkg/headers"
 
-	"github.com/mallardduck/dirio/internal/consts"
+	"github.com/DirIO-S3/dirio/internal/consts"
 )
 
 const (

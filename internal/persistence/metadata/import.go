@@ -9,14 +9,14 @@ import (
 	"github.com/go-git/go-billy/v5/util"
 	"github.com/google/uuid"
 
-	"github.com/mallardduck/dirio/internal/consts"
+	"github.com/DirIO-S3/dirio/internal/consts"
 
-	minioimport "github.com/mallardduck/dirio/internal/compat/minio/import"
-	"github.com/mallardduck/dirio/internal/config/data"
-	"github.com/mallardduck/dirio/internal/jsonutil"
-	"github.com/mallardduck/dirio/internal/logging"
-	"github.com/mallardduck/dirio/internal/persistence/path"
-	"github.com/mallardduck/dirio/sdk/iam"
+	minioimport "github.com/DirIO-S3/dirio/internal/compat/minio/import"
+	"github.com/DirIO-S3/dirio/internal/config/data"
+	"github.com/DirIO-S3/dirio/internal/jsonutil"
+	"github.com/DirIO-S3/dirio/internal/logging"
+	"github.com/DirIO-S3/dirio/internal/persistence/path"
+	"github.com/DirIO-S3/dirio/sdk/iam"
 )
 
 var importLog = logging.Component("import")

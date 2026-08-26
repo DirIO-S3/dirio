@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"time"
 
-	contextInt "github.com/mallardduck/dirio/internal/context"
+	contextInt "github.com/DirIO-S3/dirio/internal/context"
 )
 
 // Timing is a middleware that captures the request start time as early as possible.

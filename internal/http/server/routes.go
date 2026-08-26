@@ -6,24 +6,24 @@ import (
 
 	"github.com/mallardduck/teapot-router/pkg/teapot"
 
-	minioHTTP "github.com/mallardduck/dirio/internal/compat/minio/http"
+	minioHTTP "github.com/DirIO-S3/dirio/internal/compat/minio/http"
 
-	dirioapi "github.com/mallardduck/dirio/internal/http/api/dirio"
-	"github.com/mallardduck/dirio/internal/http/server/prof"
+	dirioapi "github.com/DirIO-S3/dirio/internal/http/api/dirio"
+	"github.com/DirIO-S3/dirio/internal/http/server/prof"
 
-	"github.com/mallardduck/dirio/internal/http/api"
-	"github.com/mallardduck/dirio/internal/http/auth"
-	"github.com/mallardduck/dirio/internal/http/middleware"
-	httpresponse "github.com/mallardduck/dirio/internal/http/response"
-	"github.com/mallardduck/dirio/internal/http/server/favicon"
-	"github.com/mallardduck/dirio/internal/http/server/health"
-	"github.com/mallardduck/dirio/internal/http/server/metrics"
+	"github.com/DirIO-S3/dirio/internal/http/api"
+	"github.com/DirIO-S3/dirio/internal/http/auth"
+	"github.com/DirIO-S3/dirio/internal/http/middleware"
+	httpresponse "github.com/DirIO-S3/dirio/internal/http/response"
+	"github.com/DirIO-S3/dirio/internal/http/server/favicon"
+	"github.com/DirIO-S3/dirio/internal/http/server/health"
+	"github.com/DirIO-S3/dirio/internal/http/server/metrics"
 
 	teapoturlbuilder "github.com/mallardduck/teapot-router/pkg/urlbuilder"
 
-	"github.com/mallardduck/dirio/internal/consts"
-	"github.com/mallardduck/dirio/internal/persistence/metadata"
-	"github.com/mallardduck/dirio/internal/policy"
+	"github.com/DirIO-S3/dirio/internal/consts"
+	"github.com/DirIO-S3/dirio/internal/persistence/metadata"
+	"github.com/DirIO-S3/dirio/internal/policy"
 )
 
 // RouteDependencies contains all dependencies needed for route handlers.

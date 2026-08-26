@@ -5,14 +5,14 @@ import (
 
 	"github.com/mallardduck/teapot-router/pkg/teapot"
 
-	loggingHttp "github.com/mallardduck/dirio/internal/http/middleware/logging"
+	loggingHttp "github.com/DirIO-S3/dirio/internal/http/middleware/logging"
 
-	"github.com/mallardduck/dirio/internal/logging"
-	"github.com/mallardduck/dirio/internal/service"
-	"github.com/mallardduck/dirio/internal/service/group"
-	"github.com/mallardduck/dirio/internal/service/policy"
-	"github.com/mallardduck/dirio/internal/service/serviceaccount"
-	"github.com/mallardduck/dirio/internal/service/user"
+	"github.com/DirIO-S3/dirio/internal/logging"
+	"github.com/DirIO-S3/dirio/internal/service"
+	"github.com/DirIO-S3/dirio/internal/service/group"
+	"github.com/DirIO-S3/dirio/internal/service/policy"
+	"github.com/DirIO-S3/dirio/internal/service/serviceaccount"
+	"github.com/DirIO-S3/dirio/internal/service/user"
 )
 
 // Handler handles MinIO Admin API v3 IAM requests

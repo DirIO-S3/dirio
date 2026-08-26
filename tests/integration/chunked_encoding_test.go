@@ -12,8 +12,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mallardduck/dirio/internal/consts"
-	"github.com/mallardduck/dirio/internal/http/auth"
+	"github.com/DirIO-S3/dirio/internal/consts"
+	"github.com/DirIO-S3/dirio/internal/http/auth"
 )
 
 // signStreamingRequest signs a request with STREAMING-AWS4-HMAC-SHA256-PAYLOAD

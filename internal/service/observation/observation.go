@@ -11,13 +11,13 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/mallardduck/dirio/internal/logging"
-	"github.com/mallardduck/dirio/internal/policy"
-	"github.com/mallardduck/dirio/internal/policy/variables"
-	svcerrors "github.com/mallardduck/dirio/internal/service/errors"
-	"github.com/mallardduck/dirio/internal/service/s3"
-	svcuser "github.com/mallardduck/dirio/internal/service/user"
-	"github.com/mallardduck/dirio/sdk/s3types"
+	"github.com/DirIO-S3/dirio/internal/logging"
+	"github.com/DirIO-S3/dirio/internal/policy"
+	"github.com/DirIO-S3/dirio/internal/policy/variables"
+	svcerrors "github.com/DirIO-S3/dirio/internal/service/errors"
+	"github.com/DirIO-S3/dirio/internal/service/s3"
+	svcuser "github.com/DirIO-S3/dirio/internal/service/user"
+	"github.com/DirIO-S3/dirio/sdk/s3types"
 )
 
 var filterLogger = logging.Component("filter")

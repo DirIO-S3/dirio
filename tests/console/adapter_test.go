@@ -10,10 +10,10 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	consoleapi "github.com/mallardduck/dirio/api"
-	consolewire "github.com/mallardduck/dirio/internal/console"
-	"github.com/mallardduck/dirio/internal/service"
-	"github.com/mallardduck/dirio/internal/testutil"
+	consoleapi "github.com/DirIO-S3/dirio/api"
+	consolewire "github.com/DirIO-S3/dirio/internal/console"
+	"github.com/DirIO-S3/dirio/internal/service"
+	"github.com/DirIO-S3/dirio/internal/testutil"
 )
 
 // newAdapterFromTestServer constructs a console Adapter backed by the given test

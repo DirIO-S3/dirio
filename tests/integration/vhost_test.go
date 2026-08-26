@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/mallardduck/dirio/internal/testutil"
+	"github.com/DirIO-S3/dirio/internal/testutil"
 )
 
 const testCanonicalDomain = "s3.vhost.test"

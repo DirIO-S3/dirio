@@ -14,8 +14,8 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"context"
-	"github.com/mallardduck/dirio/console/components/icon"
-	"github.com/mallardduck/dirio/console/utils"
+	"github.com/DirIO-S3/dirio/console/components/icon"
+	"github.com/DirIO-S3/dirio/console/utils"
 )
 
 type contextKey string

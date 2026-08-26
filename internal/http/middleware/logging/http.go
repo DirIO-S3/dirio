@@ -9,8 +9,8 @@ import (
 
 	"github.com/mallardduck/teapot-router/pkg/teapot"
 
-	"github.com/mallardduck/dirio/internal/http/middleware"
-	"github.com/mallardduck/dirio/internal/logging"
+	"github.com/DirIO-S3/dirio/internal/http/middleware"
+	"github.com/DirIO-S3/dirio/internal/logging"
 )
 
 // contextKey for storing response writer in context

@@ -8,13 +8,13 @@ import (
 
 	"github.com/mallardduck/go-http-helpers/pkg/headers"
 
-	contextInt "github.com/mallardduck/dirio/internal/context"
-	"github.com/mallardduck/dirio/internal/http/middleware"
-	loggingHttp "github.com/mallardduck/dirio/internal/http/middleware/logging"
-	httpresponse "github.com/mallardduck/dirio/internal/http/response"
-	"github.com/mallardduck/dirio/internal/persistence/metadata"
-	"github.com/mallardduck/dirio/sdk/iam"
-	"github.com/mallardduck/dirio/sdk/s3types"
+	contextInt "github.com/DirIO-S3/dirio/internal/context"
+	"github.com/DirIO-S3/dirio/internal/http/middleware"
+	loggingHttp "github.com/DirIO-S3/dirio/internal/http/middleware/logging"
+	httpresponse "github.com/DirIO-S3/dirio/internal/http/response"
+	"github.com/DirIO-S3/dirio/internal/persistence/metadata"
+	"github.com/DirIO-S3/dirio/sdk/iam"
+	"github.com/DirIO-S3/dirio/sdk/s3types"
 )
 
 func (a *Authenticator) AuthMiddleware(next http.Handler) http.Handler {

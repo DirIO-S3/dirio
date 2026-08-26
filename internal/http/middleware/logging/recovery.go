@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/mallardduck/dirio/internal/logging"
+	"github.com/DirIO-S3/dirio/internal/logging"
 )
 
 // RecoveryMiddleware is a middleware that recovers from any panics and returns a consistent error response.

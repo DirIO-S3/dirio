@@ -10,8 +10,8 @@ import (
 
 	"github.com/brutella/dnssd"
 
-	"github.com/mallardduck/dirio/internal/hostname"
-	"github.com/mallardduck/dirio/internal/logging"
+	"github.com/DirIO-S3/dirio/internal/hostname"
+	"github.com/DirIO-S3/dirio/internal/logging"
 )
 
 // Service represents an mDNS service registration for DirIO.

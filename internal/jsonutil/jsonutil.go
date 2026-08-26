@@ -6,7 +6,7 @@ import (
 
 	"github.com/go-git/go-billy/v5"
 
-	"github.com/mallardduck/dirio/internal/config"
+	"github.com/DirIO-S3/dirio/internal/config"
 )
 
 // isDebugMode determines whether to use pretty-printed JSON output.

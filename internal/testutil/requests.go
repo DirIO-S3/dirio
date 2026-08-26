@@ -15,8 +15,8 @@ import (
 
 	"github.com/minio/madmin-go/v3"
 
-	"github.com/mallardduck/dirio/internal/consts"
-	"github.com/mallardduck/dirio/internal/http/auth"
+	"github.com/DirIO-S3/dirio/internal/consts"
+	"github.com/DirIO-S3/dirio/internal/http/auth"
 )
 
 // ---------------------------------------------------------------------------

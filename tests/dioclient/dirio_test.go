@@ -3,7 +3,7 @@ package dioclient_test
 import (
 	"testing"
 
-	"github.com/mallardduck/dirio/internal/testutil"
+	"github.com/DirIO-S3/dirio/internal/testutil"
 )
 
 // TestServer is a type alias so test helpers can reference testutil.TestServer

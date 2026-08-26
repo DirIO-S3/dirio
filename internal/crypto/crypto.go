@@ -46,7 +46,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/mallardduck/dirio/internal/consts"
+	"github.com/DirIO-S3/dirio/internal/consts"
 )
 
 const (

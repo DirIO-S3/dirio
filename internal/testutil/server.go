@@ -20,10 +20,10 @@ import (
 
 	"github.com/go-git/go-billy/v5/osfs"
 
-	"github.com/mallardduck/dirio/internal/config/data"
-	"github.com/mallardduck/dirio/internal/crypto"
-	"github.com/mallardduck/dirio/internal/http/server"
-	"github.com/mallardduck/dirio/internal/startup"
+	"github.com/DirIO-S3/dirio/internal/config/data"
+	"github.com/DirIO-S3/dirio/internal/crypto"
+	"github.com/DirIO-S3/dirio/internal/http/server"
+	"github.com/DirIO-S3/dirio/internal/startup"
 )
 
 const (

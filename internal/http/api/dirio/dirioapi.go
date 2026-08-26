@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	consoleapi "github.com/mallardduck/dirio/api"
-	"github.com/mallardduck/dirio/internal/policy"
+	consoleapi "github.com/DirIO-S3/dirio/api"
+	"github.com/DirIO-S3/dirio/internal/policy"
 )
 
 // RouteHandlers defines the HTTP handler surface for the DirIO REST API (/.dirio/api/v1/).

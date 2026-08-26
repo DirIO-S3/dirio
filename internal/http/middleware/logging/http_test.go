@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/mallardduck/dirio/internal/http/middleware"
-	"github.com/mallardduck/dirio/internal/http/trace"
+	"github.com/DirIO-S3/dirio/internal/http/middleware"
+	"github.com/DirIO-S3/dirio/internal/http/trace"
 )
 
 func TestPrepareAccessLogMiddleware(t *testing.T) {

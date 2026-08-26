@@ -1,7 +1,7 @@
 package config
 
 import (
-	"github.com/mallardduck/dirio/internal/config/option"
+	"github.com/DirIO-S3/dirio/internal/config/option"
 )
 
 // Server configuration options

@@ -1,6 +1,6 @@
 package policy
 
-import "github.com/mallardduck/dirio/sdk/iam"
+import "github.com/DirIO-S3/dirio/sdk/iam"
 
 // CreatePolicyRequest represents a request to create a new policy
 type CreatePolicyRequest struct {

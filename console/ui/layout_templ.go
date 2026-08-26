@@ -9,8 +9,8 @@ import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
 import (
-	"github.com/mallardduck/dirio/console/components/dialog"
-	"github.com/mallardduck/dirio/console/components/toast"
+	"github.com/DirIO-S3/dirio/console/components/dialog"
+	"github.com/DirIO-S3/dirio/console/components/toast"
 )
 
 // Base is the root layout: sidebar + topbar + content slot + footer.

@@ -13,9 +13,9 @@ import (
 	context "context"
 	reflect "reflect"
 
+	metadata "github.com/DirIO-S3/dirio/internal/persistence/metadata"
+	iam "github.com/DirIO-S3/dirio/sdk/iam"
 	uuid "github.com/google/uuid"
-	metadata "github.com/mallardduck/dirio/internal/persistence/metadata"
-	iam "github.com/mallardduck/dirio/sdk/iam"
 	gomock "go.uber.org/mock/gomock"
 )
 

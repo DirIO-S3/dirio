@@ -3,7 +3,7 @@ package middleware
 import (
 	"net/http"
 
-	"github.com/mallardduck/dirio/internal/global"
+	"github.com/DirIO-S3/dirio/internal/global"
 )
 
 // SetDefaultHeadersMiddleware is a middleware that sets a specific header

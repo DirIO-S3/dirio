@@ -8,12 +8,12 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/mallardduck/dirio/internal/consts"
-	"github.com/mallardduck/dirio/internal/persistence/metadata"
-	"github.com/mallardduck/dirio/internal/persistence/storage"
-	"github.com/mallardduck/dirio/internal/policy"
-	"github.com/mallardduck/dirio/internal/service/validation"
-	"github.com/mallardduck/dirio/sdk/s3types"
+	"github.com/DirIO-S3/dirio/internal/consts"
+	"github.com/DirIO-S3/dirio/internal/persistence/metadata"
+	"github.com/DirIO-S3/dirio/internal/persistence/storage"
+	"github.com/DirIO-S3/dirio/internal/policy"
+	"github.com/DirIO-S3/dirio/internal/service/validation"
+	"github.com/DirIO-S3/dirio/sdk/s3types"
 )
 
 // Service provides S3 operations for buckets and objects

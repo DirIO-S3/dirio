@@ -7,8 +7,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/mallardduck/dirio/internal/testutil"
-	"github.com/mallardduck/dirio/sdk/dioclient"
+	"github.com/DirIO-S3/dirio/internal/testutil"
+	"github.com/DirIO-S3/dirio/sdk/dioclient"
 )
 
 // newDirioClient creates a dioclient.DirioClient pointed at the test server.

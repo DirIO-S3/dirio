@@ -11,7 +11,7 @@ import (
 	"net/http"
 	"strings"
 
-	compatminio "github.com/mallardduck/dirio/sdk/dioclient/compat/minio"
+	compatminio "github.com/DirIO-S3/dirio/sdk/dioclient/compat/minio"
 )
 
 // DirioClient makes authenticated requests to the DirIO-specific REST API at

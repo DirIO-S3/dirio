@@ -144,7 +144,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/mallardduck/dirio/internal/metadata"
+	"github.com/DirIO-S3/dirio/internal/metadata"
 )
 
 // RequestContext contains all information for policy evaluation
@@ -377,7 +377,7 @@ package policy
 import (
 	"sync"
 
-	"github.com/mallardduck/dirio/pkg/iam"
+	"github.com/DirIO-S3/dirio/pkg/iam"
 )
 
 // Cache holds all policies in memory for fast evaluation
@@ -435,7 +435,7 @@ package policy
 import (
 	"context"
 
-	"github.com/mallardduck/dirio/pkg/iam"
+	"github.com/DirIO-S3/dirio/pkg/iam"
 )
 
 // Engine is the core policy evaluation engine
@@ -580,9 +580,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/mallardduck/dirio/internal/auth"
-	contextInt "github.com/mallardduck/dirio/internal/context"
-	"github.com/mallardduck/dirio/internal/policy"
+	"github.com/DirIO-S3/dirio/internal/auth"
+	contextInt "github.com/DirIO-S3/dirio/internal/context"
+	"github.com/DirIO-S3/dirio/internal/policy"
 	"github.com/mallardduck/teapot-router/pkg/teapot"
 )
 

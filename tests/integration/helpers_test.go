@@ -9,7 +9,7 @@ import (
 	"net/http"
 	"testing"
 
-	"github.com/mallardduck/dirio/internal/testutil"
+	"github.com/DirIO-S3/dirio/internal/testutil"
 )
 
 // TestServer is an alias so integration test files can use the type without

@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	httpresponse "github.com/mallardduck/dirio/internal/http/response"
-	"github.com/mallardduck/dirio/sdk/s3types"
+	httpresponse "github.com/DirIO-S3/dirio/internal/http/response"
+	"github.com/DirIO-S3/dirio/sdk/s3types"
 )
 
 func TestWriteXMLResponse(t *testing.T) {

@@ -9,8 +9,8 @@ import (
 	"github.com/go-git/go-billy/v5/util"
 	"github.com/google/uuid"
 
-	"github.com/mallardduck/dirio/internal/consts"
-	"github.com/mallardduck/dirio/internal/crypto"
+	"github.com/DirIO-S3/dirio/internal/consts"
+	"github.com/DirIO-S3/dirio/internal/crypto"
 )
 
 // ConfigDataVersion represents the version of the configuration data format

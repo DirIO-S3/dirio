@@ -8,7 +8,7 @@ import (
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/util"
 
-	configdata "github.com/mallardduck/dirio/internal/config/data"
+	configdata "github.com/DirIO-S3/dirio/internal/config/data"
 )
 
 // Config2019 represents MinIO 2019 config.json structure (format version 33)

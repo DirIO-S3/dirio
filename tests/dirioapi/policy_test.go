@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	consoleapi "github.com/mallardduck/dirio/api"
+	consoleapi "github.com/DirIO-S3/dirio/api"
 )
 
 // ---------------------------------------------------------------------------

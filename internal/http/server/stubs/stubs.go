@@ -5,10 +5,10 @@ import (
 
 	"github.com/mallardduck/teapot-router/pkg/teapot"
 
-	minioHTTP "github.com/mallardduck/dirio/internal/compat/minio/http"
-	"github.com/mallardduck/dirio/internal/http/server/health"
-	"github.com/mallardduck/dirio/internal/http/server/metrics"
-	"github.com/mallardduck/dirio/internal/http/server/prof"
+	minioHTTP "github.com/DirIO-S3/dirio/internal/compat/minio/http"
+	"github.com/DirIO-S3/dirio/internal/http/server/health"
+	"github.com/DirIO-S3/dirio/internal/http/server/metrics"
+	"github.com/DirIO-S3/dirio/internal/http/server/prof"
 )
 
 var _ health.RouteHandlers = (*StubHandler)(nil)

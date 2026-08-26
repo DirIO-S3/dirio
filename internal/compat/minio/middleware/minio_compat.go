@@ -4,7 +4,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/mallardduck/dirio/internal/global"
+	"github.com/DirIO-S3/dirio/internal/global"
 )
 
 // isMinioClient reports whether the request originates from a MinIO SDK or

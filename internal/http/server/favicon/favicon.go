@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/mallardduck/dirio/common/version"
+	"github.com/DirIO-S3/dirio/common/version"
 )
 
 //go:embed favicon.ico

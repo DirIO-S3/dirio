@@ -8,7 +8,7 @@ package ui
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "github.com/mallardduck/dirio/console/components/icon"
+import "github.com/DirIO-S3/dirio/console/components/icon"
 
 // ThemeToggle renders a 3-way light / system / dark mode picker.
 // State is persisted to localStorage under "dirio-theme" and applied as

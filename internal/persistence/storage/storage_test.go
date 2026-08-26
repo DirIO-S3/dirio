@@ -10,9 +10,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	contextInt "github.com/mallardduck/dirio/internal/context"
-	"github.com/mallardduck/dirio/internal/persistence/metadata"
-	"github.com/mallardduck/dirio/sdk/iam"
+	contextInt "github.com/DirIO-S3/dirio/internal/context"
+	"github.com/DirIO-S3/dirio/internal/persistence/metadata"
+	"github.com/DirIO-S3/dirio/sdk/iam"
 )
 
 func setupTestStorage(t *testing.T) *Storage {

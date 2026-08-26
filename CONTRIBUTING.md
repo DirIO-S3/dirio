@@ -13,7 +13,7 @@ go install github.com/go-task/task/v3/cmd/task@latest
 Then clone and build:
 
 ```bash
-git clone https://github.com/mallardduck/dirio.git
+git clone https://github.com/DirIO-S3/dirio.git
 cd dirio
 go mod tidy
 task build

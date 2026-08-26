@@ -8,7 +8,7 @@ package ui
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "github.com/mallardduck/dirio/api"
+import "github.com/DirIO-S3/dirio/api"
 
 // UserSelectProps configures the UserSelect component.
 type UserSelectProps struct {

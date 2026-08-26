@@ -11,8 +11,8 @@ import templruntime "github.com/a-h/templ/runtime"
 import (
 	"fmt"
 
-	"github.com/mallardduck/dirio/console/components/dialog"
-	"github.com/mallardduck/dirio/console/utils"
+	"github.com/DirIO-S3/dirio/console/components/dialog"
+	"github.com/DirIO-S3/dirio/console/utils"
 )
 
 // RevealSecretProps holds the inputs for the RevealSecret component.

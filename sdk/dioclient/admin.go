@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	compatminio "github.com/mallardduck/dirio/sdk/dioclient/compat/minio"
+	compatminio "github.com/DirIO-S3/dirio/sdk/dioclient/compat/minio"
 )
 
 type ctxKey int

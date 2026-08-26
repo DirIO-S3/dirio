@@ -4,7 +4,7 @@ import (
 	"maps"
 	"sync"
 
-	"github.com/mallardduck/dirio/sdk/iam"
+	"github.com/DirIO-S3/dirio/sdk/iam"
 )
 
 // Cache holds all policies in memory for fast evaluation.

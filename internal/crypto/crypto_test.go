@@ -7,7 +7,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/mallardduck/dirio/internal/consts"
+	"github.com/DirIO-S3/dirio/internal/consts"
 )
 
 // testKeyB64 is a 32-byte key in the "base64:<encoded>" format used by DirIO.

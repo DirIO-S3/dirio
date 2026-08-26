@@ -5,7 +5,7 @@ import (
 	"strings"
 	"unicode"
 
-	svcerrors "github.com/mallardduck/dirio/internal/service/errors"
+	svcerrors "github.com/DirIO-S3/dirio/internal/service/errors"
 )
 
 const (
