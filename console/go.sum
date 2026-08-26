@@ -1,3 +1,5 @@
+github.com/DirIO-S3/dirio/api v0.0.0-20260826010118-110c2138279c h1:Ts8rMigEGvn3sAKIAek0UyrBaTJ9ArDlOWzWGbHPmcE=
+github.com/DirIO-S3/dirio/api v0.0.0-20260826010118-110c2138279c/go.mod h1:NU+VzmFCNeEAsPM9120Au2bdrnp94TsyTGU+ggrtXIs=
 github.com/Oudwins/tailwind-merge-go v0.2.3 h1:RCiZ/DlLpoJnE5QSs1sRPDtIs3We0RQpsLH7bBWfbUI=
 github.com/a-h/templ v0.3.1020 h1:ypAT/L5ySWEnZ6Zft/5yfoWXYYkhFNvEFOeeqecg4tw=
 github.com/a-h/templ v0.3.1020/go.mod h1:A2DlK61v+K+NRoGnhmYbNYVmtYHcFO5/AisMvBdDxTM=
@@ -6,8 +8,6 @@ github.com/google/go-cmp v0.7.0 h1:wk8382ETsv4JYUZwIsn6YpYiWiBsYLSJiTsyBybVuN8=
 github.com/google/go-cmp v0.7.0/go.mod h1:pXiqmnSA92OHEEa9HXL2W4E7lf9JzCmGVUdgjX3N/iU=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
-github.com/DirIO-S3/dirio/api v0.0.0-20260704182817-44a6b84bcf92 h1:TZZUHLASqvbhtn5y78fNQIxpfynODxENno07mC8dIgA=
-github.com/DirIO-S3/dirio/api v0.0.0-20260704182817-44a6b84bcf92/go.mod h1:I8zK3Xe/E7PDkQGb5M9oQqGXFa5ebkdSiKnzwjiwTk0=
 github.com/mallardduck/teapot-router v0.15.2 h1:MUvi/+lHD77outSYLDK4K3j1VmHrFfGY743ck0D7Yj8=
 github.com/stretchr/objx v0.5.3 h1:jmXUvGomnU1o3W/V5h2VEradbpJDwGrzugQQvL0POH4=
 github.com/stretchr/objx v0.5.3/go.mod h1:rDQraq+vQZU7Fde9LOZLr8Tax6zZvy4kuNKF+QYS+U0=

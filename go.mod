@@ -12,6 +12,10 @@ replace (
 replace github.com/brutella/dnssd => github.com/mallardduck/dnssd v0.0.0-20260320220649-bc4db50b7db8
 
 require (
+	github.com/DirIO-S3/dirio/api v0.0.0
+	github.com/DirIO-S3/dirio/common v0.0.0
+	github.com/DirIO-S3/dirio/console v0.0.0
+	github.com/DirIO-S3/dirio/sdk v0.0.0
 	github.com/brutella/dnssd v1.2.14
 	github.com/charmbracelet/huh v1.0.0
 	github.com/charmbracelet/lipgloss v1.1.0
@@ -20,10 +24,6 @@ require (
 	github.com/go-chi/chi/v5 v5.3.2
 	github.com/go-git/go-billy/v5 v5.9.1
 	github.com/google/uuid v1.6.0
-	github.com/DirIO-S3/dirio/api v0.0.0
-	github.com/DirIO-S3/dirio/common v0.0.0
-	github.com/DirIO-S3/dirio/console v0.0.0
-	github.com/DirIO-S3/dirio/sdk v0.0.0
 	github.com/mallardduck/go-http-helpers v0.1.0
 	github.com/mallardduck/teapot-router v0.15.2
 	github.com/minio/madmin-go/v3 v3.0.110
