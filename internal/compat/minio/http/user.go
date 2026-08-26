@@ -111,15 +111,14 @@ func (s *UserHTTPService) CreateUser(w nethttp.ResponseWriter, r *nethttp.Reques
 		return
 	}
 
-	s.ctxLog(r.Context()).With(
+	s.ctxLog(r.Context()).Debug("CreateUser request details",
 		"request_host", r.URL.Host,
 		"request_query", r.URL.Query(),
 		"content_type", r.Header.Get("Content-Type"),
 		"content_length", r.ContentLength,
 		"body_length", len(bodyBytes),
-		"body", string(bodyBytes),
-		"headers", r.Header,
-	).Info("CreateUser request details")
+		"headers", logging.RedactHeaders(r.Header),
+	)
 
 	secretKey := body["secretKey"]
 	enabled := body["status"] == "enabled"
