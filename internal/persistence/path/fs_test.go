@@ -5,6 +5,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/go-git/go-billy/v5/helper/chroot"
 	"github.com/go-git/go-billy/v5/memfs"
 	"github.com/go-git/go-billy/v5/util"
 
@@ -370,7 +371,7 @@ func TestScopedFS_BoundaryEnforcement(t *testing.T) {
 	baseFS.MkdirAll("bucket2", 0o755)
 
 	// Create scoped filesystem for bucket1
-	scopedFS := newScopedFS(baseFS, "bucket1")
+	scopedFS := chroot.New(baseFS, "bucket1")
 
 	// Test that we can access files within bucket1
 	f, err := scopedFS.Create("test.txt")
@@ -401,6 +402,32 @@ func TestScopedFS_BoundaryEnforcement(t *testing.T) {
 	}
 }
 
+func TestScopedFS_BoundaryEscapeRejected(t *testing.T) {
+	baseFS := memfs.New()
+	baseFS.MkdirAll("bucket1", 0o755)
+	f, _ := baseFS.Create("bucket2/secret.txt")
+	if f != nil {
+		f.Close()
+	}
+
+	scopedFS := chroot.New(baseFS, "bucket1")
+
+	escapes := []string{"../bucket2/secret.txt", "..", "../../etc/passwd", "a/../../bucket2/secret.txt"}
+	for _, p := range escapes {
+		if _, err := scopedFS.Open(p); err == nil {
+			t.Errorf("Open(%q) should have been rejected as a boundary escape", p)
+		}
+		if _, err := scopedFS.Stat(p); err == nil {
+			t.Errorf("Stat(%q) should have been rejected as a boundary escape", p)
+		}
+	}
+
+	// Sanity: the file genuinely exists outside the scope, just not reachable through it.
+	if _, err := baseFS.Stat("bucket2/secret.txt"); err != nil {
+		t.Fatalf("setup: expected bucket2/secret.txt to exist in baseFS: %v", err)
+	}
+}
+
 func TestScopedFS_ReadDir(t *testing.T) {
 	baseFS := memfs.New()
 
@@ -413,7 +440,7 @@ func TestScopedFS_ReadDir(t *testing.T) {
 	f2.Close()
 
 	// Create scoped filesystem
-	scopedFS := newScopedFS(baseFS, "bucket")
+	scopedFS := chroot.New(baseFS, "bucket")
 
 	// Read directory
 	entries, err := scopedFS.ReadDir(".")
@@ -444,7 +471,7 @@ func TestScopedFS_Rename(t *testing.T) {
 	baseFS := memfs.New()
 	baseFS.MkdirAll("bucket", 0o755)
 
-	scopedFS := newScopedFS(baseFS, "bucket")
+	scopedFS := chroot.New(baseFS, "bucket")
 
 	// Create a file
 	f, _ := scopedFS.Create("old.txt")
@@ -479,7 +506,7 @@ func TestScopedFS_TempFile(t *testing.T) {
 	baseFS := memfs.New()
 	baseFS.MkdirAll("bucket", 0o755)
 
-	scopedFS := newScopedFS(baseFS, "bucket")
+	scopedFS := chroot.New(baseFS, "bucket")
 
 	// Create temp file
 	tmpFile, err := scopedFS.TempFile("", "temp-")
@@ -503,7 +530,7 @@ func TestScopedFS_Chroot(t *testing.T) {
 	baseFS := memfs.New()
 	baseFS.MkdirAll("bucket/subdir/nested", 0o755)
 
-	scopedFS := newScopedFS(baseFS, "bucket")
+	scopedFS := chroot.New(baseFS, "bucket")
 
 	// Chroot to subdirectory
 	subFS, err := scopedFS.Chroot("subdir")

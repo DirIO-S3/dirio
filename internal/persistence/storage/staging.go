@@ -60,6 +60,9 @@ func (m *stagingManager) getUploadStagingFS(bucket string) (billy.Filesystem, er
 
 // cleanupMultipartUpload removes all staging state for a multipart uploadID.
 func (m *stagingManager) cleanupMultipartUpload(bucket, uploadID string) error {
+	if err := path.ValidatePathSafe(uploadID); err != nil {
+		return fmt.Errorf("invalid upload id: %w", err)
+	}
 	stagingFS, err := path.NewUploadStagingFS(m.rootFS, bucket)
 	if err != nil {
 		return fmt.Errorf("failed to get staging filesystem: %w", err)

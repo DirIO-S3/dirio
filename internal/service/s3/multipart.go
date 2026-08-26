@@ -15,6 +15,8 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+
+	"github.com/DirIO-S3/dirio/internal/persistence/path"
 )
 
 // ============================================================================
@@ -97,6 +99,12 @@ func (s *Service) CreateMultipartUpload(ctx context.Context, req *CreateMultipar
 
 // UploadPart uploads a single part for a multipart upload
 func (s *Service) UploadPart(ctx context.Context, req *UploadPartRequest) (*UploadPartResponse, error) {
+	// UploadID is attacker-controlled request input and is used directly as a
+	// staging directory name below, so it must be validated for path safety.
+	if err := path.ValidatePathSafe(req.UploadID); err != nil {
+		return nil, errors.New("multipart upload not found")
+	}
+
 	// Get staging filesystem for this bucket
 	stagingFS, err := s.diskStorage.GetUploadStagingFS(ctx, req.Bucket)
 	if err != nil {
@@ -166,6 +174,10 @@ func (s *Service) UploadPart(ctx context.Context, req *UploadPartRequest) (*Uplo
 
 // CompleteMultipartUpload completes a multipart upload by assembling all parts
 func (s *Service) CompleteMultipartUpload(ctx context.Context, req *CompleteMultipartUploadRequest) (*CompleteMultipartUploadResponse, error) {
+	if err := path.ValidatePathSafe(req.UploadID); err != nil {
+		return nil, errors.New("multipart upload not found")
+	}
+
 	// Get staging filesystem for this bucket
 	stagingFS, err := s.diskStorage.GetUploadStagingFS(ctx, req.Bucket)
 	if err != nil {
@@ -252,6 +264,10 @@ func (s *Service) CompleteMultipartUpload(ctx context.Context, req *CompleteMult
 
 // AbortMultipartUpload aborts a multipart upload and cleans up all parts
 func (s *Service) AbortMultipartUpload(ctx context.Context, req *AbortMultipartUploadRequest) error {
+	if err := path.ValidatePathSafe(req.UploadID); err != nil {
+		return errors.New("multipart upload not found")
+	}
+
 	// Verify multipart upload exists
 	stagingFS, err := s.diskStorage.GetUploadStagingFS(ctx, req.Bucket)
 	if err != nil {
@@ -271,6 +287,10 @@ func (s *Service) AbortMultipartUpload(ctx context.Context, req *AbortMultipartU
 
 // ListParts lists all parts for a multipart upload
 func (s *Service) ListParts(ctx context.Context, req *ListPartsRequest) (*ListPartsResponse, error) {
+	if err := path.ValidatePathSafe(req.UploadID); err != nil {
+		return nil, errors.New("multipart upload not found")
+	}
+
 	// Get staging filesystem for this bucket
 	stagingFS, err := s.diskStorage.GetUploadStagingFS(ctx, req.Bucket)
 	if err != nil {

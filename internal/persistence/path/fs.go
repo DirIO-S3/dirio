@@ -1,7 +1,7 @@
 // Package path provides filesystem abstraction and security for DirIO.
 //
 // This package wraps go-billy to provide:
-// - Chroot-based filesystem isolation
+// - Chroot-based filesystem isolation (via go-billy's helper/chroot)
 // - Path traversal attack prevention
 // - Scoped filesystem access for buckets and metadata
 //
@@ -14,13 +14,12 @@ package path
 import (
 	"errors"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/go-git/go-billy/v5"
+	"github.com/go-git/go-billy/v5/helper/chroot"
 	"github.com/go-git/go-billy/v5/osfs"
-	"github.com/go-git/go-billy/v5/util"
 
 	"github.com/DirIO-S3/dirio/internal/consts"
 )
@@ -51,14 +50,9 @@ func NewRootFS(dataDir string) (billy.Filesystem, error) {
 		return nil, fmt.Errorf("failed to resolve data directory: %w", err)
 	}
 
-	// Create OS filesystem at the data directory
-	fs := osfs.New(absDataDir)
-
-	// Note: go-billy's chroot.New() doesn't exist in v5
-	// Instead, osfs.New() already provides the base directory isolation
-	// All paths are relative to the base directory
-
-	return fs, nil
+	// osfs.New defaults to go-billy's ChrootOS, which already wraps the OS
+	// filesystem in helper/chroot for us, so this is chroot-protected as-is.
+	return osfs.New(absDataDir), nil
 }
 
 // NewMinIOFS creates a read-only filesystem scoped to the MinIO metadata directory.
@@ -76,10 +70,9 @@ func NewMinIOFS(rootFS billy.Filesystem) (billy.Filesystem, error) {
 		return nil, fmt.Errorf("MinIO metadata path is not a directory")
 	}
 
-	// Create a chrooted filesystem for the MinIO directory
-	// Since go-billy v5 doesn't have chroot, we'll use a wrapper
+	// Create a chrooted, read-only filesystem for the MinIO directory
 	readOnlyRootFS := ReadOnlyFS{rootFS}
-	return newScopedFS(readOnlyRootFS, consts.MinioMetadataDir), nil
+	return chroot.New(readOnlyRootFS, consts.MinioMetadataDir), nil
 }
 
 // NewMetadataFS creates a read/write filesystem scoped to the DirIO metadata directory.
@@ -93,7 +86,7 @@ func NewMetadataFS(rootFS billy.Filesystem) (billy.Filesystem, error) {
 	}
 
 	// Create a scoped filesystem for the metadata directory
-	return newScopedFS(rootFS, consts.DirIOMetadataDir), nil
+	return chroot.New(rootFS, consts.DirIOMetadataDir), nil
 }
 
 // NewBucketFS creates a filesystem scoped to a specific bucket directory.
@@ -115,7 +108,7 @@ func NewBucketFS(rootFS billy.Filesystem, bucket string) (billy.Filesystem, erro
 	}
 
 	// Create a scoped filesystem for the bucket
-	return newScopedFS(rootFS, bucket), nil
+	return chroot.New(rootFS, bucket), nil
 }
 
 // NewUploadStagingFS creates a filesystem scoped to the upload staging area for a bucket.
@@ -131,7 +124,7 @@ func NewUploadStagingFS(rootFS billy.Filesystem, bucket string) (billy.Filesyste
 	if err := rootFS.MkdirAll(stagingPath, 0o755); err != nil {
 		return nil, fmt.Errorf("failed to create upload staging directory: %w", err)
 	}
-	return newScopedFS(rootFS, stagingPath), nil
+	return chroot.New(rootFS, stagingPath), nil
 }
 
 // ValidatePathSafe checks if a path is safe from a filesystem security perspective.
@@ -192,99 +185,4 @@ func CleanPath(path string) (string, error) {
 	}
 
 	return cleaned, nil
-}
-
-// scopedFS wraps a billy.Filesystem to scope all operations to a subdirectory.
-// This provides chroot-like functionality for go-billy v5.
-type scopedFS struct {
-	base billy.Filesystem
-	root string
-}
-
-// newScopedFS creates a new scoped filesystem.
-func newScopedFS(base billy.Filesystem, root string) billy.Filesystem {
-	return &scopedFS{
-		base: base,
-		root: root,
-	}
-}
-
-// join joins the scoped root with the given path.
-func (fs *scopedFS) join(path string) string {
-	return filepath.Join(fs.root, path)
-}
-
-// Create implements billy.Filesystem.
-func (fs *scopedFS) Create(filename string) (billy.File, error) {
-	return fs.base.Create(fs.join(filename))
-}
-
-// Open implements billy.Filesystem.
-func (fs *scopedFS) Open(filename string) (billy.File, error) {
-	return fs.base.Open(fs.join(filename))
-}
-
-// OpenFile implements billy.Filesystem.
-func (fs *scopedFS) OpenFile(filename string, flag int, perm os.FileMode) (billy.File, error) {
-	return fs.base.OpenFile(fs.join(filename), flag, perm)
-}
-
-// Stat implements billy.Filesystem.
-func (fs *scopedFS) Stat(filename string) (os.FileInfo, error) {
-	return fs.base.Stat(fs.join(filename))
-}
-
-// Rename implements billy.Filesystem.
-func (fs *scopedFS) Rename(oldpath, newpath string) error {
-	return fs.base.Rename(fs.join(oldpath), fs.join(newpath))
-}
-
-// Remove implements billy.Filesystem.
-func (fs *scopedFS) Remove(filename string) error {
-	return fs.base.Remove(fs.join(filename))
-}
-
-// Join implements billy.Filesystem.
-func (fs *scopedFS) Join(elem ...string) string {
-	return fs.base.Join(elem...)
-}
-
-// TempFile implements billy.Filesystem.
-func (fs *scopedFS) TempFile(dir, prefix string) (billy.File, error) {
-	return util.TempFile(fs.base, fs.join(dir), prefix)
-}
-
-// ReadDir implements billy.Filesystem.
-func (fs *scopedFS) ReadDir(path string) ([]os.FileInfo, error) {
-	return fs.base.ReadDir(fs.join(path))
-}
-
-// MkdirAll implements billy.Filesystem.
-func (fs *scopedFS) MkdirAll(filename string, perm os.FileMode) error {
-	return fs.base.MkdirAll(fs.join(filename), perm)
-}
-
-// Lstat implements billy.Filesystem.
-func (fs *scopedFS) Lstat(filename string) (os.FileInfo, error) {
-	return fs.base.Lstat(fs.join(filename))
-}
-
-// Symlink implements billy.Filesystem.
-func (fs *scopedFS) Symlink(target, link string) error {
-	return fs.base.Symlink(fs.join(target), fs.join(link))
-}
-
-// Readlink implements billy.Filesystem.
-func (fs *scopedFS) Readlink(link string) (string, error) {
-	return fs.base.Readlink(fs.join(link))
-}
-
-// Chroot implements billy.Filesystem.
-func (fs *scopedFS) Chroot(path string) (billy.Filesystem, error) {
-	return newScopedFS(fs.base, fs.join(path)), nil
-}
-
-// Root implements billy.Filesystem.
-func (fs *scopedFS) Root() string {
-	return fs.root
 }
