@@ -138,13 +138,16 @@ func (s *Session) Validate(r *http.Request) (accessKey string, ok bool) {
 }
 
 // Clear deletes the session cookie.
-func (s *Session) Clear(w http.ResponseWriter) {
+func (s *Session) Clear(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
-		Name:    cookieName,
-		Value:   "",
-		Path:    s.cookiePath,
-		MaxAge:  -1,
-		Expires: time.Unix(0, 0),
+		Name:     cookieName,
+		Value:    "",
+		Path:     s.cookiePath,
+		HttpOnly: true,
+		Secure:   s.isRequestSecure(r),
+		SameSite: http.SameSiteLaxMode,
+		MaxAge:   -1,
+		Expires:  time.Unix(0, 0),
 	})
 }
 
@@ -180,11 +183,14 @@ func (s *Session) GetFlash(w http.ResponseWriter, r *http.Request) (FlashData, b
 
 	// Clear the flash cookie immediately.
 	http.SetCookie(w, &http.Cookie{
-		Name:    flashCookieName,
-		Value:   "",
-		Path:    s.cookiePath,
-		MaxAge:  -1,
-		Expires: time.Unix(0, 0),
+		Name:     flashCookieName,
+		Value:    "",
+		Path:     s.cookiePath,
+		HttpOnly: true,
+		Secure:   s.isRequestSecure(r),
+		SameSite: http.SameSiteLaxMode,
+		MaxAge:   -1,
+		Expires:  time.Unix(0, 0),
 	})
 
 	idx := strings.LastIndex(cookie.Value, ".")

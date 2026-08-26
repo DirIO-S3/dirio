@@ -64,7 +64,7 @@ func (h *Handler) LoginSubmit(w http.ResponseWriter, r *http.Request) {
 
 // Logout handles POST /logout — destroys the session and redirects to login.
 func (h *Handler) Logout(w http.ResponseWriter, r *http.Request) {
-	h.sessions.Clear(w)
+	h.sessions.Clear(w, r)
 	http.Redirect(w, r, string(ui.LoginURL()), http.StatusSeeOther)
 }
 
