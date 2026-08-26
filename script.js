@@ -5,8 +5,8 @@
   const OS_LABELS = { linux: "Linux", darwin: "macOS", windows: "Windows" };
   const ARCH_LABELS = { amd64: "x86_64", arm64: "ARM64" };
   const BINARIES = [
-    { prefix: "dirio_", label: "dirio (server)" },
-    { prefix: "dio_", label: "dio (client)" },
+    { prefix: "dirio_", panelId: "panel-server" },
+    { prefix: "dio_", panelId: "panel-client" },
   ];
 
   function detectOS() {
@@ -24,7 +24,7 @@
     return { binary: match[1], os: match[2].toLowerCase(), arch: match[3].toLowerCase() };
   }
 
-  function buildTable(binaryLabel, assets) {
+  function buildTable(assets) {
     const rows = assets
       .map((a) => ({ ...a, ...parseAssetName(a.name) }))
       .filter((a) => a.os && a.arch)
@@ -43,7 +43,6 @@
       .join("");
 
     return `<table class="downloads">
-      <caption>${binaryLabel}</caption>
       <thead><tr><th>OS</th><th>Arch</th><th>Download</th></tr></thead>
       <tbody>${body}</tbody>
     </table>`;
@@ -52,7 +51,7 @@
   async function main() {
     const versionBanner = document.getElementById("version-banner");
     const status = document.getElementById("downloads-status");
-    const tablesEl = document.getElementById("downloads-tables");
+    const tabsEl = document.getElementById("downloads-tabs");
     const primaryBtn = document.getElementById("primary-download");
 
     let release;
@@ -70,18 +69,20 @@
     primaryBtn.href = release.html_url;
 
     const assets = release.assets || [];
-    let html = "";
-    for (const { prefix, label } of BINARIES) {
-      html += buildTable(label, assets.filter((a) => a.name.startsWith(prefix)));
+    let foundAny = false;
+    for (const { prefix, panelId } of BINARIES) {
+      const table = buildTable(assets.filter((a) => a.name.startsWith(prefix)));
+      if (table) foundAny = true;
+      document.getElementById(panelId).innerHTML = table;
     }
 
-    if (!html) {
+    if (!foundAny) {
       status.textContent = "No downloadable assets found on the latest release — use the link below instead.";
       return;
     }
 
     status.remove();
-    tablesEl.innerHTML = html;
+    tabsEl.hidden = false;
 
     // Point the primary CTA at a best-effort match for the visitor's OS (server, amd64).
     const os = detectOS();

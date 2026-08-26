@@ -65,7 +65,18 @@
     <h2>Downloads</h2>
     <p>Two binaries, no dependencies: <code>dirio</code> is the server, <code>dio</code> is the first-party CLI client.</p>
     <p id="downloads-status" class="muted">Loading the latest release from GitHub&hellip;</p>
-    <div id="downloads-tables"></div>
+    <div class="tabs" id="downloads-tabs" hidden>
+      <input type="radio" name="download-tab" id="tab-server" class="tab-input" checked>
+      <input type="radio" name="download-tab" id="tab-client" class="tab-input">
+      <div class="tab-labels">
+        <label for="tab-server">Server (dirio)</label>
+        <label for="tab-client">Client (dio)</label>
+      </div>
+      <div class="tab-panels">
+        <div class="tab-panel" id="panel-server"></div>
+        <div class="tab-panel" id="panel-client"></div>
+      </div>
+    </div>
     <p class="muted">
       Can't find your platform, or the list above didn't load?
       <a href="https://github.com/DirIO-S3/dirio/releases/latest">Browse all release assets on GitHub</a>.

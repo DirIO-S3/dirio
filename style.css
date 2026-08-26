@@ -180,6 +180,55 @@ table.downloads a:hover {
   text-decoration: underline;
 }
 
+.tabs {
+  margin-top: 1.5rem;
+}
+
+.tab-input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.tab-labels {
+  display: flex;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--border);
+}
+
+.tab-labels label {
+  cursor: pointer;
+  padding: 0.6rem 1rem;
+  font-weight: 600;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  user-select: none;
+}
+
+.tab-labels label:hover {
+  color: var(--ink);
+}
+
+.tab-panel {
+  display: none;
+}
+
+#tab-server:checked ~ .tab-labels label[for="tab-server"],
+#tab-client:checked ~ .tab-labels label[for="tab-client"] {
+  color: var(--teal);
+  border-bottom-color: var(--teal);
+}
+
+#tab-server:checked ~ .tab-panels #panel-server,
+#tab-client:checked ~ .tab-panels #panel-client {
+  display: block;
+}
+
+table.downloads {
+  margin-top: 1rem;
+}
+
 .use-cases {
   padding-left: 1.2rem;
 }
