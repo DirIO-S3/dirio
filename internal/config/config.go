@@ -10,6 +10,7 @@ import (
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
 
+	"github.com/DirIO-S3/dirio/console/auth"
 	"github.com/DirIO-S3/dirio/internal/config/data"
 )
 
@@ -53,6 +54,7 @@ type Settings struct {
 	ConsoleEnabled       bool
 	ConsoleDedicatedPort bool
 	ConsolePort          int
+	TrustedProxies       string
 
 	// Lifecycle settings
 	ShutdownTimeout time.Duration
@@ -107,6 +109,14 @@ func (s *Settings) Validate() error {
 		return fmt.Errorf("invalid mdns-mode: %s (valid: auto, guest, master)", s.MDNSMode)
 	}
 
+	// Validate trusted-proxies entries early so bad input fails startup with
+	// a clear message rather than surfacing later as a console panic. Reuse
+	// the console's own parser so the accepted format can't drift between
+	// the two places that validate this value.
+	if _, err := auth.ParseTrustedProxies(s.TrustedProxies); err != nil {
+		return fmt.Errorf("invalid trusted-proxies: %w", err)
+	}
+
 	return nil
 }
 
@@ -153,6 +163,7 @@ func LoadConfig(flags *pflag.FlagSet, v *viper.Viper) (*Settings, error) {
 		ConsoleEnabled:       resolver.GetBool(ConsoleEnabled),
 		ConsoleDedicatedPort: resolver.GetBool(ConsoleDedicatedPort),
 		ConsolePort:          resolver.GetInt(ConsolePort),
+		TrustedProxies:       resolver.Get(TrustedProxies),
 
 		// Lifecycle settings
 		ShutdownTimeout: time.Duration(resolver.GetInt(ShutdownTimeout)) * time.Second,

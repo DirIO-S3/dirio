@@ -55,7 +55,7 @@ func (h *Handler) LoginSubmit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.sessions.Create(w, accessKey); err != nil {
+	if err := h.sessions.Create(w, r, accessKey); err != nil {
 		http.Error(w, "Session error", http.StatusInternalServerError)
 		return
 	}
@@ -93,8 +93,8 @@ func (h *Handler) Toasts(w http.ResponseWriter, r *http.Request) {
 	}))
 }
 
-func (h *Handler) triggerToast(w http.ResponseWriter, message, msgType string) {
-	h.sessions.SetFlash(w, message, msgType)
+func (h *Handler) triggerToast(w http.ResponseWriter, r *http.Request, message, msgType string) {
+	h.sessions.SetFlash(w, r, message, msgType)
 	w.Header().Add("HX-Trigger", "toast")
 }
 
@@ -147,10 +147,10 @@ func (h *Handler) UserCreate(w http.ResponseWriter, r *http.Request) {
 	}
 	if err != nil {
 		data.ErrorMsg = err.Error()
-		h.triggerToast(w, "Failed to create user: "+err.Error(), "error")
+		h.triggerToast(w, r, "Failed to create user: "+err.Error(), "error")
 	} else {
 		data.GeneratedSecret = user.SecretKey
-		h.triggerToast(w, "User created successfully", "success")
+		h.triggerToast(w, r, "User created successfully", "success")
 	}
 	render(w, r, ui.UsersPage(data))
 }
@@ -159,9 +159,9 @@ func (h *Handler) UserDelete(w http.ResponseWriter, r *http.Request) {
 	uuid := teapot.URLParam(r, "uuid")
 	err := h.api.DeleteUser(r.Context(), uuid)
 	if err != nil {
-		h.triggerToast(w, "Failed to delete user: "+err.Error(), "error")
+		h.triggerToast(w, r, "Failed to delete user: "+err.Error(), "error")
 	} else {
-		h.triggerToast(w, "User deleted successfully", "success")
+		h.triggerToast(w, r, "User deleted successfully", "success")
 	}
 	users, _ := h.api.ListUsers(r.Context())
 	render(w, r, ui.UsersTable(users))
@@ -171,20 +171,20 @@ func (h *Handler) UserSetStatus(w http.ResponseWriter, r *http.Request) {
 	uuid := teapot.URLParam(r, "uuid")
 	u, err := h.api.GetUser(r.Context(), uuid)
 	if err != nil {
-		h.triggerToast(w, "User not found", "error")
+		h.triggerToast(w, r, "User not found", "error")
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
 	newStatus := u.Status != "on"
 	err = h.api.SetUserStatus(r.Context(), uuid, newStatus)
 	if err != nil {
-		h.triggerToast(w, "Failed to update user status: "+err.Error(), "error")
+		h.triggerToast(w, r, "Failed to update user status: "+err.Error(), "error")
 	} else {
 		msg := "User enabled"
 		if !newStatus {
 			msg = "User disabled"
 		}
-		h.triggerToast(w, msg, "success")
+		h.triggerToast(w, r, msg, "success")
 	}
 	users, _ := h.api.ListUsers(r.Context())
 	render(w, r, ui.UsersTable(users))
@@ -199,9 +199,9 @@ func (h *Handler) UserUpdateSecret(w http.ResponseWriter, r *http.Request) {
 	users, _ := h.api.ListUsers(r.Context())
 	data := ui.UsersPageData{Users: users}
 	if err != nil {
-		h.triggerToast(w, "Failed to update secret: "+err.Error(), "error")
+		h.triggerToast(w, r, "Failed to update secret: "+err.Error(), "error")
 	} else {
-		h.triggerToast(w, "Secret updated successfully", "success")
+		h.triggerToast(w, r, "Secret updated successfully", "success")
 	}
 	render(w, r, ui.UsersPage(data))
 }
@@ -214,10 +214,10 @@ func (h *Handler) UserRotateSecret(w http.ResponseWriter, r *http.Request) {
 	users, _ := h.api.ListUsers(r.Context())
 	data := ui.UsersPageData{Users: users}
 	if err != nil {
-		h.triggerToast(w, "Failed to rotate secret: "+err.Error(), "error")
+		h.triggerToast(w, r, "Failed to rotate secret: "+err.Error(), "error")
 	} else {
 		data.GeneratedSecret = user.SecretKey
-		h.triggerToast(w, "Secret rotated successfully", "success")
+		h.triggerToast(w, r, "Secret rotated successfully", "success")
 	}
 	render(w, r, ui.UsersPage(data))
 }
@@ -273,9 +273,9 @@ func (h *Handler) BucketCreate(w http.ResponseWriter, r *http.Request) {
 	data := ui.BucketsPageData{Buckets: buckets, Users: users}
 	if err != nil {
 		data.ErrorMsg = err.Error()
-		h.triggerToast(w, "Failed to create bucket: "+err.Error(), "error")
+		h.triggerToast(w, r, "Failed to create bucket: "+err.Error(), "error")
 	} else {
-		h.triggerToast(w, "Bucket created successfully", "success")
+		h.triggerToast(w, r, "Bucket created successfully", "success")
 	}
 	render(w, r, ui.BucketsPage(data))
 }
@@ -283,11 +283,11 @@ func (h *Handler) BucketCreate(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) BucketDelete(w http.ResponseWriter, r *http.Request) {
 	bucket := teapot.URLParam(r, "bucket")
 	if err := h.api.DeleteBucket(r.Context(), bucket); err != nil {
-		h.triggerToast(w, "Failed to delete bucket: "+err.Error(), "error")
+		h.triggerToast(w, r, "Failed to delete bucket: "+err.Error(), "error")
 		http.Redirect(w, r, string(ui.PageURL("/buckets/"+bucket)), http.StatusSeeOther)
 		return
 	}
-	h.triggerToast(w, "Bucket deleted", "success")
+	h.triggerToast(w, r, "Bucket deleted", "success")
 	http.Redirect(w, r, string(ui.PageURL("/buckets")), http.StatusSeeOther)
 }
 
@@ -313,9 +313,9 @@ func (h *Handler) BucketPolicySet(w http.ResponseWriter, r *http.Request) {
 	bucket := teapot.URLParam(r, "bucket")
 	policyJSON := r.FormValue("policy")
 	if err := h.api.SetBucketPolicy(r.Context(), bucket, policyJSON); err != nil {
-		h.triggerToast(w, "Failed to save policy: "+err.Error(), "error")
+		h.triggerToast(w, r, "Failed to save policy: "+err.Error(), "error")
 	} else {
-		h.triggerToast(w, "Policy saved", "success")
+		h.triggerToast(w, r, "Policy saved", "success")
 	}
 	b, _ := h.api.GetBucket(r.Context(), bucket)
 	if b == nil {
@@ -336,9 +336,9 @@ func (h *Handler) BucketTransferOwnership(w http.ResponseWriter, r *http.Request
 	bucket := teapot.URLParam(r, "bucket")
 	accessKey := r.FormValue("access_key")
 	if err := h.api.TransferBucketOwnership(r.Context(), bucket, accessKey); err != nil {
-		h.triggerToast(w, "Failed to transfer ownership: "+err.Error(), "error")
+		h.triggerToast(w, r, "Failed to transfer ownership: "+err.Error(), "error")
 	} else {
-		h.triggerToast(w, "Ownership transferred to "+accessKey, "success")
+		h.triggerToast(w, r, "Ownership transferred to "+accessKey, "success")
 	}
 	b, _ := h.api.GetBucket(r.Context(), bucket)
 	policyJSON, _ := h.api.GetBucketPolicy(r.Context(), bucket)
@@ -549,9 +549,9 @@ func (h *Handler) ServiceAccountUpdateSecret(w http.ResponseWriter, r *http.Requ
 		SecretKey: &secretKey,
 	})
 	if err != nil {
-		h.triggerToast(w, "Failed to rotate secret: "+err.Error(), "error")
+		h.triggerToast(w, r, "Failed to rotate secret: "+err.Error(), "error")
 	} else {
-		h.triggerToast(w, "Secret rotated successfully", "success")
+		h.triggerToast(w, r, "Secret rotated successfully", "success")
 	}
 	sas, _ := h.api.ListServiceAccounts(r.Context())
 	render(w, r, ui.ServiceAccountsTable(sas))

@@ -54,6 +54,7 @@ func init() {
 	serveCmd.Flags().Bool(config.ConsoleEnabled.GetFlagKey(), true, "Enable the embedded web admin console (default: true; use --console=false to disable)")
 	serveCmd.Flags().Bool(config.ConsoleDedicatedPort.GetFlagKey(), false, "Serve the admin console on its own port (dual-port mode); when false the console shares the main S3 port")
 	serveCmd.Flags().Int(config.ConsolePort.GetFlagKey(), 9010, "Port for the admin console and control plane when --console-dedicated-port is enabled (default: 9010)")
+	serveCmd.Flags().String(config.TrustedProxies.GetFlagKey(), config.TrustedProxies.GetDefaultAsString(), "Comma-separated list of IPs/CIDRs (e.g. 10.0.0.0/8,192.168.1.5) for reverse proxies/ingress trusted to report request metadata via forwarded headers; leave empty if not behind a trusted TLS-terminating proxy")
 
 	// Lifecycle flags
 	serveCmd.Flags().Int(config.ShutdownTimeout.GetFlagKey(), 30, "Graceful shutdown timeout in seconds")
@@ -80,6 +81,7 @@ func init() {
 	_ = viper.BindPFlag(config.ConsoleEnabled.GetViperKey(), serveCmd.Flags().Lookup(config.ConsoleEnabled.GetFlagKey()))
 	_ = viper.BindPFlag(config.ConsoleDedicatedPort.GetViperKey(), serveCmd.Flags().Lookup(config.ConsoleDedicatedPort.GetFlagKey()))
 	_ = viper.BindPFlag(config.ConsolePort.GetViperKey(), serveCmd.Flags().Lookup(config.ConsolePort.GetFlagKey()))
+	_ = viper.BindPFlag(config.TrustedProxies.GetViperKey(), serveCmd.Flags().Lookup(config.TrustedProxies.GetFlagKey()))
 	_ = viper.BindPFlag(config.ShutdownTimeout.GetViperKey(), serveCmd.Flags().Lookup(config.ShutdownTimeout.GetFlagKey()))
 	_ = viper.BindPFlag(config.OTLPMetricsEnabled.GetViperKey(), serveCmd.Flags().Lookup(config.OTLPMetricsEnabled.GetFlagKey()))
 	_ = viper.BindPFlag(config.OTLPMetricsEndpoint.GetViperKey(), serveCmd.Flags().Lookup(config.OTLPMetricsEndpoint.GetFlagKey()))
@@ -192,7 +194,7 @@ func runServer(cmd *cobra.Command, _ []string) error {
 		return fmt.Errorf("failed to create server: %w", err)
 	}
 
-	setupConsole(srv, settings.ConsoleEnabled, settings.ConsoleDedicatedPort, settings.ConsolePort)
+	setupConsole(srv, settings.ConsoleEnabled, settings.ConsoleDedicatedPort, settings.ConsolePort, settings.TrustedProxies)
 
 	// Launch Phase 2 MinIO import (groups, service accounts) in the background
 	// now that the server is constructed and ready to serve S3 requests.

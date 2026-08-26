@@ -23,7 +23,7 @@ import (
 // When dedicatedPort is false the console is mounted at /dirio/ui/ on the main
 // S3 port (single-port mode). When true it is served on its own listener at
 // port (dual-port mode).
-func setupConsole(srv *server.Server, enabled, dedicatedPort bool, port int) {
+func setupConsole(srv *server.Server, enabled, dedicatedPort bool, port int, trustedProxies string) {
 	if !enabled {
 		return
 	}
@@ -35,7 +35,7 @@ func setupConsole(srv *server.Server, enabled, dedicatedPort bool, port int) {
 	if dedicatedPort {
 		basePath = ""
 	}
-	handler := console.New(adapter, srv.Router(), newConsoleAdminAuth(srv.Auth()), version.Version, basePath)
+	handler := console.New(adapter, srv.Router(), newConsoleAdminAuth(srv.Auth()), version.Version, basePath, trustedProxies)
 
 	effectivePort := 0
 	if dedicatedPort {

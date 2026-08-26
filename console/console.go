@@ -35,10 +35,18 @@ var staticFiles embed.FS
 // adminAuth validates admin credentials at login time.
 // basePath is the URL prefix the console is reachable under: "/dirio/ui" in
 // single-port mode, "" in dedicated-port mode (console owns its own listener root).
-func New(api consoleapi.API, s3Router ui.S3Router, adminAuth consoleauth.AdminAuth, version, basePath string) *teapot.Router {
+// trustedProxies is a comma-separated list of IPs/CIDRs (e.g.
+// "10.0.0.0/8,192.168.1.5") identifying reverse proxies/ingress controllers
+// allowed to report request metadata via Forwarded-family headers; pass ""
+// if the console is not deployed behind a trusted TLS-terminating proxy.
+func New(api consoleapi.API, s3Router ui.S3Router, adminAuth consoleauth.AdminAuth, version, basePath, trustedProxies string) *teapot.Router {
 	ui.AppVersion = version
 	ui.BasePath = basePath
-	sessions, err := consoleauth.NewSession(basePath)
+	trustedProxyList, err := consoleauth.ParseTrustedProxies(trustedProxies)
+	if err != nil {
+		panic("console: invalid trusted proxies: " + err.Error())
+	}
+	sessions, err := consoleauth.NewSession(basePath, trustedProxyList)
 	if err != nil {
 		panic("console: failed to create session manager: " + err.Error())
 	}

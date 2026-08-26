@@ -62,9 +62,9 @@ func (h *Handler) ObjectDelete(w http.ResponseWriter, r *http.Request) {
 		prefix = ui.ParentPrefix(key)
 	}
 	if err := h.api.DeleteObject(r.Context(), bucket, key); err != nil {
-		h.triggerToast(w, "Failed to delete object: "+err.Error(), "error")
+		h.triggerToast(w, r, "Failed to delete object: "+err.Error(), "error")
 	} else {
-		h.triggerToast(w, "Object deleted", "success")
+		h.triggerToast(w, r, "Object deleted", "success")
 	}
 	if !isHTMX(r) {
 		http.Redirect(w, r, string(ui.PageURL("/buckets/"+bucket+"/objects?prefix="+prefix)), http.StatusSeeOther)
@@ -88,7 +88,7 @@ func (h *Handler) ObjectCopy(w http.ResponseWriter, r *http.Request) {
 		dstKey = key + ".copy"
 	}
 	if err := h.api.CopyObject(r.Context(), bucket, key, dstBucket, dstKey); err != nil {
-		h.triggerToast(w, "Failed to copy object: "+err.Error(), "error")
+		h.triggerToast(w, r, "Failed to copy object: "+err.Error(), "error")
 		meta, _ := h.api.GetObjectMetadata(r.Context(), bucket, key)
 		tags, _ := h.api.GetObjectTags(r.Context(), bucket, key)
 		if tags == nil {
@@ -121,9 +121,9 @@ func (h *Handler) ObjectSetTags(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if err := h.api.SetObjectTags(r.Context(), bucket, key, tags); err != nil {
-		h.triggerToast(w, "Failed to save tags: "+err.Error(), "error")
+		h.triggerToast(w, r, "Failed to save tags: "+err.Error(), "error")
 	} else {
-		h.triggerToast(w, "Tags saved", "success")
+		h.triggerToast(w, r, "Tags saved", "success")
 	}
 	meta, _ := h.api.GetObjectMetadata(r.Context(), bucket, key)
 	owner, _ := h.api.GetObjectOwner(r.Context(), bucket, key)
@@ -166,7 +166,7 @@ func (h *Handler) ObjectPresignedURL(w http.ResponseWriter, r *http.Request) {
 		Method:    "GET",
 	})
 	if err != nil {
-		h.triggerToast(w, "Failed to generate URL: "+err.Error(), "error")
+		h.triggerToast(w, r, "Failed to generate URL: "+err.Error(), "error")
 		w.WriteHeader(http.StatusInternalServerError)
 		return
 	}

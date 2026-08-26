@@ -73,6 +73,18 @@ var (
 	// ConsolePort is the port used for the admin console and control plane when
 	// ConsoleDedicatedPort is true. Has no effect in single-port mode.
 	ConsolePort = option.NewOption("console-port", 9010)
+
+	// TrustedProxies is a comma-separated list of IPs/CIDR ranges (e.g.
+	// "10.0.0.0/8,192.168.1.5") identifying reverse proxies/ingress
+	// controllers that sit directly in front of the console. Only requests
+	// whose immediate peer matches this list are trusted to report request
+	// metadata via Forwarded-family headers (currently X-Forwarded-Proto,
+	// used to mark session cookies Secure when TLS is terminated upstream).
+	// This is a single allowlist meant to gate every such header the console
+	// consumes, not just the one in use today. Default "" trusts nothing,
+	// so forwarded headers are always ignored and cookies are never marked
+	// Secure unless the console itself terminates TLS.
+	TrustedProxies = option.NewOption("trusted-proxies", "")
 )
 
 // Lifecycle configuration options
