@@ -55,6 +55,13 @@ for mod in "${MODULES[@]}"; do
     | grep -v "^${MODULE_PREFIX}/${mod}\$" || true)
 
   for dep in $deps; do
+    # Skip deps already satisfied by a local-path replace (e.g. console -> ../api) —
+    # those never go stale and re-pinning a version here would regress that fix.
+    if grep -qE "${dep//\//\\/}\s*=>\s*\.\./" "$modfile"; then
+      echo "Skipping $mod: $dep (has local replace)"
+      continue
+    fi
+
     echo "Bumping $mod: $dep -> @$SHA"
     any_changed=true
     strategy="${STRATEGY[$mod]}"
