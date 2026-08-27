@@ -3,7 +3,7 @@ package conditions
 import (
 	"time"
 
-	"github.com/google/uuid"
+	"uuid"
 
 	"github.com/DirIO-S3/dirio/internal/policy/variables"
 )
@@ -21,7 +21,7 @@ func Build(varCtx *variables.Context, secureTransport bool, contentLength int64)
 	// Populate from VarContext if available
 	if varCtx != nil {
 		ctx.Username = varCtx.Username
-		if varCtx.UserID != uuid.Nil {
+		if varCtx.UserID != uuid.Nil() {
 			ctx.UserID = varCtx.UserID.String()
 		}
 		ctx.S3Prefix = varCtx.S3Prefix

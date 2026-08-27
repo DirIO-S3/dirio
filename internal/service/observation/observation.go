@@ -9,7 +9,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/google/uuid"
+	"uuid"
 
 	"github.com/DirIO-S3/dirio/internal/logging"
 	"github.com/DirIO-S3/dirio/internal/policy"

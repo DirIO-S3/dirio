@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 
-	"github.com/google/uuid"
+	"uuid"
 
 	"github.com/DirIO-S3/dirio/internal/persistence/metadata"
 	svcerrors "github.com/DirIO-S3/dirio/internal/service/errors"

@@ -9,8 +9,7 @@ package consoleapi
 import (
 	"context"
 	"time"
-
-	"github.com/google/uuid"
+	"uuid"
 )
 
 // AdminUserUUID is the stable UUID for the built-in admin account.

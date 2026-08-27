@@ -12,9 +12,10 @@ import (
 	"sync"
 	"time"
 
+	"uuid"
+
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/util"
-	"github.com/google/uuid"
 	"github.com/phuslu/lru"
 	bbolt "go.etcd.io/bbolt"
 
@@ -426,7 +427,7 @@ func (m *Manager) CreateOrUpdateUser(ctx context.Context, user *User) error {
 	}
 
 	// Ensure the user has a UUID before we check uniqueness.
-	if user.UUID == uuid.Nil {
+	if user.UUID == uuid.Nil() {
 		user.UUID = uuid.New()
 	}
 
@@ -436,13 +437,13 @@ func (m *Manager) CreateOrUpdateUser(ctx context.Context, user *User) error {
 		byAccessKey := tx.Bucket([]byte(boltUsersByAccessKey))
 
 		if v := byUsername.Get([]byte(user.Username)); v != nil {
-			uid, err := uuid.FromBytes(v)
+			uid, err := FromBytesToUUID(v)
 			if err == nil && uid != user.UUID {
 				return ErrUsernameAlreadyTaken
 			}
 		}
 		if v := byAccessKey.Get([]byte(user.AccessKey)); v != nil {
-			uid, err := uuid.FromBytes(v)
+			uid, err := FromBytesToUUID(v)
 			if err == nil && uid != user.UUID {
 				return ErrAccessKeyAlreadyTaken
 			}
@@ -554,7 +555,7 @@ func (m *Manager) syncUserIndexes(
 // username is already taken by a different user.
 func updateUsernameIndex(b *bbolt.Bucket, oldUsername, newUsername string, userUID uuid.UUID, uidBytes []byte) error {
 	if v := b.Get([]byte(newUsername)); v != nil {
-		uid, err := uuid.FromBytes(v)
+		uid, err := FromBytesToUUID(v)
 		if err == nil && uid != userUID {
 			return ErrUsernameAlreadyTaken
 		}
@@ -567,7 +568,7 @@ func updateUsernameIndex(b *bbolt.Bucket, oldUsername, newUsername string, userU
 // access key is already taken by a different user.
 func updateAccessKeyIndex(b *bbolt.Bucket, oldAccessKey, newAccessKey string, userUID uuid.UUID, uidBytes []byte) error {
 	if v := b.Get([]byte(newAccessKey)); v != nil {
-		uid, err := uuid.FromBytes(v)
+		uid, err := FromBytesToUUID(v)
 		if err == nil && uid != userUID {
 			return ErrAccessKeyAlreadyTaken
 		}

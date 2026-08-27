@@ -9,7 +9,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/google/uuid"
+	"uuid"
 
 	consoleapi "github.com/DirIO-S3/dirio/api"
 	"github.com/DirIO-S3/dirio/internal/consts"

@@ -4,7 +4,7 @@ import (
 	"context"
 	"testing"
 
-	"github.com/google/uuid"
+	"uuid"
 
 	"github.com/DirIO-S3/dirio/internal/persistence/metadata"
 	"github.com/DirIO-S3/dirio/sdk/iam"

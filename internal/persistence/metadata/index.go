@@ -8,7 +8,8 @@ import (
 	"slices"
 	"time"
 
-	"github.com/google/uuid"
+	"uuid"
+
 	bbolt "go.etcd.io/bbolt"
 )
 
@@ -70,7 +71,7 @@ func (m *Manager) reconcileIndexes(ctx context.Context) {
 		stale := make([][]byte, 0)
 
 		_ = byUsername.ForEach(func(k, v []byte) error {
-			uid, err := uuid.FromBytes(v)
+			uid, err := FromBytesToUUID(v)
 			if err != nil {
 				stale = append(stale, append([]byte(nil), k...))
 				return nil //nolint:nilerr // intentional: invalid bytes are stale; return nil to continue ForEach iteration
@@ -86,7 +87,7 @@ func (m *Manager) reconcileIndexes(ctx context.Context) {
 
 		stale = stale[:0]
 		_ = byAccessKey.ForEach(func(k, v []byte) error {
-			uid, err := uuid.FromBytes(v)
+			uid, err := FromBytesToUUID(v)
 			if err != nil {
 				stale = append(stale, append([]byte(nil), k...))
 				return nil //nolint:nilerr // intentional: invalid bytes are stale; return nil to continue ForEach iteration
@@ -260,7 +261,7 @@ func (m *Manager) GetUserByUsername(ctx context.Context, username string) (*User
 		if v == nil {
 			return ErrUserNotFound
 		}
-		uid, err := uuid.FromBytes(v)
+		uid, err := FromBytesToUUID(v)
 		if err != nil {
 			return fmt.Errorf("corrupt index for username %q: %w", username, err)
 		}
@@ -287,7 +288,7 @@ func (m *Manager) GetUserByAccessKey(ctx context.Context, accessKey string) (*Us
 		if v == nil {
 			return ErrUserNotFound
 		}
-		uid, err := uuid.FromBytes(v)
+		uid, err := FromBytesToUUID(v)
 		if err != nil {
 			return fmt.Errorf("corrupt index for access key %q: %w", accessKey, err)
 		}

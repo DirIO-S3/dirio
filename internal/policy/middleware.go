@@ -7,7 +7,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
+	"uuid"
+
 	"github.com/mallardduck/go-http-helpers/pkg/headers"
 	"github.com/mallardduck/teapot-router/pkg/teapot"
 

@@ -1,6 +1,6 @@
 package iam
 
-import "github.com/google/uuid"
+import "uuid"
 
 // AdminUUIDString is the canonical string form of the admin account UUID.
 // Must match internal/consts.AdminUUIDString and api.AdminUserUUID.

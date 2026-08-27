@@ -5,9 +5,10 @@ import (
 	"log/slog"
 	"path/filepath"
 
+	"uuid"
+
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/util"
-	"github.com/google/uuid"
 
 	"github.com/DirIO-S3/dirio/internal/consts"
 	"github.com/DirIO-S3/dirio/internal/persistence/path"

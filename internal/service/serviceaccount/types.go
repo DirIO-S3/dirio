@@ -3,7 +3,7 @@ package serviceaccount
 import (
 	"time"
 
-	"github.com/google/uuid"
+	"uuid"
 
 	"github.com/DirIO-S3/dirio/sdk/iam"
 )

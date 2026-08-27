@@ -6,8 +6,9 @@ import (
 	"path/filepath"
 	"time"
 
+	"uuid"
+
 	"github.com/go-git/go-billy/v5/util"
-	"github.com/google/uuid"
 
 	"github.com/DirIO-S3/dirio/internal/consts"
 

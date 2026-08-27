@@ -3,7 +3,7 @@ package global
 import (
 	"sync/atomic"
 
-	"github.com/google/uuid"
+	"uuid"
 )
 
 var (
@@ -15,7 +15,7 @@ var (
 	GlobalInstanceID = func() uuid.UUID {
 		ptr := globalInstanceIDPtr.Load()
 		if ptr == nil {
-			return uuid.Nil
+			return uuid.Nil()
 		}
 		return *ptr
 	}

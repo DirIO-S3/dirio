@@ -6,7 +6,6 @@ require (
 	github.com/DirIO-S3/dirio/api v0.0.0
 	github.com/Oudwins/tailwind-merge-go v0.2.3
 	github.com/a-h/templ v0.3.1020
-	github.com/google/uuid v1.6.0
 	github.com/mallardduck/teapot-router v0.15.2
 )
 

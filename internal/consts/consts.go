@@ -1,7 +1,7 @@
 package consts
 
 import (
-	"github.com/google/uuid"
+	"uuid"
 )
 
 const (

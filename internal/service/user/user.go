@@ -6,7 +6,7 @@ import (
 	"slices"
 	"time"
 
-	"github.com/google/uuid"
+	"uuid"
 
 	"github.com/DirIO-S3/dirio/internal/http/auth"
 	"github.com/DirIO-S3/dirio/internal/persistence/metadata"

@@ -3,7 +3,7 @@ package iam
 import (
 	"time"
 
-	"github.com/google/uuid"
+	"uuid"
 )
 
 // Metadata format versions

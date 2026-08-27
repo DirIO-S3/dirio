@@ -7,9 +7,10 @@ import (
 	"testing"
 	"time"
 
+	"uuid"
+
 	"github.com/go-git/go-billy/v5/osfs"
 	"github.com/go-git/go-billy/v5/util"
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 

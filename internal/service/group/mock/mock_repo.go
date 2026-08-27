@@ -15,8 +15,8 @@ import (
 
 	metadata "github.com/DirIO-S3/dirio/internal/persistence/metadata"
 	iam "github.com/DirIO-S3/dirio/sdk/iam"
-	uuid "github.com/google/uuid"
 	gomock "go.uber.org/mock/gomock"
+	uuid "uuid"
 )
 
 // MockRepository is a mock of Repository interface.

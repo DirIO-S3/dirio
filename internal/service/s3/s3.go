@@ -6,7 +6,7 @@ import (
 	"io"
 	"io/fs"
 
-	"github.com/google/uuid"
+	"uuid"
 
 	"github.com/DirIO-S3/dirio/internal/consts"
 	"github.com/DirIO-S3/dirio/internal/persistence/metadata"

@@ -12,7 +12,7 @@ import (
 	"fmt"
 
 	"github.com/DirIO-S3/dirio/api"
-	"github.com/google/uuid"
+	"uuid"
 )
 
 // memberKey returns the access key for a member UUID, falling back to the UUID string.

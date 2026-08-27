@@ -6,7 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
+	"uuid"
+
 	"github.com/mallardduck/go-http-helpers/pkg/headers"
 
 	contextInt "github.com/DirIO-S3/dirio/internal/context"

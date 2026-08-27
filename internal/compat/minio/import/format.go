@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"uuid"
+
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/util"
-	"github.com/google/uuid"
 )
 
 // FormatInfo represents MinIO's format.json structure
@@ -42,29 +43,29 @@ func ValidateFormat(minioFS billy.Filesystem) (uuid.UUID, error) {
 	data, err := util.ReadFile(minioFS, formatPath)
 	if err != nil {
 		if isNotExist(err) {
-			return uuid.Nil, fmt.Errorf("format.json not found - not a valid MinIO data directory")
+			return uuid.Nil(), fmt.Errorf("format.json not found - not a valid MinIO data directory")
 		}
-		return uuid.Nil, fmt.Errorf("failed to read format.json: %w", err)
+		return uuid.Nil(), fmt.Errorf("failed to read format.json: %w", err)
 	}
 
 	var format FormatInfo
 	if err := json.Unmarshal(data, &format); err != nil {
-		return uuid.Nil, fmt.Errorf("failed to parse format.json: %w", err)
+		return uuid.Nil(), fmt.Errorf("failed to parse format.json: %w", err)
 	}
 
 	// Only support single-node filesystem mode
 	if format.Format != "fs" {
-		return uuid.Nil, fmt.Errorf("unsupported MinIO format: %s (only 'fs' single-node filesystem mode is supported)", format.Format)
+		return uuid.Nil(), fmt.Errorf("unsupported MinIO format: %s (only 'fs' single-node filesystem mode is supported)", format.Format)
 	}
 
 	// Ensure it's not distributed/erasure coded
 	if format.XL != nil {
-		return uuid.Nil, fmt.Errorf("erasure coded MinIO installations are not supported (detected XL format)")
+		return uuid.Nil(), fmt.Errorf("erasure coded MinIO installations are not supported (detected XL format)")
 	}
 
 	// Validate FS format version
 	if format.FS == nil {
-		return uuid.Nil, fmt.Errorf("invalid fs format: missing fs field")
+		return uuid.Nil(), fmt.Errorf("invalid fs format: missing fs field")
 	}
 
 	return uuid.Parse(format.ID)

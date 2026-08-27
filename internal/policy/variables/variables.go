@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/google/uuid"
+	"uuid"
 )
 
 // Variable names supported by the policy engine
@@ -83,7 +83,7 @@ func (c *Context) getValue(varName string) (string, error) {
 		return c.Username, nil
 
 	case VarUserID:
-		if c.UserID == uuid.Nil {
+		if c.UserID == uuid.Nil() {
 			return "", fmt.Errorf("variable %q not available: user ID not set", varName)
 		}
 		return c.UserID.String(), nil

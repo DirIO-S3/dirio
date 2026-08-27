@@ -3,14 +3,15 @@ package global
 import (
 	"testing"
 
-	"github.com/google/uuid"
+	"uuid"
+
 	"github.com/stretchr/testify/assert"
 )
 
 func TestGlobalInstanceID_DefaultsToNil(t *testing.T) {
 	// Reset to nil before testing the zero state.
 	globalInstanceIDPtr.Store(nil)
-	assert.Equal(t, uuid.Nil, GlobalInstanceID())
+	assert.Equal(t, uuid.Nil(), GlobalInstanceID())
 }
 
 func TestSetAndGetGlobalInstanceID(t *testing.T) {

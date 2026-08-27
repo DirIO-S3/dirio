@@ -9,8 +9,9 @@ import (
 	"path/filepath"
 	"time"
 
+	"uuid"
+
 	"github.com/go-git/go-billy/v5"
-	"github.com/google/uuid"
 
 	contextInt "github.com/DirIO-S3/dirio/internal/context"
 	"github.com/DirIO-S3/dirio/internal/persistence/metadata"
