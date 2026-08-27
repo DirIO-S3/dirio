@@ -731,4 +731,3 @@ Already complete:
 - [x] Client compatibility guide — [CLIENTS.md](docs/CLIENTS.md)
 - [x] IAM/Admin API architecture — [docs/IAM-ARCHITECTURE.md](docs/design/IAM-ARCHITECTURE.md)
 - [x] Console architecture — [docs/CONSOLE-ARCHITECTURE.md](docs/design/CONSOLE-ARCHITECTURE.md)
-- [x] Completed work log — [docs/CHANGELOG.md](docs/CHANGELOG.md)

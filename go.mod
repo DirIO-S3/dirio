@@ -1,6 +1,6 @@
 module github.com/DirIO-S3/dirio
 
-go 1.26
+go 1.27
 
 replace (
 	github.com/DirIO-S3/dirio/api => ./api

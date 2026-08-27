@@ -1,6 +1,6 @@
 module github.com/DirIO-S3/dirio/console
 
-go 1.26
+go 1.27
 
 require (
 	github.com/DirIO-S3/dirio/api v0.0.0
