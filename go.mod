@@ -28,7 +28,7 @@ require (
 	github.com/minio/madmin-go/v3 v3.0.110
 	github.com/minio/minio-go/v7 v7.3.0
 	github.com/moby/moby/api v1.55.0
-	github.com/phuslu/lru v1.0.22
+	github.com/phuslu/lru v1.0.24
 	github.com/prometheus/client_golang v1.24.1
 	github.com/spf13/cobra v1.10.2
 	github.com/spf13/pflag v1.0.10
