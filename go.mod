@@ -22,7 +22,7 @@ require (
 	github.com/charmbracelet/x/term v0.2.2
 	github.com/fsnotify/fsnotify v1.10.1
 	github.com/go-chi/chi/v5 v5.3.2
-	github.com/go-git/go-billy/v5 v5.9.1
+	github.com/go-git/go-billy/v5 v5.9.2
 	github.com/mallardduck/go-http-helpers v0.1.0
 	github.com/mallardduck/teapot-router v0.15.2
 	github.com/minio/madmin-go/v3 v3.0.110
