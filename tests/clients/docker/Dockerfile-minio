@@ -1,3 +1,8 @@
+# MC_RELEASE: the recovered mc build published as ghcr.io/dirio-s3/test-mc
+# (see the test-assets branch). dl.min.io no longer serves mc.
+ARG MC_RELEASE=RELEASE.2025-08-13T08-35-41Z
+FROM ghcr.io/dirio-s3/test-mc:${MC_RELEASE} AS mc
+
 FROM alpine:3.24
 
 # 1. Install dependencies
@@ -7,10 +12,8 @@ RUN apk add --no-cache \
     bash \
     jq
 
-# 2. Install MinIO mc client
-RUN curl -fSL https://dl.min.io/client/mc/release/linux-amd64/mc \
-    -o /usr/local/bin/mc \
-    && chmod +x /usr/local/bin/mc
+# 2. Copy the MinIO mc client from the recovered image
+COPY --from=mc /usr/local/bin/mc /usr/local/bin/mc
 
 # 3. Create a non-root user
 RUN adduser -D -h /home/mcuser mcuser
