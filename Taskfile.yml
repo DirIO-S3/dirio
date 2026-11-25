@@ -172,6 +172,23 @@ tasks:
           --build-arg GIT_TREE_STATE={{.GIT_TREE_STATE}}
           .
 
+  docker-buildx:
+    desc: Verify multi-platform Docker build (amd64 + arm64). Requires QEMU/buildx.
+    vars:
+      GIT_TREE_STATE:
+        sh: git diff --quiet && echo clean || echo dirty
+      GIT_COMMIT:
+        sh: git rev-parse --short HEAD
+    cmds:
+      # Multi-platform output can't be --load'ed into the local daemon, so this
+      # only verifies that both platforms build. Add --push to publish.
+      - docker buildx build --platform linux/amd64,linux/arm64 -f ./package/Dockerfile
+          --build-arg VERSION=dev
+          --build-arg COMMIT={{.GIT_COMMIT}}
+          --build-arg BUILT_BY=local.docker
+          --build-arg GIT_TREE_STATE={{.GIT_TREE_STATE}}
+          .
+
   docker-run:
     desc: Build and run with Docker
     deps: [docker-build]

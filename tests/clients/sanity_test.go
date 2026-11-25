@@ -93,10 +93,7 @@ func runClientTest(t *testing.T, testName string, req testcontainers.ContainerRe
 	t.Helper()
 	ctx := context.Background()
 
-	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
-		ContainerRequest: req,
-		Started:          true,
-	})
+	container, err := startClientContainer(ctx, req)
 	require.NoError(t, err)
 	defer container.Terminate(ctx)
 
