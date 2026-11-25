@@ -93,7 +93,9 @@ This is a list of the S3 API actions and how they could be mapped to the `teapot
 
 **Tier 5 (Advanced - Compliance & Locking):**
 
-* PutObjectLockConfiguration
+Implemented for non-versioned buckets: bucket Object Lock configuration (GET/PUT `?object-lock`), object retention and legal hold (GET/PUT `?retention`, `?legal-hold`), default bucket retention, and enforcement on delete, multi-delete, overwrite (PutObject, CopyObject, multipart complete). Versioned-bucket lock semantics depend on versioning, which is not implemented.
+
+* PutObjectLockConfiguration, GetObjectLockConfiguration
 * GetObjectRetention, PutObjectRetention
 * GetObjectLegalHold, PutObjectLegalHold
 

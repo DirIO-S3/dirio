@@ -220,7 +220,22 @@ func requestsBypassGovernance(r *http.Request) bool {
 // GOVERNANCE bypass. Requests that do not ask for a bypass are always allowed; ones
 // that do must hold s3:BypassGovernanceRetention on the same resource.
 func governanceBypassAllowed(r *http.Request, engine *Engine, reqCtx *RequestContext, routeAction string) bool {
-	return true
+	if !acceptsBypassGovernance(routeAction) || !requestsBypassGovernance(r) {
+		return true
+	}
+	bypassCtx := *reqCtx
+	bypassCtx.Action = "s3:BypassGovernanceRetention"
+	decision := engine.Evaluate(r.Context(), &bypassCtx)
+	if !decision.IsAllowed() {
+		authzLogger(r.Context()).With(
+			"action", routeAction,
+			"permission", bypassCtx.Action,
+			"bucket", reqCtx.Resource.Bucket,
+			"principal", principalString(reqCtx.Principal),
+			"decision", decision.String(),
+		).Debug("governance bypass denied")
+	}
+	return decision.IsAllowed()
 }
 
 // getRequestUser extracts the user from request context.
