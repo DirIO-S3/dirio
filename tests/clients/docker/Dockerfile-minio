@@ -1,7 +1,7 @@
-# MC_RELEASE: the recovered mc build published as ghcr.io/dirio-s3/test-mc
+# MC_RELEASE: the recovered mc build published as ghcr.io/dirio-s3/dirio-debug/test-mc
 # (see the test-assets branch). dl.min.io no longer serves mc.
 ARG MC_RELEASE=RELEASE.2025-08-13T08-35-41Z
-FROM ghcr.io/dirio-s3/test-mc:${MC_RELEASE} AS mc
+FROM ghcr.io/dirio-s3/dirio-debug/test-mc:${MC_RELEASE} AS mc
 
 FROM alpine:3.24
 

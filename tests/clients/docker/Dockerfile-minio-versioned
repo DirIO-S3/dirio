@@ -1,7 +1,7 @@
-# MC_RELEASE: a recovered mc release tag with a matching ghcr.io/dirio-s3/test-mc image,
+# MC_RELEASE: a recovered mc release tag with a matching ghcr.io/dirio-s3/dirio-debug/test-mc image,
 # e.g. RELEASE.2025-08-13T08-35-41Z. dl.min.io no longer serves mc.
 ARG MC_RELEASE
-FROM ghcr.io/dirio-s3/test-mc:${MC_RELEASE} AS mc
+FROM ghcr.io/dirio-s3/dirio-debug/test-mc:${MC_RELEASE} AS mc
 
 FROM alpine:3.24
 
