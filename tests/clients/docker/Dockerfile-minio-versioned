@@ -1,8 +1,9 @@
-FROM alpine:3.24
-
-# MC_RELEASE: a specific mc release tag, e.g. RELEASE.2025-08-13T08-35-41Z
-# Browse available releases: https://github.com/minio/mc/releases
+# MC_RELEASE: a recovered mc release tag with a matching ghcr.io/dirio-s3/dirio-debug/test-mc image,
+# e.g. RELEASE.2025-08-13T08-35-41Z. dl.min.io no longer serves mc.
 ARG MC_RELEASE
+FROM ghcr.io/dirio-s3/dirio-debug/test-mc:${MC_RELEASE} AS mc
+
+FROM alpine:3.24
 
 # 1. Install dependencies
 RUN apk add --no-cache \
@@ -11,10 +12,8 @@ RUN apk add --no-cache \
     bash \
     jq
 
-# 2. Install the pinned MinIO mc client version
-RUN curl -fSL "https://dl.min.io/client/mc/release/linux-amd64/archive/mc.${MC_RELEASE}" \
-    -o /usr/local/bin/mc \
-    && chmod +x /usr/local/bin/mc
+# 2. Copy the pinned MinIO mc client from the recovered image
+COPY --from=mc /usr/local/bin/mc /usr/local/bin/mc
 
 # 3. Create a non-root user
 RUN adduser -D -h /home/mcuser mcuser
