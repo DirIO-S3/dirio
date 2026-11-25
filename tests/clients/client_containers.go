@@ -3,7 +3,9 @@
 package clients_test
 
 import (
+	"context"
 	"runtime"
+	"sync"
 	"time"
 
 	"github.com/moby/moby/api/types/container"
@@ -12,6 +14,31 @@ import (
 )
 
 const ContainerRepo = "dirio-test-local"
+
+// imageBuildMu serializes image builds and container creation. Parallel tests share
+// image tags (e.g. dirio-test-local:mc-latest), and a concurrent build of the same tag
+// can replace the image between another test's build and its container create,
+// which fails with "No such image".
+var imageBuildMu sync.Mutex
+
+// startClientContainer builds the image (if needed) and creates the container while
+// holding imageBuildMu, then starts it outside the lock so tests still run in parallel.
+func startClientContainer(ctx context.Context, req testcontainers.ContainerRequest) (testcontainers.Container, error) {
+	imageBuildMu.Lock()
+	ctr, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
+		ContainerRequest: req,
+		Started:          false,
+	})
+	imageBuildMu.Unlock()
+	if err != nil {
+		return nil, err
+	}
+	if err := ctr.Start(ctx); err != nil {
+		_ = ctr.Terminate(ctx)
+		return nil, err
+	}
+	return ctr, nil
+}
 
 // hostGatewayHosts returns the extra host mapping needed so containers can reach
 // the test server running on the host.

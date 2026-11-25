@@ -350,10 +350,7 @@ func TestAWSCLI(t *testing.T) {
 	// Use alpine with AWS CLI installed (has proper shell)
 	req := AwsClientContainer(envMap)
 
-	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
-		ContainerRequest: req,
-		Started:          true,
-	})
+	container, err := startClientContainer(ctx, req)
 	require.NoError(t, err)
 	defer container.Terminate(ctx)
 
@@ -418,10 +415,7 @@ func TestBoto3(t *testing.T) {
 	}
 	req := Boto3ClientContainer(envMap)
 
-	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
-		ContainerRequest: req,
-		Started:          true,
-	})
+	container, err := startClientContainer(ctx, req)
 	require.NoError(t, err)
 	defer container.Terminate(ctx)
 
@@ -480,10 +474,7 @@ var pinnedMCReleases = []string{
 func runMCClientTest(t *testing.T, ctx context.Context, req testcontainers.ContainerRequest) {
 	t.Helper()
 
-	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
-		ContainerRequest: req,
-		Started:          true,
-	})
+	container, err := startClientContainer(ctx, req)
 	require.NoError(t, err)
 	defer container.Terminate(ctx)
 
@@ -582,10 +573,7 @@ func TestMCAdmin(t *testing.T) {
 	req := MinioClientContainer(envMap)
 	req.Cmd = []string{"mc_admin.sh"}
 
-	container, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{
-		ContainerRequest: req,
-		Started:          true,
-	})
+	container, err := startClientContainer(ctx, req)
 	require.NoError(t, err)
 	defer container.Terminate(ctx)
 
