@@ -245,8 +245,14 @@ func (s *Service) CompleteMultipartUpload(ctx context.Context, req *CompleteMult
 		partFile.Close()
 	}
 
+	// Apply the bucket's default Object Lock retention, as a plain PutObject would
+	opts, err := s.putOptionsFor(ctx, req.Bucket, "", nil, "", false)
+	if err != nil {
+		return nil, fmt.Errorf("failed to resolve object lock: %w", err)
+	}
+
 	// Store the complete object
-	etag, err := s.diskStorage.PutObject(ctx, req.Bucket, req.Key, &assembledData, uploadMeta.ContentType, uploadMeta.CustomMetadata)
+	etag, err := s.diskStorage.PutObject(ctx, req.Bucket, req.Key, &assembledData, uploadMeta.ContentType, uploadMeta.CustomMetadata, opts)
 	if err != nil {
 		return nil, fmt.Errorf("failed to store complete object: %w", err)
 	}

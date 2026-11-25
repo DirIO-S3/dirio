@@ -177,6 +177,12 @@ func buildS3RouteDeps(style routeStyle, deps RouteDependencies) *s3RouteDeps {
 		putObjectACL:            httpresponse.NotImplemented,
 		getObjectTagging:        object(style, h.GetObjectTagging),
 		putObjectTagging:        object(style, h.PutObjectTagging),
+		getBucketObjectLock:     bucket(style, h.GetBucketObjectLockConfiguration),
+		putBucketObjectLock:     bucket(style, h.PutBucketObjectLockConfiguration),
+		getObjectRetention:      object(style, h.GetObjectRetention),
+		putObjectRetention:      object(style, h.PutObjectRetention),
+		getObjectLegalHold:      object(style, h.GetObjectLegalHold),
+		putObjectLegalHold:      object(style, h.PutObjectLegalHold),
 		multipartCreate:         object(style, h.CreateMultipartUpload),
 		multipartUploadPart:     object(style, h.UploadPart),
 		multipartUploadPartCopy: object(style, h.UploadPartCopy),
@@ -293,6 +299,13 @@ type s3RouteDeps struct {
 	putObjectACL     http.HandlerFunc
 	getObjectTagging http.HandlerFunc
 	putObjectTagging http.HandlerFunc
+	// Object lock — bucket configuration and object retention / legal hold
+	getBucketObjectLock http.HandlerFunc
+	putBucketObjectLock http.HandlerFunc
+	getObjectRetention  http.HandlerFunc
+	putObjectRetention  http.HandlerFunc
+	getObjectLegalHold  http.HandlerFunc
+	putObjectLegalHold  http.HandlerFunc
 	// Multipart upload operations
 	multipartCreate         http.HandlerFunc
 	multipartUploadPart     http.HandlerFunc
@@ -372,7 +385,8 @@ func setupS3Routes(r *teapot.Router, style routeStyle, deps *s3RouteDeps) {
 	r.Func().QueryPUT(bucketPattern, httpresponse.NotImplemented).Query("publicAccessBlock").Name("bucket.put-public-access-block").Action("s3:PutPublicAccessBlock")
 
 	// Object lock configuration
-	r.Func().QueryPUT(bucketPattern, httpresponse.NotImplemented).Query("object-lock").Name("bucket.put-object-lock-configuration").Action("s3:PutObjectLockConfiguration")
+	r.QueryGET(bucketPattern, deps.getBucketObjectLock).Query("object-lock").Name("bucket.get-object-lock-configuration").Action("s3:GetBucketObjectLockConfiguration")
+	r.QueryPUT(bucketPattern, deps.putBucketObjectLock).Query("object-lock").Name("bucket.put-object-lock-configuration").Action("s3:PutBucketObjectLockConfiguration")
 
 	// List object versions (for versioned buckets)
 	r.QueryGET(bucketPattern, deps.listObjectVersions).Query("versions").Name("buckets.versions").Action("s3:ListObjectVersions")
@@ -399,6 +413,8 @@ func setupS3Routes(r *teapot.Router, style routeStyle, deps *s3RouteDeps) {
 		d.When(m.QueryExists("partNumber"), m.QueryExists("uploadId")).Do(deps.multipartUploadPart).Name("multipart.upload-part").Action("s3:UploadPart")
 		d.When(m.QueryExists("acl")).Do(deps.putObjectACL).Name("objects.acl.store").Action("s3:PutObjectAcl")
 		d.When(m.QueryExists("tagging")).Do(deps.putObjectTagging).Name("objects.tagging.store").Action("s3:PutObjectTagging")
+		d.When(m.QueryExists("retention")).Do(deps.putObjectRetention).Name("objects.retention.store").Action("s3:PutObjectRetention")
+		d.When(m.QueryExists("legal-hold")).Do(deps.putObjectLegalHold).Name("objects.legal-hold.store").Action("s3:PutObjectLegalHold")
 
 		// Header-based copy operation
 		d.When(m.HeaderExists(consts.HeaderCopySource)).Do(deps.copyObject).Name("object.copy").Action("s3:CopyObject")
@@ -412,6 +428,10 @@ func setupS3Routes(r *teapot.Router, style routeStyle, deps *s3RouteDeps) {
 
 	// Object tagging
 	r.QueryGET(objectPattern, deps.getObjectTagging).Query("tagging").Name("objects.tagging.show").Action("s3:GetObjectTagging")
+
+	// Object lock: retention and legal hold
+	r.QueryGET(objectPattern, deps.getObjectRetention).Query("retention").Name("objects.retention.show").Action("s3:GetObjectRetention")
+	r.QueryGET(objectPattern, deps.getObjectLegalHold).Query("legal-hold").Name("objects.legal-hold.show").Action("s3:GetObjectLegalHold")
 
 	// Multipart upload operations
 	r.QueryPOST(objectPattern, deps.multipartCreate).Query("uploads").Name("multipart.create").Action("s3:CreateMultipartUpload")

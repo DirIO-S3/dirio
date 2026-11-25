@@ -101,6 +101,10 @@ type BucketMetadata struct {
 	VersioningConfigUpdatedAt   time.Time `json:"versioningConfigUpdatedAt"`
 }
 
+// ErrObjectMetadataNotFound is returned by GetObjectMetadata when no metadata
+// file exists for the object.
+var ErrObjectMetadataNotFound = fmt.Errorf("object metadata not found")
+
 // ObjectMetadata represents object metadata
 type ObjectMetadata struct {
 	Version        string            `json:"version"`                  // DirIO metadata version
@@ -111,6 +115,15 @@ type ObjectMetadata struct {
 	LastModified   time.Time         `json:"lastModified"`             // Last modification timestamp
 	CustomMetadata map[string]string `json:"customMetadata,omitempty"` // Custom headers like Cache-Control, Content-Disposition, x-amz-meta-*, etc.
 	Tags           map[string]string `json:"tags,omitempty"`           // Object tags (key-value pairs)
+	Retention      *ObjectRetention  `json:"retention,omitempty"`      // Object Lock retention; nil = none
+	LegalHold      bool              `json:"legalHold,omitempty"`      // Object Lock legal hold
+}
+
+// ObjectRetention is the Object Lock retention applied to an object.
+// Mode is s3types.RetentionModeGovernance or s3types.RetentionModeCompliance.
+type ObjectRetention struct {
+	Mode        string    `json:"mode"`
+	RetainUntil time.Time `json:"retainUntil"`
 }
 
 // New creates a new metadata manager
@@ -308,7 +321,7 @@ func (m *Manager) GetObjectMetadata(ctx context.Context, bucket, key string) (*O
 	data, err := util.ReadFile(m.metadataFS, metaPath)
 	if err != nil {
 		if isNotExist(err) {
-			return nil, fmt.Errorf("object metadata not found")
+			return nil, ErrObjectMetadataNotFound
 		}
 		return nil, err
 	}
@@ -849,6 +862,20 @@ func (m *Manager) SetBucketPolicy(ctx context.Context, bucket string, policy *Po
 	meta.PolicyConfigUpdatedAt = time.Now().UTC()
 
 	// Save the updated metadata
+	bucketPath := filepath.Join("buckets", bucket+".json")
+	return jsonutil.MarshalToFile(m.metadataFS, bucketPath, meta)
+}
+
+// SetBucketObjectLockConfig stores the bucket's Object Lock configuration XML
+func (m *Manager) SetBucketObjectLockConfig(ctx context.Context, bucket, configXML string) error {
+	meta, err := m.GetBucketMetadata(ctx, bucket)
+	if err != nil {
+		return err
+	}
+
+	meta.ObjectLockConfigXML = configXML
+	meta.ObjectLockConfigUpdatedAt = time.Now().UTC()
+
 	bucketPath := filepath.Join("buckets", bucket+".json")
 	return jsonutil.MarshalToFile(m.metadataFS, bucketPath, meta)
 }

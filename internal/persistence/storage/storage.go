@@ -26,6 +26,7 @@ var (
 	ErrNoSuchBucket   = s3types.ErrBucketNotFound
 	ErrBucketNotEmpty = s3types.ErrBucketNotEmpty
 	ErrNoSuchKey      = s3types.ErrObjectNotFound
+	ErrObjectLocked   = s3types.ErrObjectLocked
 )
 
 // errStopWalk is a sentinel returned by the walk callback to signal early termination.

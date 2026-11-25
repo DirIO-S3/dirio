@@ -281,38 +281,57 @@ func extractObjectMetadataHeaders(r *http.Request) (contentType string, customMe
 func (h *HTTPHandler) PutObject(w http.ResponseWriter, r *http.Request, bucket, key string) {
 	contentType, customMetadata := extractObjectMetadataHeaders(r)
 
+	lockMode, lockRetainUntil, lockLegalHold, err := objectLockWriteHeaders(r)
+	if err != nil {
+		writeObjectLockError(w, r, err)
+		return
+	}
+
 	putRequest := &s3.PutObjectRequest{
-		Bucket:         bucket,
-		Key:            key,
-		Content:        r.Body,
-		ContentType:    contentType,
-		CustomMetadata: customMetadata,
+		Bucket:                    bucket,
+		Key:                       key,
+		Content:                   r.Body,
+		ContentType:               contentType,
+		CustomMetadata:            customMetadata,
+		ObjectLockMode:            lockMode,
+		ObjectLockRetainUntil:     lockRetainUntil,
+		ObjectLockLegalHold:       lockLegalHold,
+		BypassGovernanceRetention: bypassGovernanceRequested(r),
 	}
 
 	// Read object content from request body
 	// Note: Chunked encoding is automatically decoded by middleware
 	etag, err := h.s3Service.PutObject(r.Context(), putRequest)
 	if err != nil {
-		requestID := middleware.GetRequestID(r.Context())
-		if errors.Is(err, s3types.ErrBucketNotFound) {
-			if writeErr := WriteErrorResponse(w, requestID, s3types.ErrCodeNoSuchBucket, response.SetErrAsMessage(err)); writeErr != nil {
-				s3Logger(r.Context()).With("err", err, "write_err", writeErr).Warn("encountered error putting object (no such bucket) and additional error writing XML error response")
-				return
-			}
-			s3Logger(r.Context()).With("err", err).Warn("encountered error putting object (no such bucket)")
-			return
-		}
-		if writeErr := WriteErrorResponse(w, requestID, s3types.ErrCodeInternalError, response.SetErrAsMessage(err)); writeErr != nil {
-			s3Logger(r.Context()).With("err", err, "write_err", writeErr).Warn("encountered error putting object and additional error writing XML error response")
-			return
-		}
-		s3Logger(r.Context()).With("err", err).Warn("encountered error putting object")
+		writePutObjectError(w, r, err)
 		return
 	}
 
 	// Set response headers
 	w.Header().Set(headers.ETag, etag)
 	w.WriteHeader(http.StatusOK)
+}
+
+// writePutObjectError maps a PutObject service error to its S3 error response.
+func writePutObjectError(w http.ResponseWriter, r *http.Request, err error) {
+	if isObjectLockError(err) {
+		writeObjectLockError(w, r, err)
+		return
+	}
+	requestID := middleware.GetRequestID(r.Context())
+	if errors.Is(err, s3types.ErrBucketNotFound) {
+		if writeErr := WriteErrorResponse(w, requestID, s3types.ErrCodeNoSuchBucket, response.SetErrAsMessage(err)); writeErr != nil {
+			s3Logger(r.Context()).With("err", err, "write_err", writeErr).Warn("encountered error putting object (no such bucket) and additional error writing XML error response")
+			return
+		}
+		s3Logger(r.Context()).With("err", err).Warn("encountered error putting object (no such bucket)")
+		return
+	}
+	if writeErr := WriteErrorResponse(w, requestID, s3types.ErrCodeInternalError, response.SetErrAsMessage(err)); writeErr != nil {
+		s3Logger(r.Context()).With("err", err, "write_err", writeErr).Warn("encountered error putting object and additional error writing XML error response")
+		return
+	}
+	s3Logger(r.Context()).With("err", err).Warn("encountered error putting object")
 }
 
 // HeadObject handles HEAD /{bucket}/{key}
@@ -358,8 +377,9 @@ func (h *HTTPHandler) HeadObject(w http.ResponseWriter, r *http.Request, bucket,
 //   - Verify route matches in routes.go line ~340: r.DELETE("/{bucket}/{key:.*}", ...)
 func (h *HTTPHandler) DeleteObject(w http.ResponseWriter, r *http.Request, bucket, key string) {
 	deleteRequest := &s3.DeleteObjectRequest{
-		Bucket: bucket,
-		Key:    key,
+		Bucket:                    bucket,
+		Key:                       key,
+		BypassGovernanceRetention: bypassGovernanceRequested(r),
 	}
 	err := h.s3Service.DeleteObject(r.Context(), deleteRequest)
 	// S3 returns 204 even if object doesn't exist
@@ -368,6 +388,8 @@ func (h *HTTPHandler) DeleteObject(w http.ResponseWriter, r *http.Request, bucke
 		switch {
 		case errors.Is(err, s3types.ErrBucketNotFound):
 			respondError(r.Context(), w, requestID, err, s3types.ErrCodeNoSuchBucket, "encountered error deleting object (no such bucket)", response.SetErrAsMessage(err))
+		case errors.Is(err, s3types.ErrObjectLocked):
+			respondError(r.Context(), w, requestID, err, s3types.ErrCodeAccessDenied, "access denied because object protected by object lock", response.SetErrAsMessage(err))
 		default:
 			respondError(r.Context(), w, requestID, err, s3types.ErrCodeInternalError, "encountered error deleting object", response.SetErrAsMessage(err))
 		}
@@ -444,6 +466,8 @@ func (h *HTTPHandler) CopyObject(w http.ResponseWriter, r *http.Request, bucket,
 			respondError(r.Context(), w, requestID, err, s3types.ErrCodeNoSuchKey, "copy source object not found", response.SetErrAsMessage(err))
 		case errors.Is(err, s3types.ErrBucketNotFound):
 			respondError(r.Context(), w, requestID, err, s3types.ErrCodeNoSuchBucket, "copy source or dest bucket not found", response.SetErrAsMessage(err))
+		case isObjectLockError(err):
+			writeObjectLockError(w, r, err)
 		default:
 			respondError(r.Context(), w, requestID, err, s3types.ErrCodeInternalError, "error copying object", response.SetErrAsMessage(err))
 		}

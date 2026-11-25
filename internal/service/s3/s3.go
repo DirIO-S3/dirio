@@ -60,6 +60,13 @@ func (s *Service) CreateBucket(ctx context.Context, req *CreateBucketRequest) (*
 		return nil, err
 	}
 
+	// Object Lock can only be enabled at creation time
+	if req.ObjectLockEnabled {
+		if err := s.createBucketObjectLock(ctx, req.Name); err != nil {
+			return nil, err
+		}
+	}
+
 	// If a bucket policy was provided, update it
 	if req.BucketPolicy != nil {
 		bucketMeta, err := s.metadataManager.GetBucketMetadata(ctx, req.Name)
@@ -220,11 +227,19 @@ func (s *Service) PutObject(ctx context.Context, req *PutObjectRequest) (string,
 		contentType = "application/octet-stream"
 	}
 
+	opts, err := s.putOptionsFor(ctx, req.Bucket, req.ObjectLockMode, req.ObjectLockRetainUntil, req.ObjectLockLegalHold, req.BypassGovernanceRetention)
+	if err != nil {
+		return "", err
+	}
+
 	// Upload object
-	etag, err := s.diskStorage.PutObject(ctx, req.Bucket, req.Key, req.Content, contentType, req.CustomMetadata)
+	etag, err := s.diskStorage.PutObject(ctx, req.Bucket, req.Key, req.Content, contentType, req.CustomMetadata, opts)
 	if err != nil {
 		if errors.Is(err, storage.ErrNoSuchBucket) {
 			return "", s3types.ErrBucketNotFound
+		}
+		if errors.Is(err, storage.ErrObjectLocked) {
+			return "", s3types.ErrObjectLocked
 		}
 		return "", err
 	}
@@ -286,7 +301,7 @@ func (s *Service) HeadObject(ctx context.Context, req *HeadObjectRequest) (*Head
 // Note: Assumes bucket and key have been validated by the caller
 func (s *Service) DeleteObject(ctx context.Context, req *DeleteObjectRequest) error {
 	// Delete object
-	err := s.diskStorage.DeleteObject(ctx, req.Bucket, req.Key)
+	err := s.diskStorage.DeleteObject(ctx, req.Bucket, req.Key, req.BypassGovernanceRetention)
 	if err != nil {
 		// S3 spec: DeleteObject is idempotent, ignore "not found" errors
 		if errors.Is(err, storage.ErrNoSuchKey) {
@@ -294,6 +309,9 @@ func (s *Service) DeleteObject(ctx context.Context, req *DeleteObjectRequest) er
 		}
 		if errors.Is(err, storage.ErrNoSuchBucket) {
 			return s3types.ErrBucketNotFound
+		}
+		if errors.Is(err, storage.ErrObjectLocked) {
+			return s3types.ErrObjectLocked
 		}
 		return err
 	}
@@ -460,7 +478,7 @@ func (s *Service) DeleteObjects(ctx context.Context, request *DeleteObjectsReque
 
 	// Delete each object
 	for _, obj := range request.Objects {
-		err := s.diskStorage.DeleteObject(ctx, request.Bucket, obj.Key)
+		err := s.diskStorage.DeleteObject(ctx, request.Bucket, obj.Key, request.BypassGovernanceRetention)
 
 		if err != nil {
 			// Per S3 spec, DeleteObject is idempotent - treat not-found as success
@@ -472,6 +490,17 @@ func (s *Service) DeleteObjects(ctx context.Context, request *DeleteObjectsReque
 						VersionId: obj.VersionId,
 					})
 				}
+				continue
+			}
+
+			// A locked object is reported per key, as AWS does, not as an internal error
+			if errors.Is(err, storage.ErrObjectLocked) {
+				response.Errors = append(response.Errors, s3types.DeleteError{
+					Key:       obj.Key,
+					VersionId: obj.VersionId,
+					Code:      "AccessDenied",
+					Message:   "Access Denied because object protected by object lock.",
+				})
 				continue
 			}
 
