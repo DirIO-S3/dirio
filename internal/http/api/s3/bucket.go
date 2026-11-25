@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/mallardduck/go-http-helpers/pkg/headers"
 	"github.com/mallardduck/go-http-helpers/pkg/query"
@@ -22,7 +23,8 @@ func (h *HTTPHandler) CreateBucket(w http.ResponseWriter, r *http.Request, bucke
 	// TODO: Parse bucket configuration from request body if present
 
 	createBucketRequest := &s3.CreateBucketRequest{
-		Name: bucket,
+		Name:              bucket,
+		ObjectLockEnabled: strings.EqualFold(r.Header.Get(consts.HeaderBucketObjectLockEnabled), "true"),
 	}
 	metadata, err := h.s3Service.CreateBucket(r.Context(), createBucketRequest)
 	if err != nil {
@@ -319,9 +321,10 @@ func (h *HTTPHandler) DeleteObjects(w http.ResponseWriter, r *http.Request, buck
 
 	// Create service request
 	deleteRequest := &s3.DeleteObjectsRequest{
-		Bucket:  bucket,
-		Objects: xmlRequest.Objects,
-		Quiet:   xmlRequest.Quiet,
+		Bucket:                    bucket,
+		Objects:                   xmlRequest.Objects,
+		Quiet:                     xmlRequest.Quiet,
+		BypassGovernanceRetention: bypassGovernanceRequested(r),
 	}
 
 	// Call service

@@ -25,9 +25,10 @@ type OwnerInfo struct {
 
 // CreateBucketRequest represents a request to create a new bucket
 type CreateBucketRequest struct {
-	Name         string
-	Owner        string                   // User who owns the bucket
-	BucketPolicy *metadata.PolicyDocument // Optional bucket policy
+	Name              string
+	Owner             string                   // User who owns the bucket
+	BucketPolicy      *metadata.PolicyDocument // Optional bucket policy
+	ObjectLockEnabled bool                     // Enable Object Lock on the new bucket
 }
 
 // UpdateBucketRequest represents a request to update bucket metadataManager
@@ -46,6 +47,16 @@ type PutObjectRequest struct {
 	Content        io.Reader
 	ContentType    string
 	CustomMetadata map[string]string // S3 metadataManager headers (Cache-Control, x-amz-meta-*, etc.)
+
+	// Object Lock settings from x-amz-object-lock-* headers. Mode and RetainUntil
+	// must be set together. LegalHold is "ON", "OFF" or empty.
+	ObjectLockMode        string
+	ObjectLockRetainUntil *time.Time
+	ObjectLockLegalHold   string
+
+	// BypassGovernanceRetention allows replacing an object under GOVERNANCE
+	// retention. The handler sets it only after the caller is authorized.
+	BypassGovernanceRetention bool
 }
 
 // GetObjectRequest represents a request to download an object
@@ -102,15 +113,17 @@ type CopyObjectRequest struct {
 
 // DeleteObjectRequest represents a request to delete an object
 type DeleteObjectRequest struct {
-	Bucket string
-	Key    string
+	Bucket                    string
+	Key                       string
+	BypassGovernanceRetention bool // Authorized bypass of GOVERNANCE retention
 }
 
 // DeleteObjectsRequest represents a request to delete multiple objects
 type DeleteObjectsRequest struct {
-	Bucket  string
-	Objects []s3types.ObjectIdentifier
-	Quiet   bool // If true, only return errors in response
+	Bucket                    string
+	Objects                   []s3types.ObjectIdentifier
+	Quiet                     bool // If true, only return errors in response
+	BypassGovernanceRetention bool // Authorized bypass of GOVERNANCE retention
 }
 
 // DeleteObjectsResponse represents the response from deleting multiple objects

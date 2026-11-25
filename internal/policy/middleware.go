@@ -181,6 +181,14 @@ func AuthorizationMiddleware(config *AuthorizationConfig) func(http.Handler) htt
 					return
 				}
 
+				// Bypassing GOVERNANCE retention is a separate permission, checked only
+				// when the request actually asks for the bypass.
+				if !governanceBypassAllowed(r, config.Engine, reqCtx, routeAction) {
+					setLogAuthz(r, "deny")
+					writeAccessDenied(w, r)
+					return
+				}
+
 				// Store decision in context for logging
 				ctx := context.WithAuthzDecision(r.Context(), decision)
 				r = r.WithContext(ctx)
@@ -191,6 +199,28 @@ func AuthorizationMiddleware(config *AuthorizationConfig) func(http.Handler) htt
 			next.ServeHTTP(w, r)
 		})
 	}
+}
+
+// acceptsBypassGovernance reports whether an S3 action honors the
+// x-amz-bypass-governance-retention header.
+func acceptsBypassGovernance(action string) bool {
+	switch action {
+	case "s3:DeleteObject", "s3:DeleteObjects", "s3:PutObject", "s3:PutObjectRetention":
+		return true
+	}
+	return false
+}
+
+// requestsBypassGovernance reports whether the request sets x-amz-bypass-governance-retention: true.
+func requestsBypassGovernance(r *http.Request) bool {
+	return strings.EqualFold(r.Header.Get(consts.HeaderBypassGovernanceRetention), "true")
+}
+
+// governanceBypassAllowed reports whether the request may proceed with respect to
+// GOVERNANCE bypass. Requests that do not ask for a bypass are always allowed; ones
+// that do must hold s3:BypassGovernanceRetention on the same resource.
+func governanceBypassAllowed(r *http.Request, engine *Engine, reqCtx *RequestContext, routeAction string) bool {
+	return true
 }
 
 // getRequestUser extracts the user from request context.

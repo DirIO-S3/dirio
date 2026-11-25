@@ -48,6 +48,21 @@ const (
 	// HeaderBucketRegion is the S3 header for bucket region
 	HeaderBucketRegion = "x-amz-bucket-region"
 
+	// HeaderBucketObjectLockEnabled on CreateBucket enables Object Lock for the new bucket
+	HeaderBucketObjectLockEnabled = "X-Amz-Bucket-Object-Lock-Enabled"
+
+	// HeaderObjectLockMode sets the Object Lock retention mode (GOVERNANCE or COMPLIANCE) on PutObject
+	HeaderObjectLockMode = "X-Amz-Object-Lock-Mode"
+
+	// HeaderObjectLockRetainUntilDate sets the Object Lock retain-until time on PutObject
+	HeaderObjectLockRetainUntilDate = "X-Amz-Object-Lock-Retain-Until-Date"
+
+	// HeaderObjectLockLegalHold sets the Object Lock legal hold (ON or OFF) on PutObject
+	HeaderObjectLockLegalHold = "X-Amz-Object-Lock-Legal-Hold"
+
+	// HeaderBypassGovernanceRetention requests bypass of GOVERNANCE retention on delete or overwrite
+	HeaderBypassGovernanceRetention = "X-Amz-Bypass-Governance-Retention"
+
 	// ContentSHA256Streaming is the value for chunked transfer encoding
 	ContentSHA256Streaming = "STREAMING-AWS4-HMAC-SHA256-PAYLOAD"
 

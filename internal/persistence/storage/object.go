@@ -116,8 +116,9 @@ func (s *Storage) GetObject(ctx context.Context, bucket, key string) (*Object, e
 	}, nil
 }
 
-// PutObject stores an object
-func (s *Storage) PutObject(ctx context.Context, bucket, key string, content io.Reader, contentType string, customMetadata map[string]string) (string, error) {
+// PutObject stores an object. An existing object that is protected by Object Lock
+// is not replaced; ErrObjectLocked is returned instead.
+func (s *Storage) PutObject(ctx context.Context, bucket, key string, content io.Reader, contentType string, customMetadata map[string]string, opts PutOptions) (string, error) {
 	// Check if context is already cancelled
 	if err := ctx.Err(); err != nil {
 		return "", fmt.Errorf("context cancelled: %w", err)
@@ -213,6 +214,18 @@ func (s *Storage) PutObject(ctx context.Context, bucket, key string, content io.
 	keyMu.Lock()
 	defer keyMu.Unlock()
 
+	// Refuse to replace a locked object. Checked under the key lock so the
+	// check and the commit below are atomic with respect to other writers.
+	existing, err := s.existingObjectMetadata(ctx, bucket, key)
+	if err != nil {
+		s.staging.abortObject(stagedPath)
+		return "", fmt.Errorf("failed to read existing object metadata: %w", err)
+	}
+	if err := checkObjectLock(existing, time.Now(), opts.BypassGovernance); err != nil {
+		s.staging.abortObject(stagedPath)
+		return "", err
+	}
+
 	// Atomically commit the staged file to the final bucket location.
 	// Cross-directory rename is atomic on POSIX; both staging and bucket
 	// live under the same dataDir filesystem.
@@ -241,6 +254,8 @@ func (s *Storage) PutObject(ctx context.Context, bucket, key string, content io.
 		ETag:           etag,
 		LastModified:   time.Now(),
 		CustomMetadata: customMetadata,
+		Retention:      opts.Retention,
+		LegalHold:      opts.LegalHold,
 	}
 	if err := s.metadataManager.PutObjectMetadata(ctx, bucket, key, meta); err != nil {
 		// If custom metadataManager was provided, fail the operation since user's explicit request cannot be fulfilled
@@ -331,8 +346,9 @@ func (s *Storage) GetObjectMetadata(ctx context.Context, bucket, key string) (*m
 	return meta, nil
 }
 
-// DeleteObject removes an object
-func (s *Storage) DeleteObject(ctx context.Context, bucket, key string) error {
+// DeleteObject removes an object. An object protected by Object Lock is not
+// removed; ErrObjectLocked is returned instead.
+func (s *Storage) DeleteObject(ctx context.Context, bucket, key string, bypassGovernance bool) error {
 	// Check if context is already cancelled
 	if err := ctx.Err(); err != nil {
 		return fmt.Errorf("context cancelled: %w", err)
@@ -374,6 +390,20 @@ func (s *Storage) DeleteObject(ctx context.Context, bucket, key string) error {
 	}
 	if info.IsDir() {
 		return ErrNoSuchKey
+	}
+
+	// Serialize the lock check with writes so a concurrent PutObject cannot
+	// change the object's lock state between the check and the removal.
+	keyMu := s.getKeyMu(bucket, key)
+	keyMu.Lock()
+	defer keyMu.Unlock()
+
+	existing, err := s.existingObjectMetadata(ctx, bucket, key)
+	if err != nil {
+		return fmt.Errorf("failed to read existing object metadata: %w", err)
+	}
+	if err := checkObjectLock(existing, time.Now(), bypassGovernance); err != nil {
+		return err
 	}
 
 	// Delete the file
