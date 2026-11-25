@@ -1,12 +1,17 @@
 # Build context must be the project root:
 #   docker build -f ./package/Dockerfile -t dirio:latest .
 #
+# Multi-arch build (requires QEMU + buildx):
+#   docker buildx build --platform linux/amd64,linux/arm64 -f ./package/Dockerfile .
+#
 # Override the BCI version at build time:
 #   docker build --build-arg BCI_VERSION=16.1 -f ./package/Dockerfile -t dirio:latest .
 ARG BCI_VERSION=16.0
 
 # ── Stage 1: Compile ──────────────────────────────────────────────────────────
-FROM rancher/hardened-build-base:v1.27.0b1 AS builder
+# Pinned to the build host so the Go compiler runs natively and cross-compiles
+# for TARGETOS/TARGETARCH instead of running under QEMU.
+FROM --platform=$BUILDPLATFORM rancher/hardened-build-base:v1.27.4b1 AS builder
 
 WORKDIR /build
 
@@ -37,13 +42,17 @@ ARG BUILD_TIME=unknown
 ARG BUILT_BY=local.docker
 ARG GIT_TREE_STATE=unknown
 
-RUN CGO_ENABLED=0 GOOS=linux go build \
+# Injected by buildx for each requested platform (e.g. linux / arm64).
+ARG TARGETOS
+ARG TARGETARCH
+
+RUN CGO_ENABLED=0 GOOS=${TARGETOS} GOARCH=${TARGETARCH} go build \
     -ldflags="-s -w \
-      -X github.com/DirIO-S3/dirio/internal/version.Version=${VERSION} \
-      -X github.com/DirIO-S3/dirio/internal/version.Commit=${COMMIT} \
-      -X github.com/DirIO-S3/dirio/internal/version.BuildTime=${BUILD_TIME} \
-      -X github.com/DirIO-S3/dirio/internal/version.BuiltBy=${BUILT_BY} \
-      -X github.com/DirIO-S3/dirio/internal/version.GitTreeState=${GIT_TREE_STATE}" \
+      -X github.com/DirIO-S3/dirio/common/version.Version=${VERSION} \
+      -X github.com/DirIO-S3/dirio/common/version.Commit=${COMMIT} \
+      -X github.com/DirIO-S3/dirio/common/version.BuildTime=${BUILD_TIME} \
+      -X github.com/DirIO-S3/dirio/common/version.BuiltBy=${BUILT_BY} \
+      -X github.com/DirIO-S3/dirio/common/version.GitTreeState=${GIT_TREE_STATE}" \
     -trimpath \
     -o dirio \
     ./cmd/server

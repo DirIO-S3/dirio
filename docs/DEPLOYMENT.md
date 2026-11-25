@@ -109,7 +109,13 @@ services:
 ### Build the image
 
 ```bash
-docker build -t dirio:latest .
+docker build -f package/Dockerfile -t dirio:latest .
+```
+
+Published images are multi-arch (`linux/amd64` and `linux/arm64`). To build both locally, use buildx (requires QEMU for the non-native platform):
+
+```bash
+docker buildx build --platform linux/amd64,linux/arm64 -f package/Dockerfile -t dirio:latest .
 ```
 
 ### Start the service
