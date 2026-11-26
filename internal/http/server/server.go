@@ -322,8 +322,8 @@ func (s *Server) buildHandler() http.Handler {
 	}
 
 	return dispatch.New(func(b *dispatch.Builder) {
-		b.When(dispatch.HostHasSubdomain(s.config.CanonicalDomain)).Do(s.vhostRouter.ServeHTTP)
-		b.Default(s.router.ServeHTTP)
+		b.When(dispatch.HostHasSubdomain(s.config.CanonicalDomain)).Do(s.vhostRouter)
+		b.Default(s.router)
 	})
 }
 

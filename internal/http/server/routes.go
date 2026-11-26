@@ -47,7 +47,7 @@ type RouteDependencies struct {
 // When deps is nil, routes are registered with nil handlers (for CLI route listing).
 func SetupRoutes(r *teapot.Router, deps RouteDependencies) {
 	// Favicon must be at site the root for full compatibility
-	r.Func().GET("/favicon.ico", favicon.HandleFavicon).Name("favicon")
+	r.GET("/favicon.ico", http.HandlerFunc(favicon.HandleFavicon)).Name("favicon")
 	// /.dirio/* — DirIO-specific routes.
 	// Dot-prefix guarantees no collision with S3 bucket names (bucket names must
 	// start with a letter or digit per the S3 spec and AWS validation rules).
@@ -377,12 +377,12 @@ func setupS3Routes(r *teapot.Router, style routeStyle, deps *s3RouteDeps) {
 	// Bucket lifecycle configuration
 	// Note: Legacy GetBucketLifecycle/PutBucketLifecycle share the same path and query param
 	//       as the modern *Configuration variants; one route per method covers both.
-	r.Func().QueryGET(bucketPattern, httpresponse.NotImplemented).Query("lifecycle").Name("bucket.get-lifecycle-configuration").Action("s3:GetBucketLifecycleConfiguration")
-	r.Func().QueryPUT(bucketPattern, httpresponse.NotImplemented).Query("lifecycle").Name("bucket.put-lifecycle-configuration").Action("s3:PutBucketLifecycleConfiguration")
+	r.QueryGET(bucketPattern, http.HandlerFunc(httpresponse.NotImplemented)).Query("lifecycle").Name("bucket.get-lifecycle-configuration").Action("s3:GetBucketLifecycleConfiguration")
+	r.QueryPUT(bucketPattern, http.HandlerFunc(httpresponse.NotImplemented)).Query("lifecycle").Name("bucket.put-lifecycle-configuration").Action("s3:PutBucketLifecycleConfiguration")
 
 	// Public access block
-	r.Func().QueryGET(bucketPattern, httpresponse.NotImplemented).Query("publicAccessBlock").Name("bucket.get-public-access-block").Action("s3:GetPublicAccessBlock")
-	r.Func().QueryPUT(bucketPattern, httpresponse.NotImplemented).Query("publicAccessBlock").Name("bucket.put-public-access-block").Action("s3:PutPublicAccessBlock")
+	r.QueryGET(bucketPattern, http.HandlerFunc(httpresponse.NotImplemented)).Query("publicAccessBlock").Name("bucket.get-public-access-block").Action("s3:GetPublicAccessBlock")
+	r.QueryPUT(bucketPattern, http.HandlerFunc(httpresponse.NotImplemented)).Query("publicAccessBlock").Name("bucket.put-public-access-block").Action("s3:PutPublicAccessBlock")
 
 	// Object lock configuration
 	r.QueryGET(bucketPattern, deps.getBucketObjectLock).Query("object-lock").Name("bucket.get-object-lock-configuration").Action("s3:GetBucketObjectLockConfiguration")

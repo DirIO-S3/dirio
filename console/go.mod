@@ -6,12 +6,13 @@ require (
 	github.com/DirIO-S3/dirio/api v0.0.0
 	github.com/Oudwins/tailwind-merge-go v0.2.3
 	github.com/a-h/templ v0.3.1020
-	github.com/mallardduck/teapot-router v0.15.2
+	github.com/mallardduck/teapot-router v0.16.0
 )
 
 require (
 	github.com/go-chi/chi/v5 v5.3.2 // indirect
 	github.com/google/go-cmp v0.7.0 // indirect
+	github.com/jinzhu/inflection v1.0.0 // indirect
 )
 
 replace github.com/DirIO-S3/dirio/api => ../api
