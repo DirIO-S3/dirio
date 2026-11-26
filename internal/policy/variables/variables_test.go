@@ -4,7 +4,6 @@ import (
 	"net"
 	"testing"
 	"time"
-
 	"uuid"
 
 	"github.com/stretchr/testify/assert"

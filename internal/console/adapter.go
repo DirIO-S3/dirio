@@ -8,7 +8,6 @@ import (
 	"errors"
 	"fmt"
 	"strings"
-
 	"uuid"
 
 	consoleapi "github.com/DirIO-S3/dirio/api"

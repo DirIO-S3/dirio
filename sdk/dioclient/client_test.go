@@ -17,17 +17,21 @@ type mockS3Backend struct {
 func (m *mockS3Backend) ListBuckets(_ context.Context) ([]BucketInfo, error) {
 	return nil, m.listBucketsErr
 }
+
 func (m *mockS3Backend) ListObjects(_ context.Context, _, _ string, _ bool) <-chan ObjectInfo {
 	ch := make(chan ObjectInfo)
 	close(ch)
 	return ch
 }
+
 func (m *mockS3Backend) PutObject(_ context.Context, _, _ string, _ io.Reader, _ int64, _ string) error {
 	return m.putObjectErr
 }
+
 func (m *mockS3Backend) GetObject(_ context.Context, _, _ string) (io.ReadCloser, ObjectInfo, error) {
 	return nil, ObjectInfo{}, nil
 }
+
 func (m *mockS3Backend) StatObject(_ context.Context, _, _ string) (ObjectInfo, error) {
 	return ObjectInfo{}, nil
 }

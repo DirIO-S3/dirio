@@ -15,41 +15,37 @@ import (
 	"time"
 
 	"github.com/fsnotify/fsnotify"
-	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/osfs"
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+
 	"github.com/mallardduck/teapot-router/pkg/dispatch"
 	"github.com/mallardduck/teapot-router/pkg/teapot"
 
-	minioHTTP "github.com/DirIO-S3/dirio/internal/compat/minio/http"
-	"github.com/DirIO-S3/dirio/internal/consts"
+	chiMiddleware "github.com/go-chi/chi/v5/middleware"
 
 	"github.com/DirIO-S3/dirio/console/ui"
+	minioHTTP "github.com/DirIO-S3/dirio/internal/compat/minio/http"
+	miniomiddleware "github.com/DirIO-S3/dirio/internal/compat/minio/middleware"
+	"github.com/DirIO-S3/dirio/internal/config/data"
 	"github.com/DirIO-S3/dirio/internal/console"
-	"github.com/DirIO-S3/dirio/internal/service"
-
+	"github.com/DirIO-S3/dirio/internal/consts"
+	"github.com/DirIO-S3/dirio/internal/http/api"
 	dirioapi "github.com/DirIO-S3/dirio/internal/http/api/dirio"
+	"github.com/DirIO-S3/dirio/internal/http/auth"
+	"github.com/DirIO-S3/dirio/internal/http/middleware"
+	loggingHttp "github.com/DirIO-S3/dirio/internal/http/middleware/logging"
 	"github.com/DirIO-S3/dirio/internal/http/server/health"
 	"github.com/DirIO-S3/dirio/internal/http/server/metrics"
 	"github.com/DirIO-S3/dirio/internal/http/server/prof"
-
-	miniomiddleware "github.com/DirIO-S3/dirio/internal/compat/minio/middleware"
-	"github.com/DirIO-S3/dirio/internal/http/api"
-	"github.com/DirIO-S3/dirio/internal/http/auth"
-	"github.com/DirIO-S3/dirio/internal/http/middleware"
 	"github.com/DirIO-S3/dirio/internal/http/urlbuilder"
-	"github.com/DirIO-S3/dirio/internal/policy"
-
-	"github.com/DirIO-S3/dirio/internal/config/data"
-
-	loggingHttp "github.com/DirIO-S3/dirio/internal/http/middleware/logging"
 	"github.com/DirIO-S3/dirio/internal/logging"
 	"github.com/DirIO-S3/dirio/internal/mdns"
 	"github.com/DirIO-S3/dirio/internal/persistence/metadata"
 	"github.com/DirIO-S3/dirio/internal/persistence/storage"
+	"github.com/DirIO-S3/dirio/internal/policy"
+	"github.com/DirIO-S3/dirio/internal/service"
 	"github.com/DirIO-S3/dirio/internal/telemetry"
-
-	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 )
 
 // Config holds server configuration.

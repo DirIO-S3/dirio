@@ -5,7 +5,6 @@ import (
 	"errors"
 	"io"
 	"io/fs"
-
 	"uuid"
 
 	"github.com/DirIO-S3/dirio/internal/consts"
@@ -360,7 +359,6 @@ func (s *Service) ObjectExists(ctx context.Context, bucket, key string) (bool, e
 		Bucket: bucket,
 		Key:    key,
 	})
-
 	if err != nil {
 		if errors.Is(err, s3types.ErrObjectNotFound) {
 			return false, nil
@@ -479,7 +477,6 @@ func (s *Service) DeleteObjects(ctx context.Context, request *DeleteObjectsReque
 	// Delete each object
 	for _, obj := range request.Objects {
 		err := s.diskStorage.DeleteObject(ctx, request.Bucket, obj.Key, request.BypassGovernanceRetention)
-
 		if err != nil {
 			// Per S3 spec, DeleteObject is idempotent - treat not-found as success
 			if errors.Is(err, storage.ErrNoSuchKey) {

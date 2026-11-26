@@ -2,7 +2,6 @@ package global
 
 import (
 	"sync/atomic"
-
 	"uuid"
 )
 

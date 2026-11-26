@@ -3,7 +3,6 @@ package group
 import (
 	"context"
 	"errors"
-
 	"uuid"
 
 	"github.com/DirIO-S3/dirio/internal/persistence/metadata"

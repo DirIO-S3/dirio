@@ -3,7 +3,6 @@ package s3
 import (
 	"io"
 	"time"
-
 	"uuid"
 
 	"github.com/DirIO-S3/dirio/internal/persistence/metadata"

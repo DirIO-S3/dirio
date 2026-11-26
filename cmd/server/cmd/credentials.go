@@ -63,7 +63,8 @@ func runCredentialsSet(cmd *cobra.Command, _ []string) error {
 
 	if !data.ConfigDataExists(fs) {
 		return fmt.Errorf(
-			"no config.json found in %s — run \"dirio init\" first", dataDir)
+			"no config.json found in %s — run \"dirio init\" first", dataDir,
+		)
 	}
 
 	dc, err := data.LoadDataConfig(fs)

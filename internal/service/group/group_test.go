@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"testing"
-
 	"uuid"
 
 	"github.com/stretchr/testify/assert"

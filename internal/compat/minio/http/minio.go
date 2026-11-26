@@ -6,7 +6,6 @@ import (
 	"github.com/mallardduck/teapot-router/pkg/teapot"
 
 	loggingHttp "github.com/DirIO-S3/dirio/internal/http/middleware/logging"
-
 	"github.com/DirIO-S3/dirio/internal/logging"
 	"github.com/DirIO-S3/dirio/internal/service"
 	"github.com/DirIO-S3/dirio/internal/service/group"

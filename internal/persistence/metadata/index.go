@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"slices"
 	"time"
-
 	"uuid"
 
 	bbolt "go.etcd.io/bbolt"
@@ -132,7 +131,6 @@ func (m *Manager) reconcileIndexes(ctx context.Context) {
 
 		return nil
 	})
-
 	if err != nil {
 		fmt.Printf("Warning: failed to reconcile bolt indexes: %v\n", err)
 	}

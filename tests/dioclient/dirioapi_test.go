@@ -24,7 +24,8 @@ func newDirioClient(ts *testutil.TestServer) *dioclient.DirioClient {
 // attachPolicy is a test helper that attaches a named policy to a user.
 func attachPolicy(t *testing.T, ac interface {
 	AttachPolicy(context.Context, dioclient.PolicyAssociationReq) (dioclient.PolicyAssociationResp, error)
-}, ctx context.Context, policy, user string) {
+}, ctx context.Context, policy, user string,
+) {
 	t.Helper()
 	_, err := ac.AttachPolicy(ctx, dioclient.PolicyAssociationReq{
 		Policies: []string{policy},

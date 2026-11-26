@@ -2,7 +2,6 @@ package global
 
 import (
 	"testing"
-
 	"uuid"
 
 	"github.com/stretchr/testify/assert"

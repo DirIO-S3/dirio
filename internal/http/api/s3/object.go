@@ -15,11 +15,10 @@ import (
 
 	"github.com/mallardduck/go-http-helpers/pkg/headers"
 
-	"github.com/DirIO-S3/dirio/internal/http/response"
-
 	"github.com/DirIO-S3/dirio/internal/consts"
 	"github.com/DirIO-S3/dirio/internal/http/copysource"
 	"github.com/DirIO-S3/dirio/internal/http/middleware"
+	"github.com/DirIO-S3/dirio/internal/http/response"
 	"github.com/DirIO-S3/dirio/internal/logging"
 	"github.com/DirIO-S3/dirio/internal/service/s3"
 	"github.com/DirIO-S3/dirio/sdk/s3types"

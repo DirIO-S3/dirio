@@ -5,11 +5,12 @@ import (
 	"context"
 	"io"
 	"log/slog"
-	nethttp "net/http"
 	"time"
 
 	"github.com/mallardduck/go-http-helpers/pkg/headers"
 	"github.com/mallardduck/go-http-helpers/pkg/query"
+
+	nethttp "net/http"
 
 	"github.com/DirIO-S3/dirio/internal/http/auth"
 	"github.com/DirIO-S3/dirio/internal/logging"

@@ -8,9 +8,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/mallardduck/teapot-router/pkg/teapot"
+
 	dirioapi "github.com/DirIO-S3/dirio/internal/http/api/dirio"
 	"github.com/DirIO-S3/dirio/internal/http/server/stubs"
-	"github.com/mallardduck/teapot-router/pkg/teapot"
 )
 
 // routeTableGolden pins the full route table (method, pattern, name, action,
@@ -21,10 +22,11 @@ const routeTableGolden = "testdata/route_table.golden"
 func renderRouteTable(routes []teapot.RouteInfo) string {
 	var b strings.Builder
 	for _, rt := range routes {
-		var query, header []string
+		query := make([]string, 0, len(rt.QueryParams))
 		for _, q := range rt.QueryParams {
 			query = append(query, q.Key+"="+q.Value)
 		}
+		header := make([]string, 0, len(rt.HeaderParams))
 		for _, h := range rt.HeaderParams {
 			header = append(header, h.Key+"="+h.Value)
 		}

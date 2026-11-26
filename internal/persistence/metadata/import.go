@@ -5,15 +5,13 @@ import (
 	"fmt"
 	"path/filepath"
 	"time"
-
 	"uuid"
 
 	"github.com/go-git/go-billy/v5/util"
 
-	"github.com/DirIO-S3/dirio/internal/consts"
-
 	minioimport "github.com/DirIO-S3/dirio/internal/compat/minio/import"
 	"github.com/DirIO-S3/dirio/internal/config/data"
+	"github.com/DirIO-S3/dirio/internal/consts"
 	"github.com/DirIO-S3/dirio/internal/jsonutil"
 	"github.com/DirIO-S3/dirio/internal/logging"
 	"github.com/DirIO-S3/dirio/internal/persistence/path"
@@ -51,7 +49,6 @@ type ImportState struct {
 // before Phase 2 finished, this call skips Phase 1 and returns only the async
 // Phase 2 function (phase1Ran=false so DataConfig is not reloaded unnecessarily).
 func (m *Manager) CheckAndImportMinIO(ctx context.Context) (phase1Ran bool, asyncPhase func(context.Context), err error) {
-
 	if err := ctx.Err(); err != nil {
 		return false, nil, fmt.Errorf("context cancelled: %w", err)
 	}

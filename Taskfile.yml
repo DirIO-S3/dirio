@@ -211,6 +211,7 @@ tasks:
     desc: Format code
     cmds:
       - go fmt ./...
+      - golangci-lint fmt
 
   lint:
     desc: Run linter

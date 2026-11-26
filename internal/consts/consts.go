@@ -74,9 +74,7 @@ const (
 	AdminUUIDString = "badfc0de-fadd-fc0f-fee0-000dadbeef00"
 )
 
-var (
-	AdminUUID uuid.UUID = uuid.MustParse(AdminUUIDString)
-)
+var AdminUUID uuid.UUID = uuid.MustParse(AdminUUIDString)
 
 const (
 	DirIOMetadataDir = ".dirio"

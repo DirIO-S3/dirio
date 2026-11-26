@@ -11,23 +11,20 @@ import (
 	"slices"
 	"sync"
 	"time"
-
 	"uuid"
 
 	"github.com/go-git/go-billy/v5"
 	"github.com/go-git/go-billy/v5/util"
 	"github.com/phuslu/lru"
+
 	bbolt "go.etcd.io/bbolt"
 
 	"github.com/DirIO-S3/dirio/internal/consts"
-	"github.com/DirIO-S3/dirio/internal/logging"
-
 	contextInt "github.com/DirIO-S3/dirio/internal/context"
-
 	"github.com/DirIO-S3/dirio/internal/crypto"
-	"github.com/DirIO-S3/dirio/internal/persistence/path"
-
 	"github.com/DirIO-S3/dirio/internal/jsonutil"
+	"github.com/DirIO-S3/dirio/internal/logging"
+	"github.com/DirIO-S3/dirio/internal/persistence/path"
 	"github.com/DirIO-S3/dirio/sdk/iam"
 )
 
@@ -66,12 +63,14 @@ type Manager struct {
 }
 
 // Type aliases for backward compatibility
-type User = iam.User
-type Policy = iam.Policy
-type PolicyDocument = iam.PolicyDocument
-type PolicyStatement = iam.Statement
-type Group = iam.Group
-type ServiceAccount = iam.ServiceAccount
+type (
+	User            = iam.User
+	Policy          = iam.Policy
+	PolicyDocument  = iam.PolicyDocument
+	PolicyStatement = iam.Statement
+	Group           = iam.Group
+	ServiceAccount  = iam.ServiceAccount
+)
 
 // BucketMetadata represents bucket configuration
 type BucketMetadata struct {
@@ -1386,5 +1385,5 @@ func (m *Manager) MetricsSnapshot() (gets, misses, entries uint64, dbBytes int64
 	if info, err := os.Stat(m.db.Path()); err == nil {
 		dbBytes = info.Size()
 	}
-	return
+	return gets, misses, entries, dbBytes
 }

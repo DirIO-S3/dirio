@@ -3,7 +3,6 @@ package minioimport
 import (
 	"encoding/json"
 	"fmt"
-
 	"uuid"
 
 	"github.com/go-git/go-billy/v5"

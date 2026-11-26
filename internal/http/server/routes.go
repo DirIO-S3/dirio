@@ -6,22 +6,19 @@ import (
 
 	"github.com/mallardduck/teapot-router/pkg/teapot"
 
+	teapoturlbuilder "github.com/mallardduck/teapot-router/pkg/urlbuilder"
+
 	minioHTTP "github.com/DirIO-S3/dirio/internal/compat/minio/http"
-
-	dirioapi "github.com/DirIO-S3/dirio/internal/http/api/dirio"
-	"github.com/DirIO-S3/dirio/internal/http/server/prof"
-
+	"github.com/DirIO-S3/dirio/internal/consts"
 	"github.com/DirIO-S3/dirio/internal/http/api"
+	dirioapi "github.com/DirIO-S3/dirio/internal/http/api/dirio"
 	"github.com/DirIO-S3/dirio/internal/http/auth"
 	"github.com/DirIO-S3/dirio/internal/http/middleware"
 	httpresponse "github.com/DirIO-S3/dirio/internal/http/response"
 	"github.com/DirIO-S3/dirio/internal/http/server/favicon"
 	"github.com/DirIO-S3/dirio/internal/http/server/health"
 	"github.com/DirIO-S3/dirio/internal/http/server/metrics"
-
-	teapoturlbuilder "github.com/mallardduck/teapot-router/pkg/urlbuilder"
-
-	"github.com/DirIO-S3/dirio/internal/consts"
+	"github.com/DirIO-S3/dirio/internal/http/server/prof"
 	"github.com/DirIO-S3/dirio/internal/persistence/metadata"
 	"github.com/DirIO-S3/dirio/internal/policy"
 )
@@ -377,12 +374,12 @@ func setupS3Routes(r *teapot.Router, style routeStyle, deps *s3RouteDeps) {
 	// Bucket lifecycle configuration
 	// Note: Legacy GetBucketLifecycle/PutBucketLifecycle share the same path and query param
 	//       as the modern *Configuration variants; one route per method covers both.
-	r.QueryGET(bucketPattern, http.HandlerFunc(httpresponse.NotImplemented)).Query("lifecycle").Name("bucket.get-lifecycle-configuration").Action("s3:GetBucketLifecycleConfiguration")
-	r.QueryPUT(bucketPattern, http.HandlerFunc(httpresponse.NotImplemented)).Query("lifecycle").Name("bucket.put-lifecycle-configuration").Action("s3:PutBucketLifecycleConfiguration")
+	r.QueryGET(bucketPattern, httpresponse.NotImplemented).Query("lifecycle").Name("bucket.get-lifecycle-configuration").Action("s3:GetBucketLifecycleConfiguration")
+	r.QueryPUT(bucketPattern, httpresponse.NotImplemented).Query("lifecycle").Name("bucket.put-lifecycle-configuration").Action("s3:PutBucketLifecycleConfiguration")
 
 	// Public access block
-	r.QueryGET(bucketPattern, http.HandlerFunc(httpresponse.NotImplemented)).Query("publicAccessBlock").Name("bucket.get-public-access-block").Action("s3:GetPublicAccessBlock")
-	r.QueryPUT(bucketPattern, http.HandlerFunc(httpresponse.NotImplemented)).Query("publicAccessBlock").Name("bucket.put-public-access-block").Action("s3:PutPublicAccessBlock")
+	r.QueryGET(bucketPattern, httpresponse.NotImplemented).Query("publicAccessBlock").Name("bucket.get-public-access-block").Action("s3:GetPublicAccessBlock")
+	r.QueryPUT(bucketPattern, httpresponse.NotImplemented).Query("publicAccessBlock").Name("bucket.put-public-access-block").Action("s3:PutPublicAccessBlock")
 
 	// Object lock configuration
 	r.QueryGET(bucketPattern, deps.getBucketObjectLock).Query("object-lock").Name("bucket.get-object-lock-configuration").Action("s3:GetBucketObjectLockConfiguration")

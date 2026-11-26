@@ -120,7 +120,8 @@ func openDataConfig(cmd *cobra.Command) (string, *data.ConfigData, billy.Filesys
 	fs := osfs.New(dataDir)
 	if !data.ConfigDataExists(fs) {
 		return dataDir, nil, nil, fmt.Errorf(
-			"no config.json found in %s — run \"dirio init\" first", dataDir)
+			"no config.json found in %s — run \"dirio init\" first", dataDir,
+		)
 	}
 	dc, err := data.LoadDataConfig(fs)
 	if err != nil {

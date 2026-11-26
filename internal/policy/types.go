@@ -5,7 +5,6 @@ package policy
 
 import (
 	"time"
-
 	"uuid"
 
 	"github.com/DirIO-S3/dirio/internal/persistence/metadata"

@@ -4,7 +4,6 @@ import (
 	"net"
 	"testing"
 	"time"
-
 	"uuid"
 
 	"github.com/DirIO-S3/dirio/internal/policy/variables"

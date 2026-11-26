@@ -13,7 +13,6 @@ import (
 	"github.com/go-git/go-billy/v5"
 
 	"github.com/DirIO-S3/dirio/internal/consts"
-
 	"github.com/DirIO-S3/dirio/internal/logging"
 	"github.com/DirIO-S3/dirio/internal/persistence/metadata"
 	"github.com/DirIO-S3/dirio/internal/persistence/path"

@@ -3,7 +3,6 @@ package context
 import (
 	"context"
 	"fmt"
-
 	"uuid"
 
 	"github.com/DirIO-S3/dirio/sdk/iam"
