@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"time"
-
 	"uuid"
 
 	"github.com/DirIO-S3/dirio/internal/crypto"

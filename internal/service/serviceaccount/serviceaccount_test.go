@@ -3,7 +3,6 @@ package serviceaccount
 import (
 	"context"
 	"testing"
-
 	"uuid"
 
 	"github.com/stretchr/testify/assert"
@@ -155,7 +154,8 @@ func TestUpdate_SecretKey(t *testing.T) {
 	svc, repo := newMockService(t)
 	newSecret := "mynewlongsecretkey"
 	repo.EXPECT().GetServiceAccount(gomock.Any(), "svcacc1").Return(
-		&iam.ServiceAccount{AccessKey: "svcacc1", Status: iam.ServiceAcctStatusActive}, nil)
+		&iam.ServiceAccount{AccessKey: "svcacc1", Status: iam.ServiceAcctStatusActive}, nil,
+	)
 	repo.EXPECT().SaveServiceAccount(gomock.Any(), gomock.Any()).Return(nil)
 
 	got, err := svc.Update(context.Background(), "svcacc1", &UpdateServiceAccountRequest{SecretKey: &newSecret})
@@ -167,7 +167,8 @@ func TestUpdate_InvalidStatus(t *testing.T) {
 	svc, repo := newMockService(t)
 	bad := iam.ServiceAcctStatus("bad")
 	repo.EXPECT().GetServiceAccount(gomock.Any(), "svcacc1").Return(
-		&iam.ServiceAccount{AccessKey: "svcacc1", Status: iam.ServiceAcctStatusActive}, nil)
+		&iam.ServiceAccount{AccessKey: "svcacc1", Status: iam.ServiceAcctStatusActive}, nil,
+	)
 
 	_, err := svc.Update(context.Background(), "svcacc1", &UpdateServiceAccountRequest{Status: &bad})
 	assert.True(t, svcerrors.IsValidation(err))
@@ -178,12 +179,14 @@ func TestUpdate_InvalidStatus(t *testing.T) {
 func TestSetStatus_Disable(t *testing.T) {
 	svc, repo := newMockService(t)
 	repo.EXPECT().GetServiceAccount(gomock.Any(), "svcacc1").Return(
-		&iam.ServiceAccount{AccessKey: "svcacc1", Status: iam.ServiceAcctStatusActive}, nil)
+		&iam.ServiceAccount{AccessKey: "svcacc1", Status: iam.ServiceAcctStatusActive}, nil,
+	)
 	repo.EXPECT().SaveServiceAccount(gomock.Any(), gomock.Any()).DoAndReturn(
 		func(_ context.Context, sa *iam.ServiceAccount) error {
 			assert.Equal(t, iam.ServiceAcctStatusDisabled, sa.Status)
 			return nil
-		})
+		},
+	)
 
 	assert.NoError(t, svc.SetStatus(context.Background(), "svcacc1", iam.ServiceAcctStatusDisabled))
 }

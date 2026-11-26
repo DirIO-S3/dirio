@@ -3,7 +3,6 @@ package context
 import (
 	"context"
 	"testing"
-
 	"uuid"
 
 	"github.com/stretchr/testify/assert"

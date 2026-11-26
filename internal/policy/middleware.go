@@ -1,16 +1,16 @@
 package policy
 
 import (
-	stdcontext "context"
 	"log/slog"
 	"net/http"
 	"strings"
 	"time"
-
 	"uuid"
 
 	"github.com/mallardduck/go-http-helpers/pkg/headers"
 	"github.com/mallardduck/teapot-router/pkg/teapot"
+
+	stdcontext "context"
 
 	"github.com/DirIO-S3/dirio/internal/consts"
 	"github.com/DirIO-S3/dirio/internal/context"

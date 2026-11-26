@@ -8,8 +8,7 @@ import (
 var _ RouteHandlers = (*Handler)(nil)
 
 // Handler implements the /health, /health/ready, and /health/live endpoints.
-type Handler struct {
-}
+type Handler struct{}
 
 func (h Handler) Index() http.Handler {
 	return http.HandlerFunc(pprof.Index)

@@ -8,9 +8,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/mallardduck/teapot-router/pkg/teapot"
+
 	dirioapi "github.com/DirIO-S3/dirio/internal/http/api/dirio"
 	"github.com/DirIO-S3/dirio/internal/http/server/stubs"
-	"github.com/mallardduck/teapot-router/pkg/teapot"
 )
 
 // routeTableGolden pins the full route table (method, pattern, name, action,

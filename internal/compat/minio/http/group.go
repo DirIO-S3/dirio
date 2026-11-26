@@ -4,10 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"log/slog"
-	nethttp "net/http"
 
 	"github.com/mallardduck/go-http-helpers/pkg/headers"
 	"github.com/mallardduck/go-http-helpers/pkg/query"
+
+	nethttp "net/http"
 
 	"github.com/DirIO-S3/dirio/internal/logging"
 	svcerrors "github.com/DirIO-S3/dirio/internal/service/errors"

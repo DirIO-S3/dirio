@@ -18,7 +18,6 @@ func TestChunkedReader_SimpleChunk(t *testing.T) {
 
 	reader := NewChunkedReader(strings.NewReader(chunkedData))
 	result, err := io.ReadAll(reader)
-
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
 	}
@@ -35,7 +34,6 @@ func TestChunkedReader_MultipleChunks(t *testing.T) {
 
 	reader := NewChunkedReader(strings.NewReader(chunkedData))
 	result, err := io.ReadAll(reader)
-
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
 	}
@@ -52,7 +50,6 @@ func TestChunkedReader_EmptyChunk(t *testing.T) {
 
 	reader := NewChunkedReader(strings.NewReader(chunkedData))
 	result, err := io.ReadAll(reader)
-
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
 	}
@@ -97,7 +94,6 @@ func TestChunkedReader_LargeChunk(t *testing.T) {
 
 	reader := NewChunkedReader(strings.NewReader(chunkedData))
 	result, err := io.ReadAll(reader)
-
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
 	}
@@ -184,7 +180,6 @@ func TestChunkedReader_RealWorldFormat(t *testing.T) {
 
 	reader := NewChunkedReader(strings.NewReader(chunkedData))
 	result, err := io.ReadAll(reader)
-
 	if err != nil {
 		t.Fatalf("Expected no error, got: %v", err)
 	}

@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"testing"
-
 	"uuid"
 
 	"github.com/stretchr/testify/assert"
@@ -222,7 +221,8 @@ func TestAttachPolicy_Idempotent(t *testing.T) {
 	repo.EXPECT().GetPolicy(gomock.Any(), "ReadOnly").Return(&iam.Policy{Name: "ReadOnly"}, nil)
 	// Policy already attached; CreateOrUpdateUser should NOT be called.
 	repo.EXPECT().GetUser(gomock.Any(), uid).Return(
-		&iam.User{UUID: uid, AttachedPolicies: []string{"ReadOnly"}}, nil)
+		&iam.User{UUID: uid, AttachedPolicies: []string{"ReadOnly"}}, nil,
+	)
 
 	assert.NoError(t, svc.AttachPolicy(context.Background(), uid, "ReadOnly"))
 }
@@ -241,13 +241,15 @@ func TestDetachPolicy_Success(t *testing.T) {
 	svc, repo := newMockService(t)
 	uid := uuid.New()
 	repo.EXPECT().GetUser(gomock.Any(), uid).Return(
-		&iam.User{UUID: uid, AttachedPolicies: []string{"ReadOnly", "Other"}}, nil)
+		&iam.User{UUID: uid, AttachedPolicies: []string{"ReadOnly", "Other"}}, nil,
+	)
 	repo.EXPECT().CreateOrUpdateUser(gomock.Any(), gomock.Any()).DoAndReturn(
 		func(_ context.Context, u *iam.User) error {
 			assert.NotContains(t, u.AttachedPolicies, "ReadOnly")
 			assert.Contains(t, u.AttachedPolicies, "Other")
 			return nil
-		})
+		},
+	)
 
 	assert.NoError(t, svc.DetachPolicy(context.Background(), uid, "ReadOnly"))
 }

@@ -12,7 +12,6 @@ func TestNewOption(t *testing.T) {
 	options = make(map[string]RegisteredOption)
 
 	t.Run("creates option with defaults", func(t *testing.T) {
-
 		opt := NewOption("test-option", "default-value")
 
 		assert.Equal(t, "test-option", opt.GetName())
@@ -34,7 +33,6 @@ func TestNewOption(t *testing.T) {
 	})
 
 	t.Run("custom keys via functional options", func(t *testing.T) {
-
 		options = make(map[string]RegisteredOption) // reset
 		opt := NewOption("custom-opt", "value",
 			WithEnvKey("CUSTOM_ENV_KEY"),
@@ -48,7 +46,6 @@ func TestNewOption(t *testing.T) {
 	})
 
 	t.Run("WithoutEnv disables env", func(t *testing.T) {
-
 		options = make(map[string]RegisteredOption) // reset
 		opt := NewOption("no-env-opt", "value", WithoutEnv)
 
@@ -57,7 +54,6 @@ func TestNewOption(t *testing.T) {
 	})
 
 	t.Run("WithoutFlag disables flag", func(t *testing.T) {
-
 		options = make(map[string]RegisteredOption) // reset
 		opt := NewOption("no-flag-opt", "value", WithoutFlag)
 
@@ -144,7 +140,6 @@ func TestAllEnvValues(t *testing.T) {
 	defer os.Unsetenv("DIRIO_OPT_TWO")
 
 	t.Run("AllEnvValues returns all env-enabled options", func(t *testing.T) {
-
 		envVals := AllEnvValues()
 
 		assert.Len(t, envVals, 2) // opt-three is excluded
@@ -153,7 +148,6 @@ func TestAllEnvValues(t *testing.T) {
 	})
 
 	t.Run("ConfiguredEnvValues returns only set values", func(t *testing.T) {
-
 		os.Unsetenv("DIRIO_OPT_TWO") // unset one
 
 		envVals := ConfiguredEnvValues()

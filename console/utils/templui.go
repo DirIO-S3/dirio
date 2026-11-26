@@ -2,11 +2,10 @@
 package utils
 
 import (
+	"crypto/rand"
 	"fmt"
 	"maps"
 	"time"
-
-	"crypto/rand"
 
 	"github.com/a-h/templ"
 
@@ -31,7 +30,7 @@ func If[T comparable](condition bool, value T) T {
 
 // TwIfElse returns trueValue if condition is true, otherwise falseValue.
 // Example: true, "bg-red-500", "bg-gray-300" → "bg-red-500"
-func IfElse[T any](condition bool, trueValue T, falseValue T) T {
+func IfElse[T any](condition bool, trueValue, falseValue T) T {
 	if condition {
 		return trueValue
 	}

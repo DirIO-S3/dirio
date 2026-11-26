@@ -4,7 +4,6 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
-
 	"uuid"
 
 	"github.com/stretchr/testify/assert"

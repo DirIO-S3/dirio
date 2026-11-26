@@ -8,12 +8,12 @@ import (
 	"time"
 
 	"github.com/a-h/templ"
-	"github.com/mallardduck/teapot-router/pkg/teapot"
 
-	"github.com/DirIO-S3/dirio/console/components/toast"
+	"github.com/mallardduck/teapot-router/pkg/teapot"
 
 	consoleapi "github.com/DirIO-S3/dirio/api"
 	"github.com/DirIO-S3/dirio/console/auth"
+	"github.com/DirIO-S3/dirio/console/components/toast"
 	"github.com/DirIO-S3/dirio/console/ui"
 )
 

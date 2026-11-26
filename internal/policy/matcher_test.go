@@ -3,7 +3,6 @@ package policy
 import (
 	"context"
 	"testing"
-
 	"uuid"
 
 	"github.com/DirIO-S3/dirio/internal/persistence/metadata"

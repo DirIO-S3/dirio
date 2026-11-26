@@ -11,13 +11,14 @@ import (
 	"github.com/DirIO-S3/dirio/internal/http/server/prof"
 )
 
-var _ health.RouteHandlers = (*StubHandler)(nil)
-var _ metrics.RouteHandlers = (*StubHandler)(nil)
-var _ minioHTTP.RouteHandlers = (*StubHandler)(nil)
-var _ prof.RouteHandlers = (*StubHandler)(nil)
+var (
+	_ health.RouteHandlers    = (*StubHandler)(nil)
+	_ metrics.RouteHandlers   = (*StubHandler)(nil)
+	_ minioHTTP.RouteHandlers = (*StubHandler)(nil)
+	_ prof.RouteHandlers      = (*StubHandler)(nil)
+)
 
-type StubHandler struct {
-}
+type StubHandler struct{}
 
 func (s StubHandler) Index() http.Handler {
 	return teapot.NoopHandler

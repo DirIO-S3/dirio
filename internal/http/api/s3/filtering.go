@@ -1,12 +1,13 @@
 package s3
 
 import (
-	stdcontext "context"
 	"net/http"
 	"strings"
 	"time"
 
 	"github.com/mallardduck/go-http-helpers/pkg/headers"
+
+	stdcontext "context"
 
 	"github.com/DirIO-S3/dirio/internal/context"
 	"github.com/DirIO-S3/dirio/internal/policy"

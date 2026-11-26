@@ -3,7 +3,6 @@ package iam
 import (
 	"testing"
 	"time"
-
 	"uuid"
 
 	"github.com/stretchr/testify/assert"

@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strings"
 	"time"
-
 	"uuid"
 
 	"github.com/mallardduck/go-http-helpers/pkg/headers"

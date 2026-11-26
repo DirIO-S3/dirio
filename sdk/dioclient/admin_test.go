@@ -20,12 +20,15 @@ type mockAdminBackend struct {
 func (m *mockAdminBackend) ListServiceAccounts(_ context.Context, _ string) (ServiceAccountsListResp, error) {
 	return ServiceAccountsListResp{}, nil
 }
+
 func (m *mockAdminBackend) AddServiceAccount(_ context.Context, _ AddServiceAccountReq) (Credentials, error) {
 	return Credentials{}, nil
 }
+
 func (m *mockAdminBackend) InfoServiceAccount(_ context.Context, _ string) (ServiceAccountInfoResp, error) {
 	return ServiceAccountInfoResp{}, nil
 }
+
 func (m *mockAdminBackend) UpdateServiceAccount(_ context.Context, _ string, _ UpdateServiceAccountReq) error {
 	return nil
 }
@@ -38,17 +41,22 @@ func (m *mockAdminBackend) RemoveUser(_ context.Context, _ string) error { retur
 func (m *mockAdminBackend) GetUserInfo(_ context.Context, _ string) (UserInfo, error) {
 	return UserInfo{}, nil
 }
+
 func (m *mockAdminBackend) SetUserStatus(_ context.Context, _ string, _ AccountStatus) error {
 	return nil
 }
+
 func (m *mockAdminBackend) ListCannedPolicies(_ context.Context) (map[string]json.RawMessage, error) {
 	return nil, nil
 }
+
 func (m *mockAdminBackend) AddCannedPolicy(_ context.Context, _ string, _ []byte) error { return nil }
+
 func (m *mockAdminBackend) InfoCannedPolicyV1(_ context.Context, name string) (*PolicyInfo, error) {
 	m.v1Called = true
 	return &PolicyInfo{PolicyName: name}, m.err
 }
+
 func (m *mockAdminBackend) InfoCannedPolicyV2(_ context.Context, name string) (*PolicyInfo, error) {
 	m.v2Called = true
 	return &PolicyInfo{PolicyName: name}, m.err
@@ -57,6 +65,7 @@ func (m *mockAdminBackend) DeleteCannedPolicy(_ context.Context, _ string) error
 func (m *mockAdminBackend) AttachPolicy(_ context.Context, _ PolicyAssociationReq) (PolicyAssociationResp, error) {
 	return PolicyAssociationResp{}, nil
 }
+
 func (m *mockAdminBackend) DetachPolicy(_ context.Context, _ PolicyAssociationReq) (PolicyAssociationResp, error) {
 	return PolicyAssociationResp{}, nil
 }

@@ -8,7 +8,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-
 	"uuid"
 
 	"github.com/DirIO-S3/dirio/internal/logging"

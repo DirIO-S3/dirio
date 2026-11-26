@@ -1,10 +1,11 @@
 package s3
 
 import (
-	stdcontext "context"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	stdcontext "context"
 
 	"github.com/DirIO-S3/dirio/internal/context"
 	"github.com/DirIO-S3/dirio/internal/policy"

@@ -6,22 +6,19 @@ import (
 
 	"github.com/mallardduck/teapot-router/pkg/teapot"
 
+	teapoturlbuilder "github.com/mallardduck/teapot-router/pkg/urlbuilder"
+
 	minioHTTP "github.com/DirIO-S3/dirio/internal/compat/minio/http"
-
-	dirioapi "github.com/DirIO-S3/dirio/internal/http/api/dirio"
-	"github.com/DirIO-S3/dirio/internal/http/server/prof"
-
+	"github.com/DirIO-S3/dirio/internal/consts"
 	"github.com/DirIO-S3/dirio/internal/http/api"
+	dirioapi "github.com/DirIO-S3/dirio/internal/http/api/dirio"
 	"github.com/DirIO-S3/dirio/internal/http/auth"
 	"github.com/DirIO-S3/dirio/internal/http/middleware"
 	httpresponse "github.com/DirIO-S3/dirio/internal/http/response"
 	"github.com/DirIO-S3/dirio/internal/http/server/favicon"
 	"github.com/DirIO-S3/dirio/internal/http/server/health"
 	"github.com/DirIO-S3/dirio/internal/http/server/metrics"
-
-	teapoturlbuilder "github.com/mallardduck/teapot-router/pkg/urlbuilder"
-
-	"github.com/DirIO-S3/dirio/internal/consts"
+	"github.com/DirIO-S3/dirio/internal/http/server/prof"
 	"github.com/DirIO-S3/dirio/internal/persistence/metadata"
 	"github.com/DirIO-S3/dirio/internal/policy"
 )

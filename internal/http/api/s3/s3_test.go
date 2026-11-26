@@ -230,7 +230,6 @@ func TestWriteErrorResponse(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			w := httptest.NewRecorder()
 			err := WriteErrorResponse(w, tt.requestID, tt.errCode, httpresponse.SetErrAsMessage(tt.err))
-
 			if err != nil {
 				t.Errorf("WriteErrorResponse() unexpected error = %v", err)
 				return

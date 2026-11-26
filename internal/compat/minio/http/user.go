@@ -6,11 +6,12 @@ import (
 	"encoding/json"
 	"io"
 	"log/slog"
-	nethttp "net/http"
 	"strings"
 
 	"github.com/mallardduck/go-http-helpers/pkg/headers"
 	"github.com/mallardduck/go-http-helpers/pkg/query"
+
+	nethttp "net/http"
 
 	"github.com/DirIO-S3/dirio/internal/global"
 	"github.com/DirIO-S3/dirio/internal/http/auth"
