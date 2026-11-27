@@ -537,7 +537,7 @@ The `dio` ownership and simulation commands require HTTP endpoints that do not y
 - ✅ Refactor `routes.go`: `routeStyle` struct (bucket path segment + resolver func), parameterize `setupS3Routes`/`bucket()`/`object()`
 - ✅ Second `teapot.Router` instance for vhost-style S3 data-plane routes, built only when `CanonicalDomain != ""`
 - ✅ `hostRouter` — thin `http.Handler` in front of both routers, dispatches by `Host` via `vhost.BucketFromHost`
-- ✅ URL generation for vhost-style — local wrapper (`internal/http/urlbuilder`) rather than an upstream `teapot-router` extension, since teapot-router isn't vendored/replaced locally; mirrors the inbound request's style for `Location` headers and bucket/object URLs. CopyObject source parsing is still `NotImplemented` (Phase 3.2 #4), so nothing to wire there yet.
+- ✅ URL generation for vhost-style — local wrapper (`internal/http/urlbuilder`) rather than an upstream `teapot-router` extension, since teapot-router isn't vendored/replaced locally; mirrors the inbound request's style for `Location` headers and bucket/object URLs. CopyObject source parsing is implemented (`internal/http/copysource`), so vhost URL generation has nothing extra to wire there.
 - ✅ DNS: virtual-hosted style requires a real DNS wildcard or reverse proxy — documented in `docs/DEPLOYMENT.md` (mDNS covers the S3/admin endpoints only)
 - ✅ Document both styles in `docs/DEPLOYMENT.md`
 - ✅ Integration tests: same object round-trips via both styles; `/.dirio/*` and `/minio/admin/*` never served by the vhost router; full existing suite passes unmodified with `CanonicalDomain == ""`
@@ -627,6 +627,35 @@ The actual HTTP serving layer. Behavior is fundamentally different from the S3 A
 - [ ] **Sustained load test** — multipart uploads under a concurrent load using wrk/hey/k6; confirm no heap growth over time (builds on Phase 4.5 memory profiling baseline)
 - [ ] **Reverse proxy integration test** — run DirIO behind nginx in dual-port mode; verify `mc`, AWS CLI, and boto3 all work correctly including pre-signed URLs and chunked uploads
 
+## Phase 12: S3 API Gap Closure
+
+Operations that return 501 or have no route. The status table and reasons are in [docs/CLIENTS.md](docs/CLIENTS.md#unsupported-operations). Order is by client impact.
+
+### Route safety (do first)
+- [ ] **Explicit 501 for unregistered sub-resources** — register `?logging`, `?notification`, `?requestPayment`, `?analytics`, `?attributes`, `?torrent` routes that return 501, so these requests stop falling through to CreateBucket/ListObjects/GetObject. Add a test per route, and a test that `PUT /{bucket}?logging` does not create or modify a bucket.
+
+### Client-facing
+- [ ] **Bucket CORS** — `GetBucketCors` / `PutBucketCors` (browser uploads; TODO Tier 2)
+- [ ] **ListMultipartUploads** — `GET /{bucket}?uploads`, backed by the existing staging directories. Note: the Phase 3.2 "all 5 handlers" line above counts the per-upload handlers only.
+- [ ] **UploadPartCopy** — copy a byte range or whole object as a part; replace the stub in `internal/http/api/s3/multipart.go`
+
+### Security / access
+- [ ] **Bucket ACL and object ACL** — get/put. Decide whether to store ACLs or return a canned `private` response and reject other grants.
+- [ ] **Public access block** — get/put, enforced in the authorization middleware (`internal/policy/`)
+
+### Lifecycle
+- [ ] **Bucket lifecycle** — get/put of lifecycle rules. Imported lifecycle config from MinIO is already stored (TODO Phase 2, "Import all bucket metadata"); expiration needs a background worker, so plan it separately.
+
+### Versioning and Object Lock (tracked in the design doc)
+- [ ] **Bucket versioning and ListObjectVersions** — design in `docs/design/VERSIONING.md`; implementation starts after design review.
+
+### Later / low priority
+- [ ] **Bucket logging, notification, requestPayment, analytics** — accept the config as stored data where clients need it to succeed; no behaviour behind it yet
+- [ ] **GetObjectAttributes** — returns ETag, size, storage class from existing metadata; cheap to add
+- [ ] **GetObjectTorrent** — legacy; leave as 501 unless a client needs it
+
+---
+
 ## Phase N+: Any future work
 
 ### Optional Minio Compatibility Layer
@@ -679,7 +708,7 @@ Using "Core + Sidecar" approach:
 - [ ] Read path: checksum verify on open; on mismatch or missing file, load parity shards
 - [ ] RS decode in-memory; serve reconstructed data to client
 - [ ] Optional heal-to-disk after successful reconstruction (configurable)
-- [ ] Checksums stored in `.metadata/` (authoritative); xattrs written as supplementary hint where supported
+- [ ] Checksums stored in `.dirio/objects/` (authoritative); xattrs written as supplementary hint where supported
 
 ### V2 Milestone 4 — Background Scrubber
 
@@ -717,7 +746,8 @@ Using "Core + Sidecar" approach:
 Priority docs — these are the highest-value items for any external user of DirIO:
 
 - [ ] **Migration guide from MinIO** — extract the MinIO import section from README into `docs/MIGRATION.md`; expand with step-by-step walkthrough, data layout comparison, IAM import details, known differences, and a "what doesn't migrate" section. Designed to grow as the app matures.
-- [ ] **S3 API compliance status** — which operations are supported, which are intentionally omitted, known deviations from AWS S3 behavior; should reference CLIENTS.md
+- [x] **S3 API compliance status** — status matrix and known deviations now live in `docs/CLIENTS.md` (Object Lock section, Known Deviations). Keep that doc current when operations change.
+- [ ] **Versioning design doc** — `docs/design/VERSIONING.md` (layout, delete markers, bucket states, phasing). Design review comes before any implementation.
 - [ ] **Configuration guide** (CLI/ENV/YAML) — all flags, env vars, and config file keys in one place; data config vs app config distinction
 
 Reference docs (lower urgency):

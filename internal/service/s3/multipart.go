@@ -16,6 +16,7 @@ import (
 	"uuid"
 
 	"github.com/DirIO-S3/dirio/internal/persistence/path"
+	"github.com/DirIO-S3/dirio/internal/persistence/storage"
 )
 
 // ============================================================================
@@ -30,6 +31,11 @@ type multipartMetadata struct {
 	ContentType    string            `json:"contentType"`
 	CustomMetadata map[string]string `json:"customMetadata"`
 	Initiated      time.Time         `json:"initiated"`
+
+	// Explicit Object Lock settings given at initiate time. Applied on completion.
+	ObjectLockMode        string     `json:"objectLockMode,omitempty"`
+	ObjectLockRetainUntil *time.Time `json:"objectLockRetainUntil,omitempty"`
+	ObjectLockLegalHold   string     `json:"objectLockLegalHold,omitempty"`
 }
 
 // partMetadata stores metadataManager for an uploaded part
@@ -46,6 +52,12 @@ func (s *Service) CreateMultipartUpload(ctx context.Context, req *CreateMultipar
 	bucketMeta, err := s.metadataManager.GetBucketMetadata(ctx, req.Bucket)
 	if err != nil || bucketMeta == nil {
 		return nil, errors.New("bucket does not exist")
+	}
+
+	// Reject invalid Object Lock settings now, as AWS does at initiate time. The
+	// resolved options are discarded: they are computed again on completion.
+	if _, err := s.putOptionsFor(ctx, req.Bucket, req.ObjectLockMode, req.ObjectLockRetainUntil, req.ObjectLockLegalHold, false); err != nil {
+		return nil, err
 	}
 
 	// Generate unique upload ID
@@ -71,6 +83,10 @@ func (s *Service) CreateMultipartUpload(ctx context.Context, req *CreateMultipar
 		ContentType:    req.ContentType,
 		CustomMetadata: req.CustomMetadata,
 		Initiated:      time.Now(),
+
+		ObjectLockMode:        req.ObjectLockMode,
+		ObjectLockRetainUntil: req.ObjectLockRetainUntil,
+		ObjectLockLegalHold:   req.ObjectLockLegalHold,
 	}
 
 	metaBytes, err := json.Marshal(uploadMeta)
@@ -244,10 +260,16 @@ func (s *Service) CompleteMultipartUpload(ctx context.Context, req *CompleteMult
 		partFile.Close()
 	}
 
-	// Apply the bucket's default Object Lock retention, as a plain PutObject would
-	opts, err := s.putOptionsFor(ctx, req.Bucket, "", nil, "", false)
-	if err != nil {
-		return nil, fmt.Errorf("failed to resolve object lock: %w", err)
+	// Explicit lock settings from initiate win. Otherwise apply the bucket's
+	// default retention, as a plain PutObject would.
+	var opts storage.PutOptions
+	if hasExplicitLock(uploadMeta.ObjectLockMode, uploadMeta.ObjectLockRetainUntil, uploadMeta.ObjectLockLegalHold) {
+		opts = explicitPutOptions(uploadMeta.ObjectLockMode, uploadMeta.ObjectLockRetainUntil, uploadMeta.ObjectLockLegalHold)
+	} else {
+		opts, err = s.putOptionsFor(ctx, req.Bucket, "", nil, "", false)
+		if err != nil {
+			return nil, fmt.Errorf("failed to resolve object lock: %w", err)
+		}
 	}
 
 	// Store the complete object

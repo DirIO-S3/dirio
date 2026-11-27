@@ -71,7 +71,7 @@ This is a list of the S3 API actions and how they could be mapped to the `teapot
 
 * DeleteObjects (bulk delete efficiency)
 * ListObjects (legacy v1 support for older SDKs)
-* GetBucketVersioning, PutBucketVersioning
+* GetBucketVersioning, PutBucketVersioning (currently NotImplemented; planned, see VERSIONING.md)
 * GetBucketCors, PutBucketCors (critical for browser-based uploads)
 * GetObjectTagging, PutObjectTagging
 * UploadPartCopy
@@ -93,7 +93,7 @@ This is a list of the S3 API actions and how they could be mapped to the `teapot
 
 **Tier 5 (Advanced - Compliance & Locking):**
 
-Implemented for non-versioned buckets: bucket Object Lock configuration (GET/PUT `?object-lock`), object retention and legal hold (GET/PUT `?retention`, `?legal-hold`), default bucket retention, and enforcement on delete, multi-delete, overwrite (PutObject, CopyObject, multipart complete). Versioned-bucket lock semantics depend on versioning, which is not implemented.
+Implemented for non-versioned buckets: bucket Object Lock configuration (GET/PUT `?object-lock`), object retention and legal hold (GET/PUT `?retention`, `?legal-hold`), default bucket retention, and enforcement on delete, multi-delete, overwrite (PutObject, CopyObject, multipart complete). CopyObject and CreateMultipartUpload accept the `x-amz-object-lock-*` headers; the lock applies to the destination object. Versioned-bucket lock semantics depend on versioning, which is not implemented. Object Lock does not require versioning here, unlike AWS. See [CLIENTS.md](../CLIENTS.md#known-deviations-from-aws-s3) for the status table and deviations, and [VERSIONING.md](../design/VERSIONING.md) for the planned versioning design.
 
 * PutObjectLockConfiguration, GetObjectLockConfiguration
 * GetObjectRetention, PutObjectRetention

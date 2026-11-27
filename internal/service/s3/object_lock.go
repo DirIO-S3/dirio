@@ -133,6 +133,24 @@ func validRetentionMode(mode string) bool {
 // Write-time Object Lock resolution
 // ============================================================================
 
+// hasExplicitLock reports whether any Object Lock write setting was supplied.
+func hasExplicitLock(mode string, retainUntil *time.Time, legalHold string) bool {
+	return mode != "" || retainUntil != nil || legalHold != ""
+}
+
+// explicitPutOptions converts explicit Object Lock settings into storage options
+// without re-checking them against the clock or the bucket. Use it only for
+// settings that putOptionsFor has already validated, such as those recorded when
+// a multipart upload was initiated, which may be older than the retain-until date.
+func explicitPutOptions(mode string, retainUntil *time.Time, legalHold string) storage.PutOptions {
+	var opts storage.PutOptions
+	opts.LegalHold = legalHold == s3types.LegalHoldStatusOn
+	if mode != "" && retainUntil != nil {
+		opts.Retention = &metadata.ObjectRetention{Mode: mode, RetainUntil: *retainUntil}
+	}
+	return opts
+}
+
 // putOptionsFor resolves the Object Lock state a newly written object should get.
 // Explicit request settings take precedence; otherwise the bucket's default
 // retention applies. Explicit settings on a bucket without Object Lock are rejected.
@@ -143,7 +161,7 @@ func (s *Service) putOptionsFor(ctx context.Context, bucket, mode string, retain
 	if err != nil {
 		return storage.PutOptions{}, err
 	}
-	hasExplicit := mode != "" || retainUntil != nil || legalHold != ""
+	hasExplicit := hasExplicitLock(mode, retainUntil, legalHold)
 
 	if !enabled {
 		if hasExplicit {

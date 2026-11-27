@@ -26,12 +26,12 @@ The primary mount point. Files are stored 1:1 with the S3 object path. This disk
 /mnt/disk_main/
 └── movies/
     └── gopher.mp4        ← the actual file, accessible directly
-└── .metadata/
+└── .dirio/objects/
     └── movies/
         └── gopher.mp4.json   ← ETag, content-type, checksum, EC manifest ref
 ```
 
-Object metadata (content-type, ETag, custom headers) is stored in DirIO's existing `.metadata/` layer, consistent with V1 behaviour. Extended attributes (xattrs) are used where available as a secondary integrity hint but are never the sole source of truth, as xattr support varies across filesystems (notably absent or limited on NTFS, some NFS mounts, and network-attached storage).
+Object metadata (content-type, ETag, custom headers) is stored in DirIO's existing `.dirio/` metadata layer, consistent with V1 behaviour. Extended attributes (xattrs) are used where available as a secondary integrity hint but are never the sole source of truth, as xattr support varies across filesystems (notably absent or limited on NTFS, some NFS mounts, and network-attached storage).
 
 ### B. Parity Tier (Secondary Disks)
 
@@ -86,7 +86,7 @@ To maintain performance, DirIO uses a parallelised streaming approach rather tha
 
 ## 5. Integrity & Metadata
 
-- **Checksums:** SHA-256 or HighwayHash digests are stored in DirIO's `.metadata/` layer alongside existing object metadata. xattrs may be written as a supplementary hint on filesystems that support them, but `.metadata/` is authoritative.
+- **Checksums:** SHA-256 or HighwayHash digests are stored in DirIO's `.dirio/` metadata layer alongside existing object metadata. xattrs may be written as a supplementary hint on filesystems that support them, but `.dirio/objects/` is authoritative.
 - **Parity manifest:** A small sidecar JSON file accompanies each parity set, recording the EC configuration (k+m values, shard count, algorithm version) used when the object was written. This allows safe reconstruction even if global config changes later.
 
 ---
@@ -95,7 +95,7 @@ To maintain performance, DirIO uses a parallelised streaming approach rather tha
 
 A background goroutine crawls the Data Tier on a configurable schedule:
 
-1. Reads each object and verifies its checksum against `.metadata/`.
+1. Reads each object and verifies its checksum against `.dirio/objects/`.
 2. On mismatch, attempts reconstruction from parity shards.
 3. If reconstruction succeeds, heals the data file back to disk and logs the event.
 4. If reconstruction fails (insufficient shards), marks the object as degraded and raises an alert.
@@ -110,7 +110,7 @@ The scrubber runs at low priority and is IO-throttled to avoid impacting foregro
 /mnt/disk_main/                     ← User-facing
 └── movies/
     └── gopher.mp4                  ← The actual video file
-└── .metadata/
+└── .dirio/objects/
     └── movies/
         └── gopher.mp4.json         ← ETag, content-type, checksum, EC manifest ref
 
@@ -162,7 +162,7 @@ storage:
 
 | Phase | Item |
 |---|---|
-| V1 (current) | Standard driver, `.metadata/` layer, mDNS, S3 core API, IAM, console |
+| V1 (current) | Standard driver, `.dirio/` metadata layer, mDNS, S3 core API, IAM, console |
 | V2 milestone 1 | `StorageCoordinator` interface + driver abstraction layer |
 | V2 milestone 2 | Sidecar EC write path (TeeReader + parallel flush) |
 | V2 milestone 3 | Degraded read + in-memory reconstruction |

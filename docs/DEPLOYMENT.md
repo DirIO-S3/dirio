@@ -473,7 +473,7 @@ journalctl -u dirio -f
 
 ```bash
 # Check data directory size
-du -sh /data/dirio/buckets
+du -sh /data/dirio --exclude=.dirio
 ```
 
 ---
@@ -487,7 +487,7 @@ DirIO data is just files. Back up the data directory:
 rsync -av /data/dirio/ /backup/dirio/
 ```
 
-**Important**: Back up both `buckets/` and `.metadata/` directories.
+**Important**: Back up the bucket directories and `.dirio/` together. `.dirio/` holds bucket policies, Object Lock configuration and per-object lock state, IAM data, and the index. Object bytes alone are not a complete backup. Don't copy `.dirio-uploads/` (in-progress uploads, cleared at startup).
 
 ---
 
@@ -682,8 +682,8 @@ services:
 ### Public Read Buckets
 
 ```bash
-# Set bucket policy to public-read (future feature)
-# For now, use reverse proxy with authentication
+# Set a public-read bucket policy with the S3 API (bucket policies are implemented)
+# Use a reverse proxy with authentication if you need to limit exposure
 ```
 
 ### Multiple Data Directories
@@ -691,5 +691,5 @@ services:
 Not supported. Use symlinks if needed:
 
 ```bash
-ln -s /mnt/disk2/more-buckets /data/dirio/buckets/extra
+ln -s /mnt/disk2/more-buckets /data/dirio/extra
 ```

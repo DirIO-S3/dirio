@@ -18,15 +18,15 @@ Built as a drop-in replacement for MinIO's discontinued **single-node filesystem
 ## Philosophy
 
 - Objects are files. Buckets are directories. That's it.
-- No database. Metadata lives in simple JSON files.
+- Metadata lives in simple JSON files, with a small embedded index (bbolt).
 - One binary. One data directory. Zero ceremony.
 - Import your existing MinIO data and keep going.
 
 ## What DirIO Does
 
 - Serves S3 API requests over HTTP
-- Stores objects as regular files in `buckets/`
-- Maintains metadata in `.metadata/` (JSON files)
+- Stores objects as regular files under `<data-dir>/<bucket>/`
+- Maintains metadata and config in `<data-dir>/.dirio/`
 - Imports from MinIO's `.minio.sys/` on first boot
 - Runs in a container on your NAS
 
@@ -34,7 +34,8 @@ Built as a drop-in replacement for MinIO's discontinued **single-node filesystem
 
 - Distributed storage / clustering
 - Built-in replication
-- Advanced S3 features (yet)
+- Bucket versioning (planned, see [docs/design/VERSIONING.md](docs/design/VERSIONING.md))
+- Object Lock on versioned buckets (depends on versioning; see [docs/CLIENTS.md](docs/CLIENTS.md))
 - Replace production-grade S3 implementations
 - Read MinIO's erasure-coded/distributed backend data (only legacy single-node FS-mode data)
 
@@ -68,7 +69,10 @@ See [QUICKSTART.md](QUICKSTART.md) for detailed setup.
 | Objects  | GET, PUT, HEAD, DELETE, LIST, COPY, Multipart Upload |
 | Buckets  | CREATE, DELETE, HEAD, LIST, GetLocation, Policy (GET/PUT/DELETE) |
 | Metadata | Custom metadata, Object tagging |
+| Locking  | Object Lock on non-versioned buckets: retention (GOVERNANCE/COMPLIANCE), legal hold, bucket default retention |
 | Advanced | Presigned URLs, Range requests |
+
+For per-operation status and known deviations from AWS S3, see [docs/CLIENTS.md](docs/CLIENTS.md).
 
 ## IAM & Authorization
 
@@ -93,10 +97,10 @@ Point DirIO at your existing MinIO FS-mode data directory. It will:
 
 1. Find `.minio.sys/`
 2. Import users, bucket policies, and object metadata
-3. Write to `.metadata/` (your MinIO files stay untouched)
+3. Write metadata to `.dirio/` (your MinIO files stay untouched)
 4. Track import state to detect changes
 
-You can switch back to MinIO anytime. The `buckets/` directory is shared.
+You can switch back to MinIO anytime. The bucket directories under the data dir are shared.
 
 ## Contributing & Development
 
