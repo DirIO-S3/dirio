@@ -405,6 +405,11 @@ func (s *Service) CopyObject(ctx context.Context, req *CopyObjectRequest) (strin
 		Content:        obj.Content,
 		ContentType:    req.ContentType,
 		CustomMetadata: req.CustomMetadata,
+
+		ObjectLockMode:            req.ObjectLockMode,
+		ObjectLockRetainUntil:     req.ObjectLockRetainUntil,
+		ObjectLockLegalHold:       req.ObjectLockLegalHold,
+		BypassGovernanceRetention: req.BypassGovernanceRetention,
 	})
 }
 

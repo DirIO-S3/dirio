@@ -420,6 +420,12 @@ func (h *HTTPHandler) CopyObject(w http.ResponseWriter, r *http.Request, bucket,
 		return
 	}
 
+	lockMode, lockRetainUntil, lockLegalHold, err := objectLockWriteHeaders(r)
+	if err != nil {
+		writeObjectLockError(w, r, err)
+		return
+	}
+
 	// HeadObject on the source serves two purposes: it gives us the
 	// ETag/LastModified needed to evaluate the copy-source-if-* conditional
 	// headers, and — for the default COPY metadata-directive — it's the
@@ -452,12 +458,16 @@ func (h *HTTPHandler) CopyObject(w http.ResponseWriter, r *http.Request, bucket,
 	}
 
 	_, err = h.s3Service.CopyObject(r.Context(), &s3.CopyObjectRequest{
-		SourceBucket:   sourceBucket,
-		SourceKey:      sourceKey,
-		DestBucket:     bucket,
-		DestKey:        key,
-		ContentType:    contentType,
-		CustomMetadata: customMetadata,
+		SourceBucket:              sourceBucket,
+		SourceKey:                 sourceKey,
+		DestBucket:                bucket,
+		DestKey:                   key,
+		ContentType:               contentType,
+		CustomMetadata:            customMetadata,
+		ObjectLockMode:            lockMode,
+		ObjectLockRetainUntil:     lockRetainUntil,
+		ObjectLockLegalHold:       lockLegalHold,
+		BypassGovernanceRetention: bypassGovernanceRequested(r),
 	})
 	if err != nil {
 		switch {

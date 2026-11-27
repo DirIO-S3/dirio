@@ -141,6 +141,23 @@ func AuthorizationMiddleware(config *AuthorizationConfig) func(http.Handler) htt
 					writeAccessDenied(w, r)
 					return
 				}
+
+				// The copy replaces the destination object, so a GOVERNANCE bypass
+				// request is checked against the destination like any other write.
+				destBucketOwner, destObjectOwner := fetchOwnership(r.Context(), config.Metadata, bucket, key)
+				destCtx := &RequestContext{
+					Principal:       principal,
+					Resource:        &Resource{Bucket: bucket, Key: key},
+					Conditions:      conditions,
+					VarContext:      varCtx,
+					BucketOwnerUUID: destBucketOwner,
+					ObjectOwnerUUID: destObjectOwner,
+				}
+				if !governanceBypassAllowed(r, config.Engine, destCtx, routeAction) {
+					setLogAuthz(r, "deny")
+					writeAccessDenied(w, r)
+					return
+				}
 			} else {
 				// Single resource operation
 				resource := &Resource{
@@ -205,7 +222,9 @@ func AuthorizationMiddleware(config *AuthorizationConfig) func(http.Handler) htt
 // x-amz-bypass-governance-retention header.
 func acceptsBypassGovernance(action string) bool {
 	switch action {
-	case "s3:DeleteObject", "s3:DeleteObjects", "s3:PutObject", "s3:PutObjectRetention":
+	// CopyObject replaces the destination, so it honors the bypass too. Without
+	// this entry the header passes through unchecked to the storage layer.
+	case "s3:DeleteObject", "s3:DeleteObjects", "s3:PutObject", "s3:CopyObject", "s3:PutObjectRetention":
 		return true
 	}
 	return false

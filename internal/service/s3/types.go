@@ -108,6 +108,16 @@ type CopyObjectRequest struct {
 	DestKey        string
 	ContentType    string
 	CustomMetadata map[string]string
+
+	// Object Lock settings for the destination, from x-amz-object-lock-*
+	// headers on the copy request. Same rules as PutObjectRequest.
+	ObjectLockMode        string
+	ObjectLockRetainUntil *time.Time
+	ObjectLockLegalHold   string
+
+	// BypassGovernanceRetention allows replacing a destination object under
+	// GOVERNANCE retention. The handler sets it only after authorization.
+	BypassGovernanceRetention bool
 }
 
 // DeleteObjectRequest represents a request to delete an object
@@ -161,6 +171,12 @@ type CreateMultipartUploadRequest struct {
 	Key            string
 	ContentType    string
 	CustomMetadata map[string]string
+
+	// Object Lock settings from x-amz-object-lock-* headers. Validated when the
+	// upload is initiated and applied to the object on completion.
+	ObjectLockMode        string
+	ObjectLockRetainUntil *time.Time
+	ObjectLockLegalHold   string
 }
 
 // CreateMultipartUploadResponse represents the response from initiating a multipart upload

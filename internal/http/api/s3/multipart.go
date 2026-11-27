@@ -33,17 +33,30 @@ func (h *HTTPHandler) CreateMultipartUpload(w http.ResponseWriter, r *http.Reque
 		}
 	}
 
+	lockMode, lockRetainUntil, lockLegalHold, err := objectLockWriteHeaders(r)
+	if err != nil {
+		writeObjectLockError(w, r, err)
+		return
+	}
+
 	// Create multipart upload
 	req := &s3.CreateMultipartUploadRequest{
-		Bucket:         bucket,
-		Key:            key,
-		ContentType:    contentType,
-		CustomMetadata: customMetadata,
+		Bucket:                bucket,
+		Key:                   key,
+		ContentType:           contentType,
+		CustomMetadata:        customMetadata,
+		ObjectLockMode:        lockMode,
+		ObjectLockRetainUntil: lockRetainUntil,
+		ObjectLockLegalHold:   lockLegalHold,
 	}
 
 	resp, err := h.s3Service.CreateMultipartUpload(r.Context(), req)
 	if err != nil {
 		requestID := middleware.GetRequestID(r.Context())
+		if isObjectLockError(err) {
+			writeObjectLockError(w, r, err)
+			return
+		}
 		_ = WriteErrorResponse(w, requestID, s3types.ErrCodeInternalError)
 		return
 	}
