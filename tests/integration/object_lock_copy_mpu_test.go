@@ -102,9 +102,9 @@ func TestObjectLock_CopyObjectHeadersRejectedOnUnlockedBucket(t *testing.T) {
 }
 
 // initiateMultipart starts a multipart upload with the given extra headers and returns its UploadId.
-func initiateMultipart(t *testing.T, ts *testutil.TestServer, bucket, key string, extra map[string]string) (*http.Response, string) {
+func initiateMultipart(t *testing.T, ts *testutil.TestServer, bucket, key string, extra map[string]string) (resp *http.Response, uploadID string) {
 	t.Helper()
-	resp := doObjectRequest(t, ts, http.MethodPost, ts.ObjectURL(bucket, key)+"?uploads", nil, extra)
+	resp = doObjectRequest(t, ts, http.MethodPost, ts.ObjectURL(bucket, key)+"?uploads", nil, extra)
 	if resp.StatusCode != http.StatusOK {
 		return resp, ""
 	}

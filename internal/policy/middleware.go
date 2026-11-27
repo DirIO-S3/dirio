@@ -136,24 +136,7 @@ func AuthorizationMiddleware(config *AuthorizationConfig) func(http.Handler) htt
 					varCtx,
 					config.Metadata,
 				)
-				if !decision.IsAllowed() {
-					setLogAuthz(r, "deny")
-					writeAccessDenied(w, r)
-					return
-				}
-
-				// The copy replaces the destination object, so a GOVERNANCE bypass
-				// request is checked against the destination like any other write.
-				destBucketOwner, destObjectOwner := fetchOwnership(r.Context(), config.Metadata, bucket, key)
-				destCtx := &RequestContext{
-					Principal:       principal,
-					Resource:        &Resource{Bucket: bucket, Key: key},
-					Conditions:      conditions,
-					VarContext:      varCtx,
-					BucketOwnerUUID: destBucketOwner,
-					ObjectOwnerUUID: destObjectOwner,
-				}
-				if !governanceBypassAllowed(r, config.Engine, destCtx, routeAction) {
+				if !decision.IsAllowed() || !destinationBypassAllowed(r, config, principal, bucket, key, conditions, varCtx, routeAction) {
 					setLogAuthz(r, "deny")
 					writeAccessDenied(w, r)
 					return
@@ -233,6 +216,30 @@ func acceptsBypassGovernance(action string) bool {
 // requestsBypassGovernance reports whether the request sets x-amz-bypass-governance-retention: true.
 func requestsBypassGovernance(r *http.Request) bool {
 	return strings.EqualFold(r.Header.Get(consts.HeaderBypassGovernanceRetention), "true")
+}
+
+// destinationBypassAllowed applies the GOVERNANCE bypass check to a multi-resource
+// write (CopyObject). The copy replaces the destination object, so the bypass is
+// checked against the destination bucket and key.
+func destinationBypassAllowed(
+	r *http.Request,
+	config *AuthorizationConfig,
+	principal *Principal,
+	bucket, key string,
+	conditions *ConditionContext,
+	varCtx *variables.Context,
+	routeAction string,
+) bool {
+	bucketOwner, objectOwner := fetchOwnership(r.Context(), config.Metadata, bucket, key)
+	destCtx := &RequestContext{
+		Principal:       principal,
+		Resource:        &Resource{Bucket: bucket, Key: key},
+		Conditions:      conditions,
+		VarContext:      varCtx,
+		BucketOwnerUUID: bucketOwner,
+		ObjectOwnerUUID: objectOwner,
+	}
+	return governanceBypassAllowed(r, config.Engine, destCtx, routeAction)
 }
 
 // governanceBypassAllowed reports whether the request may proceed with respect to
