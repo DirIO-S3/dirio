@@ -632,7 +632,7 @@ The actual HTTP serving layer. Behavior is fundamentally different from the S3 A
 Operations that return 501 or have no route. The status table and reasons are in [docs/CLIENTS.md](docs/CLIENTS.md#unsupported-operations). Order is by client impact.
 
 ### Route safety (do first)
-- [ ] **Explicit 501 for unregistered sub-resources** — register `?logging`, `?notification`, `?requestPayment`, `?analytics`, `?attributes`, `?torrent` routes that return 501, so these requests stop falling through to CreateBucket/ListObjects/GetObject. Add a test per route, and a test that `PUT /{bucket}?logging` does not create or modify a bucket.
+- [x] **Explicit 501 for unregistered sub-resources** — `?logging`, `?notification`, `?requestPayment`, `?analytics` (GET and PUT) and `?attributes`, `?torrent` now return 501 from explicit routes. Tests in `tests/integration/unsupported_subresource_test.go` cover each route and check that a PUT does not change the bucket. The route golden file is updated.
 
 ### Client-facing
 - [ ] **Bucket CORS** — `GetBucketCors` / `PutBucketCors` (browser uploads; TODO Tier 2)

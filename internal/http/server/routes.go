@@ -381,6 +381,17 @@ func setupS3Routes(r *teapot.Router, style routeStyle, deps *s3RouteDeps) {
 	r.QueryGET(bucketPattern, httpresponse.NotImplemented).Query("publicAccessBlock").Name("bucket.get-public-access-block").Action("s3:GetPublicAccessBlock")
 	r.QueryPUT(bucketPattern, httpresponse.NotImplemented).Query("publicAccessBlock").Name("bucket.put-public-access-block").Action("s3:PutPublicAccessBlock")
 
+	// Unsupported bucket sub-resources. Registered explicitly so these requests
+	// get 501 instead of falling through to CreateBucket or ListObjects.
+	r.QueryGET(bucketPattern, httpresponse.NotImplemented).Query("logging").Name("bucket.get-logging").Action("s3:GetBucketLogging")
+	r.QueryPUT(bucketPattern, httpresponse.NotImplemented).Query("logging").Name("bucket.put-logging").Action("s3:PutBucketLogging")
+	r.QueryGET(bucketPattern, httpresponse.NotImplemented).Query("notification").Name("bucket.get-notification").Action("s3:GetBucketNotificationConfiguration")
+	r.QueryPUT(bucketPattern, httpresponse.NotImplemented).Query("notification").Name("bucket.put-notification").Action("s3:PutBucketNotificationConfiguration")
+	r.QueryGET(bucketPattern, httpresponse.NotImplemented).Query("requestPayment").Name("bucket.get-request-payment").Action("s3:GetBucketRequestPayment")
+	r.QueryPUT(bucketPattern, httpresponse.NotImplemented).Query("requestPayment").Name("bucket.put-request-payment").Action("s3:PutBucketRequestPayment")
+	r.QueryGET(bucketPattern, httpresponse.NotImplemented).Query("analytics").Name("bucket.get-analytics").Action("s3:GetAnalyticsConfiguration")
+	r.QueryPUT(bucketPattern, httpresponse.NotImplemented).Query("analytics").Name("bucket.put-analytics").Action("s3:PutAnalyticsConfiguration")
+
 	// Object lock configuration
 	r.QueryGET(bucketPattern, deps.getBucketObjectLock).Query("object-lock").Name("bucket.get-object-lock-configuration").Action("s3:GetBucketObjectLockConfiguration")
 	r.QueryPUT(bucketPattern, deps.putBucketObjectLock).Query("object-lock").Name("bucket.put-object-lock-configuration").Action("s3:PutBucketObjectLockConfiguration")
@@ -422,6 +433,10 @@ func setupS3Routes(r *teapot.Router, style routeStyle, deps *s3RouteDeps) {
 
 	// Query-based object operations
 	r.QueryGET(objectPattern, deps.getObjectACL).Query("acl").Name("objects.acl.show").Action("s3:GetObjectAcl")
+
+	// Unsupported object sub-resources: explicit 501 rather than falling through to GetObject.
+	r.QueryGET(objectPattern, httpresponse.NotImplemented).Query("attributes").Name("objects.attributes").Action("s3:GetObjectAttributes")
+	r.QueryGET(objectPattern, httpresponse.NotImplemented).Query("torrent").Name("objects.torrent").Action("s3:GetObjectTorrent")
 
 	// Object tagging
 	r.QueryGET(objectPattern, deps.getObjectTagging).Query("tagging").Name("objects.tagging.show").Action("s3:GetObjectTagging")
