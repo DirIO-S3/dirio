@@ -129,10 +129,10 @@ These S3 operations are not implemented. A request for them gets a 501 NotImplem
 | UploadPartCopy | `PUT /{bucket}/{key}?partNumber&uploadId` with `x-amz-copy-source` | 501 NotImplemented (route is wired, handler is a stub) | Phase 12 |
 | GetBucketLifecycle / PutBucketLifecycleConfiguration (and the Get variant) | `GET/PUT /{bucket}?lifecycle` | 501 NotImplemented | Phase 12 |
 | GetPublicAccessBlock / PutPublicAccessBlock | `GET/PUT /{bucket}?publicAccessBlock` | 501 NotImplemented | Phase 12 |
-| Bucket logging, notification, requestPayment, analytics | `?logging`, `?notification`, `?requestPayment`, `?analytics` | No route registered. The request reaches the bucket's default handler, so behaviour is undefined until fixed. | Phase 12 (add explicit 501 routes) |
-| GetObjectAttributes, GetObjectTorrent | `GET /{bucket}/{key}?attributes`, `?torrent` | No route registered (same as above) | Phase 12 |
+| Bucket logging, notification, requestPayment, analytics | `GET/PUT /{bucket}?logging`, `?notification`, `?requestPayment`, `?analytics` | 501 NotImplemented | Phase 12 (store as config where clients need it) |
+| GetObjectAttributes, GetObjectTorrent | `GET /{bucket}/{key}?attributes`, `?torrent` | 501 NotImplemented | Phase 12 |
 
-**Note on the last two rows:** a sub-resource without a registered route is not a clean 501. The request can fall through to the plain bucket or object handler, so a `PUT /{bucket}?logging` could reach CreateBucket. This has not been tested yet; Phase 12 includes a test for it.
+**Note:** these sub-resources have explicit routes returning 501, so a request for one never reaches CreateBucket, ListObjects, or GetObject. Tests in `tests/integration/unsupported_subresource_test.go` cover each route and confirm that a PUT does not change the bucket.
 
 ---
 
