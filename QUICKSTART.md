@@ -43,9 +43,9 @@ aws --endpoint-url http://localhost:9000 s3 cp s3://test/test.txt downloaded.txt
 cat downloaded.txt  # Should print "Hello DirIO"
 ```
 
-Your file is now at: `data/buckets/test/test.txt`
+Your file is now at: `data/test/test.txt`
 
-Check it: `cat data/buckets/test/test.txt`
+Check it: `cat data/test/test.txt`
 
 ## Run with Docker
 
@@ -97,14 +97,14 @@ When DirIO starts, it creates:
 
 ```
 data/
-├── .metadata/              # DirIO metadata (JSON)
-│   ├── users.json
+├── .dirio/                # DirIO metadata, config and index
 │   ├── buckets/
-│   └── .import-state
+│   ├── objects/
+│   ├── iam/
+│   └── dirio.db
 ├── .minio.sys/            # MinIO metadata (if migrating)
-└── buckets/               # Your objects
-    └── test/
-        └── test.txt       # Regular file!
+└── test/                  # Your bucket (one directory per bucket)
+    └── test.txt           # Regular file!
 ```
 
 ## Next Steps

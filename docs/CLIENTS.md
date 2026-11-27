@@ -2,7 +2,7 @@
 
 DirIO's compatibility status with major S3 clients.
 
-**Last Updated:** February 23, 2026 (00:05 EST)
+**Last Updated:** November 26, 2026 (Object Lock and copy/multipart lock headers added)
 **Test Framework:** Structured JSON output with automated feature matrix
 **Test Location:** `tests/clients/`
 
@@ -72,6 +72,30 @@ All clients test the same 23 canonical S3 operations defined in `tests/clients/f
 | PreSignedURL_Upload | ✅ | ✅ | ✅ | AWS CLI/boto3 not applicable (N/A = pass); mc uses S3 POST Policy |
 | MultipartUpload | ✅ | ✅ | ✅ | Large file uploads with full content integrity verification |
 
+### Object Lock and Versioning
+
+These rows are **server-verified** by the integration tests in `tests/integration/object_lock_test.go` and `tests/integration/object_lock_copy_mpu_test.go`. They are not yet part of the 23-operation client matrix above, so no client has been run against them.
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| Bucket Object Lock at creation (`X-Amz-Bucket-Object-Lock-Enabled`) | ✅ | Non-versioned buckets only (see deviations) |
+| GetBucketObjectLockConfiguration / PutBucketObjectLockConfiguration | ✅ | Includes default retention rule |
+| PutObject lock headers (mode, retain-until, legal hold) | ✅ | Bucket default applies when no explicit lock is given |
+| CopyObject lock headers | ✅ | Applied to the destination object |
+| CreateMultipartUpload lock headers | ✅ | Validated at initiate; applied on completion |
+| GetObjectRetention / PutObjectRetention | ✅ | COMPLIANCE cannot be shortened; GOVERNANCE shortening needs bypass |
+| GetObjectLegalHold / PutObjectLegalHold | ✅ | Blocks delete and overwrite |
+| Enforcement: DeleteObject, DeleteObjects, PutObject, CopyObject, multipart complete | ✅ | Multi-delete reports locked keys per key |
+| GOVERNANCE bypass (`X-Amz-Bypass-Governance-Retention`) | ✅ | Honored only with `s3:BypassGovernanceRetention`, on DeleteObject, DeleteObjects, PutObject, CopyObject, PutObjectRetention |
+| GetBucketVersioning / PutBucketVersioning | ❌ NotImplemented | Returns NotImplemented; see [VERSIONING.md](design/VERSIONING.md) (design only) |
+| ListObjectVersions, `versionId` parameters | ❌ NotImplemented | Planned with versioning |
+
+### Known Deviations from AWS S3
+
+- **Object Lock does not require versioning.** AWS requires versioning on Object Lock buckets. DirIO allows lock on unversioned buckets, and `PutBucketVersioning` is not available to change this.
+- **Overwrite of a locked object is refused, not versioned.** AWS creates a new version. Until versioning exists, a PutObject, CopyObject, or multipart completion that would replace a locked object returns 403 AccessDenied.
+- **Lock headers on copy and multipart apply to the destination only.** The source object's lock state is not copied.
+
 **Legend:** ✅ Pass | ❌ Fail | ⏭️ Skip | ➖ N/A
 
 ---
@@ -87,6 +111,28 @@ None — all tested operations pass or are intentionally skipped.
 - **ListObjectsV1:** Legacy API; modern clients use ListObjectsV2 by default. Not a server deficiency.
 - **PreSignedURL_Upload:** AWS CLI and boto3 don't easily generate upload URLs; mc uses S3 POST Policy instead (tested and passing).
 - **ListObjectsV2_MaxKeys:** mc doesn't expose the MaxKeys parameter at CLI level. Not a server deficiency.
+
+---
+
+## Unsupported Operations
+
+These S3 operations are not implemented. A request for them gets a 501 NotImplemented response, or, for the sub-resources in the last table, no route is registered for them (see the note there). The roadmap item for each is in `TODO.md` under Phase 12.
+
+| Operation | Request | Current behaviour | Roadmap |
+|-----------|---------|-------------------|---------|
+| GetBucketVersioning / PutBucketVersioning | `GET/PUT /{bucket}?versioning` | 501 NotImplemented | Phase 12 (versioning design: [VERSIONING.md](design/VERSIONING.md)) |
+| ListObjectVersions | `GET /{bucket}?versions` | 501 NotImplemented | Phase 12 (versioning design) |
+| GetBucketACL / PutBucketACL | `GET/PUT /{bucket}?acl` | 501 NotImplemented | Phase 12 |
+| GetObjectACL / PutObjectACL | `GET/PUT /{bucket}/{key}?acl` | 501 NotImplemented | Phase 12 |
+| GetBucketCors / PutBucketCors | `GET/PUT /{bucket}?cors` | 501 NotImplemented | Phase 12 (needed for browser uploads) |
+| ListMultipartUploads | `GET /{bucket}?uploads` | 501 NotImplemented | Phase 12 |
+| UploadPartCopy | `PUT /{bucket}/{key}?partNumber&uploadId` with `x-amz-copy-source` | 501 NotImplemented (route is wired, handler is a stub) | Phase 12 |
+| GetBucketLifecycle / PutBucketLifecycleConfiguration (and the Get variant) | `GET/PUT /{bucket}?lifecycle` | 501 NotImplemented | Phase 12 |
+| GetPublicAccessBlock / PutPublicAccessBlock | `GET/PUT /{bucket}?publicAccessBlock` | 501 NotImplemented | Phase 12 |
+| Bucket logging, notification, requestPayment, analytics | `?logging`, `?notification`, `?requestPayment`, `?analytics` | No route registered. The request reaches the bucket's default handler, so behaviour is undefined until fixed. | Phase 12 (add explicit 501 routes) |
+| GetObjectAttributes, GetObjectTorrent | `GET /{bucket}/{key}?attributes`, `?torrent` | No route registered (same as above) | Phase 12 |
+
+**Note on the last two rows:** a sub-resource without a registered route is not a clean 501. The request can fall through to the plain bucket or object handler, so a `PUT /{bucket}?logging` could reach CreateBucket. This has not been tested yet; Phase 12 includes a test for it.
 
 ---
 
@@ -163,6 +209,13 @@ cat tests/clients/results/mc.json
 ---
 
 ## Recent Changes
+
+### November 26, 2026 - Object Lock Documented
+
+- Object Lock (bucket config, retention, legal hold, enforcement) added to this status doc
+- CopyObject and CreateMultipartUpload accept `x-amz-object-lock-*` headers
+- GOVERNANCE bypass on CopyObject now requires `s3:BypassGovernanceRetention` (previously unchecked)
+- Known deviations recorded: lock without versioning, overwrite refused instead of versioned
 
 ### February 23, 2026 (00:05) - POST Policy Upload Support Added
 

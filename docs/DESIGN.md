@@ -6,9 +6,9 @@ DirIO is built on a simple principle: **objects should be files**.
 
 ### 1. Filesystem is the Source of Truth
 
-Objects live in `buckets/bucket-name/path/to/object`. That's where your data is. Everything else (metadata, indexes, caches) is derived state that can be regenerated.
+Objects live at `<data-dir>/<bucket>/<key>` (for example `data/photos/2026/cat.jpg`). That's where your object bytes are, and a plain `cat` or `ls` shows them.
 
-If you delete `.dirio/`, DirIO should still work. It might be slower, but the data is there.
+`<data-dir>/.dirio/` holds state that is **not** all derivable from the bucket directories: bucket config (owner, policy, Object Lock configuration), per-object metadata (content type, custom metadata, Object Lock retention and legal hold), IAM users, groups, policies and service accounts, the bbolt index (`.dirio/dirio.db`), and config and keyring files. Deleting `.dirio/` keeps your object bytes but loses that state. Back up `.dirio/` together with the bucket directories.
 
 ### 2. No Encoding, No Chunking
 
@@ -18,17 +18,22 @@ This makes debugging trivial: `ls` and `cat` work as expected.
 
 ### 3. Minimal Metadata
 
-Metadata lives in `.dirio/` as JSON files. Structure:
+Metadata lives in `.dirio/`, mostly as JSON files, plus a bbolt index. Structure (abridged):
 
 ```
 .dirio/
-├── users.json              # All users, one file
 ├── buckets/
-│   └── mybucket.json      # Per-bucket: owner, policy, created timestamp
+│   └── mybucket.json      # Per-bucket: owner, policy, Object Lock config, versioning config
+├── objects/
+│   └── mybucket/
+│       └── path/to/object.json   # Per-object: content type, custom metadata, lock state
+├── iam/                   # Users, groups, policies, service accounts (one JSON file each)
+├── dirio.db               # bbolt index
+├── config.json
 └── .import-state          # MinIO import tracking
 ```
 
-Object metadata (ETag, content-type) can be stored per-object if needed, but by default we calculate on-the-fly from the filesystem.
+Object metadata is stored per object, so ETag and content type are not recomputed from the filesystem on each request.
 
 ### 4. Import, Don't Migrate
 
@@ -48,8 +53,8 @@ DirIO is one Go binary. No Redis, no PostgreSQL, no external services. Just:
 ### We Will Not Support
 
 - **Distributed mode**: Use actual S3 or MinIO if you need clustering
-- **Versioning**: Keep it simple; this is Phase N work if ever
-- **Advanced IAM**: Basic access keys and bucket policies only
+- **Versioning (for now)**: Not implemented. A design is planned, with the current version kept at the original path and prior versions under `.dirio/versions/`. See [docs/design/VERSIONING.md](design/VERSIONING.md).
+- **Advanced IAM**: Groups, policies and service accounts exist; AWS IAM API compatibility does not (see [README](../README.md)).
 
 ### Durability — Filesystem First, Sidecar EC as Fallback
 
@@ -81,9 +86,7 @@ For environments where that isn't possible (ext4/XFS JBODs, NTFS, locked-down NA
 
 ### Why Not SQLite?
 
-SQLite would be great, but adds dependency complexity. For 10-100 buckets and 1000-100k objects, JSON files are fine.
-
-If we hit performance issues, we can add SQLite as an optional backend later.
+SQLite would add dependency complexity. Object and bucket metadata stays as JSON files, and an embedded bbolt index (`.dirio/dirio.db`, pure Go) handles lookups. SQLite remains an option if we hit performance limits.
 
 ### Why msgpack for MinIO Import?
 
@@ -145,13 +148,12 @@ These are rough estimates. Real performance depends on disk speed, CPU, and work
 
 ## Future Work
 
-Things we might add later (Phase 3+):
+Still open:
 
-- **Multipart uploads**: Required for large files from some clients
-- **Pre-signed URLs**: Useful for browser uploads
-- **Range requests**: For streaming video/audio
-- **Object tagging**: Nice-to-have for organization
-- **Bucket versioning**: Complex but requested feature
+- **Bucket versioning**: Requested. Design in [docs/design/VERSIONING.md](design/VERSIONING.md). Implementation waits for design review.
+- **Object Lock on versioned buckets**: Depends on versioning. Object Lock currently works on non-versioned buckets only.
+
+Done (kept for reference): multipart uploads, pre-signed URLs, range requests, object tagging, Object Lock on non-versioned buckets.
 
 Things we probably won't add:
 

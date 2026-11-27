@@ -84,7 +84,7 @@ See [DEPLOYMENT.md](DEPLOYMENT.md) for details.
 
 ### Will my existing buckets/objects still work?
 
-Yes. Objects in `buckets/` are just files—DirIO reads them directly.
+Yes. Objects in the bucket directories under the data dir are just files—DirIO reads them directly.
 
 ### What happens to MinIO metadata?
 
@@ -93,7 +93,7 @@ DirIO imports:
 - Bucket policies
 - Object metadata (content-type, etag)
 
-Then stores it in `.metadata/` as JSON. Your original `.minio.sys/` stays intact.
+Then stores it in `.dirio/` (JSON files, plus a bbolt index). Your original `.minio.sys/` stays intact.
 
 ### Can I migrate back to MinIO?
 
@@ -105,12 +105,14 @@ The `.dirio/` directory won't interfere with MinIO, and DirIO will not modify `.
 
 ### What S3 operations are supported?
 
-- Object: GET, PUT, HEAD, DELETE, LIST
-- Bucket: CREATE, DELETE, HEAD, LIST, GetLocation
+- Object: GET, PUT, HEAD, DELETE, LIST, COPY, tagging
+- Bucket: CREATE, DELETE, HEAD, LIST, GetLocation, policies
 - Multipart uploads
 - Pre-signed URLs
 - Range requests
-- Most bucket operations
+- Object Lock on non-versioned buckets (retention, legal hold, bucket default retention)
+
+For per-operation status and known deviations, see [CLIENTS.md](CLIENTS.md).
 
 ### Does it support bucket policies?
 
@@ -118,7 +120,7 @@ Basic support. For MinIO style policies and S3 policies.
 
 ### Does it support versioning?
 
-No, and probably won't. This adds significant complexity for minimal homelab benefit.
+Not yet. It's requested, and a design is planned: the current version of each object stays at its normal path, and older versions are kept under `.dirio/versions/`. See [design/VERSIONING.md](design/VERSIONING.md). Until then, Object Lock works only on buckets without versioning, and overwriting a locked object is refused rather than versioned.
 
 ### Does it support encryption?
 
@@ -156,7 +158,7 @@ Use MinIO if you need maximum performance.
 
 ### Where is my data?
 
-In `data/buckets/bucket-name/path/to/object`. Regular files on disk.
+In `<data-dir>/bucket-name/path/to/object`. Regular files on disk. For example, `data/bucket-name/path/to/object`.
 
 ### Can I edit objects directly on the filesystem?
 
@@ -184,11 +186,11 @@ NTFS via FUSE probably works but isn't tested.
 ### How much disk space does metadata use?
 
 Minimal. JSON files are small:
-- `users.json`: ~1-10 KB
-- Per-bucket metadata: ~1 KB
-- Per-object metadata: 0-1 KB (optional)
+- Per-user, group and policy files under `.dirio/iam/`: small JSON files
+- Per-bucket metadata under `.dirio/buckets/`: small JSON files
+- Per-object metadata under `.dirio/objects/`: small JSON files, written for every object
 
-For 1000 objects, expect <1 MB of metadata.
+The exact size depends on how much custom metadata each object has. Measure your own data directory before sizing a backup.
 
 ## Troubleshooting
 
@@ -209,7 +211,7 @@ Check:
 ### Objects missing after import
 
 Check:
-- Objects exist in `buckets/bucket-name/`
+- Objects exist in `<data-dir>/bucket-name/`
 - File permissions are correct
 - DirIO has read access to data directory
 
@@ -253,7 +255,6 @@ If you need S3 server functionality in your Go app, consider using MinIO's libra
 No formal security audit has been done. Use at your own risk.
 
 Known limitations:
-- No AWS Signature V4 auth yet (Phase 2)
 - No rate limiting
 - No request validation beyond basic S3 format
 - No protection against path traversal (yet)
@@ -266,9 +267,7 @@ Yes! Default is `minioadmin:minioadmin`. Change this immediately.
 
 ### Can I restrict access per-bucket?
 
-Not yet. Phase 2 will add bucket policy enforcement.
-
-For now, all authenticated users have full access.
+Yes. S3 bucket policies are enforced for non-root users, and IAM users, groups and service accounts are supported. The root credentials bypass policy checks.
 
 ### Does it log requests?
 
